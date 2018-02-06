@@ -81,7 +81,7 @@ package wins
 			var currentLength:int = currentText.length
 			
 			if (currentLength > settings.maxLength || e.currentTarget.numLines > 5)
-				e.currentTarget.text = currentText.substring(0, currentLength - 1)
+				e.currentTarget.text = currentText.substring(0, settings.maxLength)
 			_inputField.wordWrap = true;
 		}
 		

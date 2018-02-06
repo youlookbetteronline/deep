@@ -1762,7 +1762,7 @@ package
 					
 				new BubbleSimpleWindow({
 					title	:'Шланг',
-					label	:'Это же длинный шланг'
+					label	:'Это же очень очень не слишком длинный шланг'
 				}).show();
 				
 			}

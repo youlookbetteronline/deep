@@ -323,7 +323,7 @@ internal class Friend extends LayerX
 		}
 		new BubbleInputWindow({
 			title		:Locale.__e('flash:1517330407319'),
-			maxLength	:90,
+			maxLength	:80,
 			popup		:true,
 			confirm		:onSendAction
 		}).show();
@@ -337,5 +337,7 @@ internal class Friend extends LayerX
 	private function sendCallback():void 
 	{
 		Window.closeAll();
+		var item:BonusItem = new BonusItem(_model.mtake.sid, _model.mtake.count);
+		item.cashMove(new Point(App.self.stage.mouseX, App.self.stage.mouseY), App.self.windowContainer, true);
 	}
 }

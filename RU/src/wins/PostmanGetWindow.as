@@ -46,7 +46,9 @@ package wins
 			if (settings.content.length < 4)
 			{
 				var tempCount:int = settings.content.length == 0?1:settings.content.length
-				settings["height"] = 220 + tempCount - 1 * 96;
+				settings["height"] = 234 + (tempCount - 1) * 96;
+				if (settings.height < 320)
+					settings.height = 320
 			}
 			settings['fontColor'] 			= 0x004762;
 			settings['fontBorderColor'] 	= 0xffffff;
@@ -72,8 +74,8 @@ package wins
 			{
 				var obj:Object = {};
 				obj['postID'] = Numbers.firstProp(_post).key;
-				obj['messageID'] = _post[obj.postID].msg;
-				obj['friendID'] = _post[obj.postID].fID;
+				obj['messageID'] =  _post[obj['postID']].msg;
+				obj['friendID'] = _post[obj['postID']].fID;
 				result.push(obj);
 			}
 			return result;
@@ -93,6 +95,9 @@ package wins
 		
 		override public function contentChange():void 
 		{
+			settings.content = parseContent;
+			paginator.itemsCount = settings.content.length;
+			paginator.update();
 			for each(var item:* in _friends){
 				item.parent.removeChild(item);
 				item = null;
@@ -106,7 +111,7 @@ package wins
 					model	:_model,
 					friend	:settings.content[i].friendID,
 					message	:settings.content[i].messageID,
-					post	:settings.content[i].messageID,
+					post	:settings.content[i].postID,
 					window	:this
 				});
 				_friend.y = Y;

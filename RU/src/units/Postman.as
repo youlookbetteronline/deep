@@ -1,9 +1,12 @@
 package units 
 {
+	import core.Numbers;
 	import core.Post;
+	import flash.geom.Point;
 	import models.PostmanModel;
 	import wins.PostmanGetWindow;
 	import wins.PostmanWindow;
+	import wins.Window;
 	/**
 	 * ...
 	 * @author ...
@@ -94,6 +97,7 @@ package units
 				Errors.show(error, data);
 				return;
 			}
+			App.user.stock.takeAll(data.__take);
 			updateData(data);
 			if (params.callback)
 				params.callback()
@@ -123,6 +127,11 @@ package units
 				Errors.show(error, data);
 				return;
 			}
+			//Treasures.bonus(data.bonus, new Point(App.self.stage.mouseX, App.self.stage.mouseY));			
+			var item:BonusItem = new BonusItem(Numbers.firstProp(data.bonus).key, Numbers.firstProp(data.bonus).val);
+			//var point:Point = Window.localToGlobal(reward);
+			item.cashMove(new Point(App.self.stage.mouseX, App.self.stage.mouseY), App.self.windowContainer);
+			
 			updateData(data)
 			if (params.callback)
 				params.callback()
