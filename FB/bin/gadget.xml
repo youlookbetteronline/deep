@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+	<ModulePrefs title="ci_test">
+		<Require feature="flash" />
+		<Require feature="dynamic-height" />
+		<Require feature="opensocial-0.9" />
+		
+	</ModulePrefs>
+	
+	<Content type="html" ><![CDATA[
+		
+		<script src='https://code.jquery.com/jquery-1.7.1.js'></script>
+		<script type="text/javascript" src="http://yabage.islandsville.com/iframe/jquery.cookie.js"></script>
+		<link href="http://t-ai.islandsville.com/iframe/style.css" rel="stylesheet" media="all">
+		
+		<style>
+			html, body { height:770px; overflow:hidden; } 
+			body { margin:0; }
+		</style>
+		<script>
+			if (!window.console) console = {log: function() {}};
+			
+			function showGame(){
+				$('#page').css('display','none');
+			}
+			function showPage(page){
+				$('#page').css('display','block');
+				$('#page').attr('src','http://yabage.islandsville.com/iframe/html/'+page+'.html');
+			}
+		</script>
+		
+		
+		<div id="container">
+		    <div class="bar">
+		        <div class="lc">
+		            <div class="rc">
+		                <a href="javascript:;" onclick="showGame();" class="button"><img src="http://t-ai.islandsville.com/iframe/images/play.png" /></a>
+		                <a href="javascript:;" onclick="showPage('faq');" class="button"><img src="http://t-ai.islandsville.com/iframe/images/faq.png" /></a>
+		                <a href="javascript:;" onclick="showGame(); showInviteBox();" class="button"><img src="http://t-ai.islandsville.com/iframe/images/invite.png" /></a>
+		                &nbsp;&nbsp;
+		                <a href="javascript:;" onclick="showGame(); getGame().openBank();" class="button"><img src="http://t-ai.islandsville.com/iframe/images/bank.png"/></a>
+		                 &nbsp;&nbsp;
+		                 <a href="javascript:;" onclick="showGame(); getGame().openGifts();" class="button"><img src="http://t-ai.islandsville.com/iframe/images/gifts.png" /></a>
+		                 &nbsp;&nbsp;
+		                 <a href="javascript:;" onclick="showGame(); getGame().openPayments();" class="button"><img src="http://t-ai.islandsville.com/iframe/images/history.png" /></a>
+		             </div>
+		         </div>
+		    </div>
+		    <div style="position:relative;">
+		         <div id="game" style="height:700px;"></div>
+		         <iframe id="page" style="position:absolute;left:0;top:0;display:none;" src="" width="100%" height="700"></iframe>
+		         <div align="center">あなたのユーザーIDは<span id="uid"></span></div>
+		     </div>
+		</div>
+		
+		<script type="text/javascript">
+			
+			var userOrigin = gadgets.util.getUrlParameters().userOrigin;
+			var currentPartnerId = gadgets.util.getUrlParameters().currentPartnerId;
+			var appId = gadgets.util.getUrlParameters().appId;
+			
+			gadgets.util.registerOnLoadHandler(init);			
+			
+			function start() {
+				var url = document.location.toString().split('?');
+				var flashdata = (url[1] ? url[1] : '');
+			
+				var flashvars = {
+					'viewer_id'	:uid,
+					'social'	:'AI',
+					'mainIP'	:encodeURIComponent(JSON.stringify(['t-ai.islandsville.com','t-ai.islandsville.com'])),
+					'resIP'		:encodeURIComponent(JSON.stringify(['t-ai.islandsville.com','t-ai.islandsville.com'])),
+					//'resIP'		:encodeURIComponent(JSON.stringify(['jp-static.islandsville.com','jp-static.islandsville.com'])),
+					'game'		:'Tribe.swf?2',
+					'preloader'	:'preloader.swf',
+					'lang'		:'jp',
+					'font'		:'_JapanFont'
+				};
+				
+				//var flashdata = "";
+				for (var key in flashvars) {
+					if (flashdata != "") {
+						flashdata += "&";
+					}
+					flashdata += key + "=" + flashvars[key];
+				}
+				
+				var params = {
+					menu: "false",
+					allowFullscreen: "true",
+					allowScriptAccess: "always", 
+					bgcolor: "#8de8b6",
+					width:  "100%",
+					height: "700",
+					wmode: "opaque",
+					id: "dreams",
+					flashvars:flashdata
+				};
+				gadgets.flash.embedFlash(
+					"http://t-ai.islandsville.com/iframe/LOADER.swf", 
+					document.getElementById("game"),
+					11,
+					params
+				);
+				gadgets.window.adjustHeight();
+			}
+			
+			
+			var uid;
+			var appFriends = [];
+			var allFriends = [];
+			var friends = {};
+			var otherFriends = {};
+			var profile = {};
+			var wallServer = null;
+			var albums = null;
+			var mainAlbum = null;
+			
+			function init(){
+			
+				var params = {}; 
+				params[opensocial.DataRequest.PeopleRequestFields.PROFILE_DETAILS] = ['@all'];
+				
+				var req = opensocial.newDataRequest();
+				req.add(req.newFetchPersonRequest(opensocial.IdSpec.PersonId.VIEWER, params), "viewer");
+				
+				req.send(function(response) {
+					
+					if (response.hadError()) {
+						// error
+						console.error(response);
+					} else {
+						var viewer = response.get('viewer').getData();
+						console.log(viewer);
+						uid = viewer.getId()+'';
+						$('#uid').text('User ID: '+uid);
+						
+						profile['first_name'] = viewer.getDisplayName();
+						profile['last_name'] = '';
+						profile['photo'] = viewer.getField(opensocial.Person.Field.THUMBNAIL_URL);
+						profile['sex'] = 'f';
+						profile['age'] = 0;
+					}
+					
+					start();
+				});
+			}
+			
+			function purchase(params){
+				getGame().updateBalance();
+			}
+			
+			
+			function reset(){
+				location.reload();
+			}
+			
+			function getFriends(callback){
+				var params = {};
+				params[opensocial.DataRequest.PeopleRequestFields.MAX] = 1000;
+				params[opensocial.IdSpec.Field.USER_ID] = opensocial.IdSpec.PersonId.VIEWER;
+				params[opensocial.IdSpec.Field.GROUP_ID] = opensocial.IdSpec.GroupId.FRIENDS;
+				var idSpec = opensocial.newIdSpec(params);
+				var req = opensocial.newDataRequest();
+				req.add(req.newFetchPeopleRequest(idSpec), "friends");
+				req.send(function(response) {
+					if (response.hadError()) {
+						// error
+						console.error(response);
+					} else {
+						
+						var friendIds = [];
+						
+						var friendsData = response.get("friends").getData();
+						friendsData.each(function(_friend) {
+							
+							friendIds.push(_friend.getId()); 
+							
+							friend = {};
+							friend['first_name'] = _friend.getDisplayName();
+							friend['last_name'] = '';
+							friend['gender'] = 'f';
+							friend['photo'] = _friend.getField(opensocial.Person.Field.THUMBNAIL_URL);
+							
+							friend['uid'] = _friend.getId()+'';
+														
+							appFriends.push(friend.uid);
+							otherFriends[friend.uid] = friend;					
+							friends[friend.uid] = friend;
+						});
+						
+						//allFriends.push(otherFriends[uid]);
+						callback();
+					}
+				});
+			}
+			
+			
+			function getPerson(id){
+				var uid = id;
+				var params = {}; 
+				params[opensocial.DataRequest.PeopleRequestFields.PROFILE_DETAILS] = [
+					opensocial.Person.Field.NICKNAME,
+					opensocial.Person.Field.THUMBNAIL_URL
+				];
+				var req = opensocial.newDataRequest();
+				
+				req.add(req.newFetchPersonRequest(uid, params), "person");
+				req.send(function(response) {
+					if (response.hadError()) {
+						getGame()['onGetProfile_'+profile['uid'] ](id);
+						console.log('Get error');
+						console.log(response);
+					} else {
+						var item = response.get("person");
+						if (item.hadError()) {
+							getGame()['onGetProfile_'+profile['uid'] ](id);
+							console.log(item);
+							  console.log('Get profile error');
+						} else {
+							var user = item.getData();
+							var profile = {};
+							profile['_id'] = user.getId()+'';
+							profile['first_name'] = user.getDisplayName();
+							profile['last_name'] = '';
+							profile['photo'] = user.getField(opensocial.Person.Field.THUMBNAIL_URL);
+								  console.log('Get profile');
+									console.log(profile);
+							getGame()['onGetProfile_'+profile['_id'] ](profile);
+						}	
+					}
+				});
+			}
+			
+
+			function initNetwork(){
+				getFriends(function(){
+					var network = {
+						appFriends:appFriends,
+						allFriends:allFriends,
+						friends:friends,
+						otherFriends:otherFriends,
+						profile:profile
+					};
+					console.log(network);
+					getGame().initNetwork(network);
+				});
+			}
+			
+			function getGame() {
+				return document.getElementById("dreams");
+			}
+			
+			
+			function showInviteBox(){
+			console.log('invite');
+				opensocial.requestShareApp(  
+					"VIEWER_FRIENDS",  
+					null,
+					function(data) {  
+						if (data.hadError()) {  
+							// error 
+						} else {  
+							// ...
+						}  
+					}
+				);  
+			}
+			
+			function wallPost(data, response){
+				
+				var params = {};
+				//params[opensocial.Activity.Field.TITLE] = data.title.substr(0,24);
+				params[opensocial.Activity.Field.TITLE] = data.msg.substr(0,140);
+				var activity = opensocial.newActivity(params);
+				opensocial.requestCreateActivity(activity, opensocial.CreateActivityPriority.LOW, function(response) {
+					if (response.hadError()) {
+						// error
+					} else {
+						console.log(response);
+						// ...
+					}
+				});			
+			}
+			
+			function chargeWindow(){
+				var win = window.open('http://wp.aima.woopie.jp/v2/u/@me/coin?coin=charge', '_blank');
+				win.focus();
+			}
+			
+			function getCookie(name){
+				if(name == null ||name == ''){
+					console.log($.cookie());
+					return $.cookie();
+				}else{
+					console.log($.cookie(name));
+					return $.cookie(name);
+				}
+			}
+			
+			function setCookie(name, data, expires){
+				if(expires == null) expires = 1;
+				$.cookie(name, data, { expires: expires});
+			}
+			
+			function removeCookie(name){
+				$.removeCookie(name);
+			}
+					
+		</script>
+	
+	]]></Content>
+</Module>

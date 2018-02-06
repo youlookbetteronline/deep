@@ -1,0 +1,590 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+    <ModulePrefs title="ci_test">
+        <Require feature="flash" />
+        <Require feature="mbga" />
+        <Require feature="dynamic-height" />
+        <Require feature="opensocial-0.8" />
+        <Require feature="opensocial-payment" />
+		<Link rel="payment.handler" href="http://w-yb.islandsville.com/app/api/YB/YBPayment.php" />
+    </ModulePrefs>
+    
+    <Content type="html" view="canvas" preferred_width="950" ><![CDATA[
+        <script src='https://code.jquery.com/jquery-1.7.1.js'></script>
+        <script type="text/javascript" src="http://w-yb.islandsville.com/iframe/js/jquery.cookie.js"></script>
+        <link href="http://w-yb.islandsville.com/iframe/style.css" rel="stylesheet" media="all">
+		<link href="http://www.bq-games.net/banner/css/jquery.bxslider.css" rel="stylesheet" type="text/css">
+		<link href="http://www.bq-games.net/banner/css/bq-games_banner.css" rel="stylesheet" type="text/css">
+		<script src="http://www.bq-games.net/banner/js/jquery.bxslider.min.js" type="text/javascript"></script>
+		<script src="http://www.bq-games.net/banner/js/bq-games_banner.js" type="text/javascript"></script>
+        <style>			
+            html, body { overflow:hidden; } 
+            body { margin:0; fonr:12px Arial;}
+			
+        </style> 
+        <script>
+            if (!window.console) console = {log: function() {}};
+        </script>
+		
+		<script src="http://w-yb.islandsville.com/iframe/js/mobage_news.js?1"></script>
+		<link href="http://w-yb.islandsville.com/iframe/mobage_styles.css?1" rel="stylesheet" type="text/css">
+		<style>
+		
+			#content div.content_block {
+				visibility: hidden;
+				display: none;
+				height: 0;
+				width: 760px;
+				position: relative;
+				margin: 0 auto;
+				top: 0;
+				left: 0;
+				margin: 0 auto;
+			}
+			#content div.content_block.act {
+				visibility: visible;
+				display: block;
+				height: auto;
+			}
+		</style>
+
+    <div id="body" align="center" style="height:1000px">
+        
+        <div id="ad_top" style="margin-bottom:15px;width:950px;">
+			<script type="text/javascript" src="http://bq-games.net/banner/js/ad_totem.js"></script>
+		</div>
+        
+
+        <script>
+            
+            function showGame(){
+                $('#page').css('display','none');
+            }
+            
+            function showPage(page){
+				console.log('PAGE SHOWN!!!');
+                $('#page').css('display','block');
+                $('#page').attr('src','http://w-yb.islandsville.com/iframe/html/'+page+'.html');
+            }
+            
+        </script>
+		
+		<div id="game_news">
+			<div class="main_container">
+				<div class="news_block_header"></div>
+				<div class="news_container"></div>
+			</div>
+		</div>
+		
+		<div id="container" style="top:206px; height:760px; position: absolute; width:100%; z-index:1000;">
+			<div class="bar" align="center">
+				<div class="lc">
+					<div class="rc">
+						<a class="button" href="javascript:showGame();"><img src="http://w-yb.islandsville.com/iframe/images/Play.png"></a>&nbsp;
+						<a href="javascript:;" onclick="showPage('faq'); return false;" target="_blank" class="button"><img src="http://w-yb.islandsville.com/iframe/images/Help.png" /></a>&nbsp;
+						<a href="javascript:;" onclick="showInviteBox();" class="button btn5"><img src="http://w-yb.islandsville.com/iframe/images/Invite.png" /></a>&nbsp;
+						<a href="javascript:;" onclick="getGame().openBank();" class="button btn1"><img src="http://w-yb.islandsville.com/iframe/images/Purchase.png" /></a>&nbsp;
+						
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<a href="javascript:;" onclick="getGame().openGifts();" class="button btn3"><img src="http://w-yb.islandsville.com/iframe/images/Free-Gift.png" /></a>&nbsp;
+						
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						
+						&nbsp;&nbsp;
+						<a href="javascript:;" onclick="showGame(); getGame().openPayments();" class="button"><img src="http://w-yb.islandsville.com/iframe/images/Purchase-History.png" /></a>
+					</div>
+				</div>
+			</div>   
+			<div style="position:relative;">
+				<div id="game" style="height:700px;"></div>
+				<iframe id="page" style="position:absolute;left:-2px;top:-2px;display:none;" src="" width="100%" height="700"></iframe>
+				<div align="center">あなたのユーザーIDは<span id="uid"></span></div>
+			</div>
+		</div>
+	</div> 
+	
+    <div align="center" id="ad_bottom" style="margin: 10px 0;"></div>
+    <script type="text/javascript">
+        
+		$(document).ready( function() {
+			requestAndShowNews();
+			return false;
+		}); 
+		
+        function start() {
+            $('#uid').text(uid);
+            var flashvars = {
+                'viewer_id'    :uid,
+                'social'    :'YB',
+                'mainIP'   :encodeURIComponent(JSON.stringify(['w-yb.islandsville.com','w-yb.islandsville.com'])),
+                'resIP'        :encodeURIComponent(JSON.stringify(['w-static1.islandsville.com','w-static1.islandsville.com'])),
+                'game'        :'Western.swf?v' + Math.random().toString(),
+                'preloader'   :'preloader.swf?v=8',
+                'testMode'    :0,
+                'lang'        :'jp',
+                'font'        :'__JapanFont',
+				'currentSocial':'YBD'
+            };
+            
+            var flashdata = "";
+            for (var key in flashvars) {
+                if (flashdata != "") {
+                    flashdata += "&";
+                }
+                flashdata += key + "=" + flashvars[key];
+            }
+            
+            var params = {
+                menu: "false",
+                allowFullscreen: "true",
+                allowScriptAccess: "always", 
+                bgcolor: "#8de8b6",
+                width:  "100%",
+                height: "700",
+                wmode: "window",
+                id: "dreams",
+                flashvars:flashdata
+            };
+            gadgets.flash.embedFlash(
+                "http://w-yb.islandsville.com/iframe/LOADER.swf", 
+                document.getElementById("game"),
+                11,
+                params
+            );
+            gadgets.window.adjustHeight();
+        }
+        
+        
+        var uid;
+        var appFriends = [];
+        var allFriends = [];
+        var friends = [];
+        var otherFriends = {};
+        var profile = {};
+        var wallServer = null;
+        var albums = null;
+        var mainAlbum = null;
+        
+        function init(){
+        
+            var params = {}; 
+            params[opensocial.DataRequest.PeopleRequestFields.PROFILE_DETAILS] = [
+                opensocial.Person.Field.NICKNAME,
+                opensocial.Person.Field.THUMBNAIL_URL,
+                opensocial.Person.Field.AGE,
+                opensocial.Person.Field.GENDER
+            ];
+            var req = opensocial.newDataRequest();
+            req.add(req.newFetchPersonRequest(opensocial.IdSpec.PersonId.VIEWER, params), "viewer");
+            req.send(function(response) {
+                
+                if (response.hadError()) {
+                    // error
+
+                    console.error(response);
+                } else {
+                    var item = response.get("viewer");
+                    if (item.hadError()) {
+                        // error
+                        console.log('Can\'t get user info');
+                        console.error(item);
+                    } else {
+                        var viewer = item.getData();
+                        
+                        uid = viewer.getId().split(':')[1];
+                        
+                        var appid = '12020062';
+                                                
+                        profile['first_name'] = viewer.getDisplayName();
+                        profile['last_name'] = '';
+                        profile['photo'] = viewer.getField(opensocial.Person.Field.THUMBNAIL_URL);
+                        profile['sex'] = viewer.getField(opensocial.Person.Field.GENDER).getDisplayValue();
+                        profile.sex = profile.sex == 'male'?'m':'f';
+                        profile['age'] = viewer.getField(opensocial.Person.Field.AGE);
+                        var year = new Date().getFullYear();
+                        profile['year'] = profile['age'] == undefined ? 0 : year - profile['age'];
+                        
+                        //Get Normal Avatar
+                        var idSpec = opensocial.newIdSpec();
+                        idSpec.setField(opensocial.IdSpec.Field.USER_ID, opensocial.IdSpec.PersonId.VIEWER);
+                        idSpec.setField(opensocial.IdSpec.Field.GROUP_ID, opensocial.IdSpec.GroupId.SELF);
+
+                        var avatar_params = {};
+                        avatar_params[mbga.Avatar.Field.EMOTION] = mbga.Enum.Avatar.Emotion.SMILE;
+                        avatar_params[mbga.Avatar.Field.TYPE] = mbga.Enum.Avatar.Type.IMAGE;
+                        avatar_params[mbga.Avatar.Field.EXTENSION] = mbga.Enum.Avatar.Extension.GIF;
+
+                        var opt_params = {};
+                        opt_params[mbga.AvatarRequestFields.AVATAR] = avatar_params;
+
+                        mbga.requestFetchAvatar(idSpec, opt_params, function(response) {
+                            if (response.hadError()) {
+                                // error
+                                console.log(response)
+                            } else {
+                            
+                                var avatar = response.getData();
+                                var url = avatar.getUrl();        
+                                profile['photo'] = url;
+                                
+                                start();
+                            }
+                        });
+                        
+                        
+                    }
+                }
+            });
+        }
+        
+        function purchase(params){
+            var name = '';
+            var image = '';
+			var description = '';
+            switch(params.type){
+                case 'Coins': 
+                    name = params.count+' スター';
+                    image = 'http://w-yb.islandsville.com/resources/icons/bank/cent_jp.png';
+     description = 'お店でスターを使って建物、装飾、作物などを購入できる';
+                    break;
+                case 'Reals': 
+                    name = params.count+' バックス'; 
+                    image = 'http://w-yb.islandsville.com/resources/icons/bank/buck.png';
+     description = 'バックスは建物の建設やアイテム作成の時間を短くしたり、様々なアイテムや珍しい装飾の購入など、様々な用途に使える';
+                    break;
+                case 'bigsale': 
+                case 'promo': 
+                case 'set': 
+                case 'actions': 
+                    name = params.name.replace(/\n|\r/,' '); 
+                    image = 'http://w-yb.islandsville.com/resources/icons/bank/star.png';
+     description = 'お得なオファー！';
+                    break;
+            }
+			
+			console.log(description);
+			
+			var itemParams = {};
+			itemParams[opensocial.BillingItem.Field.SKU_ID] = parseInt(params.SKU_ID);
+			itemParams[opensocial.BillingItem.Field.PRICE]  = parseInt(params.price);
+			itemParams[opensocial.BillingItem.Field.COUNT]  = 1;
+			itemParams[opensocial.BillingItem.Field.DESCRIPTION]  = description;
+			itemParams[mbga.BillingItem.Field.NAME]         = name;
+			itemParams[mbga.BillingItem.Field.IMAGE_URL]    = image;
+			
+			console.log(itemParams);
+			
+			var item = opensocial.newBillingItem(itemParams);
+			 
+			var data = {};
+			data[opensocial.Payment.Field.ITEMS]  = [item];
+			data[opensocial.Payment.Field.AMOUNT] = parseInt(params.price);
+			var payment = opensocial.newPayment(data);
+			opensocial.requestPayment(payment, function(response) {
+				if (response.hadError()) {
+					console.log(response);
+					// error
+				} else {
+					getGame().updateBalance();
+				}
+			});
+        }
+        
+        function navigatePaymentHistory()
+        {
+            
+            
+        }
+        
+        function reset(){
+            location.reload();
+        }
+        
+        function makePayment(id,name,price,image){
+            swaves.pay.yb.init();
+            var itemobj={
+                item: id,
+                name: name,
+                price: price,
+                img: image
+            };
+            console.log(itemobj);
+            swaves.pay.yb.pay(itemobj);
+            console.log(swaves.pay.yb);
+        }
+        
+        
+        function getFriends(callback){
+            var blackusers = [];
+			
+			var idSpec = opensocial.newIdSpec();
+			idSpec.setField(opensocial.IdSpec.Field.USER_ID, [ opensocial.IdSpec.PersonId.VIEWER ]);
+			idSpec.setField(opensocial.IdSpec.Field.GROUP_ID, opensocial.IdSpec.GroupId.ALL);
+			
+			var opt_params = {};
+			opt_params[mbga.BlackListRequestFields.MAX] = 100;
+			opt_params[mbga.BlackListRequestFields.FIRST] = 0;
+			mbga.requestFetchBlackList(idSpec, opt_params, function(response) {
+			  if (response.hadError()) {
+				// error handling
+			  }
+			  var blacklist = response.getData();
+			  if(blacklist != null){
+				  blacklist.each(function(entry) {
+					var user = entry.getTargetId().split(':')[1];
+					blackusers.push(user);
+				  });
+		      }
+			
+				
+				//console.log('BLACKLIST: ');
+				//console.log(blackusers);
+				
+				var params = {};
+				params[opensocial.DataRequest.PeopleRequestFields.MAX] = 1000;
+				params[opensocial.IdSpec.Field.USER_ID] = opensocial.IdSpec.PersonId.VIEWER;
+				params[opensocial.IdSpec.Field.GROUP_ID] = opensocial.IdSpec.GroupId.FRIENDS;
+				idSpec = opensocial.newIdSpec(params);
+				
+				
+				var req = opensocial.newDataRequest();
+				req.add(req.newFetchPeopleRequest(idSpec, params), "friends");
+				req.send(function(response) {
+					if (response.hadError()) {
+						// error
+						console.error(response);
+					} else {
+						
+						var friendIds = [];
+						
+						var friendsData = response.get("friends").getData();
+						friendsData.each(function(_friend) {
+							
+							var uid = _friend.getId().split(':')[1];
+							
+							if(blackusers.indexOf(uid) == -1){	
+								friendIds.push(_friend.getId());
+								
+								friend = {};
+								friend['first_name'] = _friend.getDisplayName();
+								friend['last_name'] = '';
+								friend['gender'] = (_friend['gender'] || 'male') == 'male' ? 'm':'f';
+								friend['photo'] = _friend.getField(opensocial.Person.Field.THUMBNAIL_URL);
+								
+								friend['uid'] = uid;
+															
+								appFriends.push(friend.uid);
+								otherFriends[friend.uid] = friend;                    
+							}
+						});
+						
+						if(friendIds.length == 0){
+							friends = otherFriends;
+							callback();
+							return;
+						}
+						
+						idSpec = opensocial.newIdSpec();
+											
+						idSpec.setField(opensocial.IdSpec.Field.USER_ID, friendIds);
+						idSpec.setField(opensocial.IdSpec.Field.GROUP_ID, opensocial.IdSpec.GroupId.SELF);
+						
+						var avatar_params = {};
+						avatar_params[mbga.Avatar.Field.EMOTION] = mbga.Enum.Avatar.Emotion.SMILE;
+						avatar_params[mbga.Avatar.Field.TYPE] = mbga.Enum.Avatar.Type.IMAGE;
+						avatar_params[mbga.Avatar.Field.EXTENSION] = mbga.Enum.Avatar.Extension.GIF;
+
+						var opt_params = {};
+						opt_params[mbga.AvatarRequestFields.AVATAR] = avatar_params;
+
+						mbga.requestFetchAvatar(idSpec, opt_params, function(response) {
+							if (response.hadError()) {
+								// error
+								console.log(response);
+							} else {
+								var avatars = response.getData();
+								console.log(avatars);
+
+								if (typeof(avatars.each) != "undefined") { 
+
+									avatars.each(function(avatar) {
+										var url = avatar.getUrl();
+										var uid = avatar.getId().split(':')[1];
+									
+										otherFriends[uid] ['photo']= url;
+										allFriends.push(otherFriends[uid]);
+									
+										});
+								}else{
+
+									var url = avatars.getUrl();
+									var uid = avatars.getId().split(':')[1];
+
+									otherFriends[uid] ['photo']= url;
+									allFriends.push(otherFriends[uid]);
+
+								}
+								friends = otherFriends;
+								callback();
+							}
+						});
+					}
+				});
+				
+			});
+        }
+        
+        
+        function getPerson(id){
+            //var uid = 'mbga.jp:'+id;
+            var uid = id;
+            console.log(id);
+            var params = {}; 
+
+            params[opensocial.DataRequest.PeopleRequestFields.PROFILE_DETAILS] = [
+                opensocial.Person.Field.NICKNAME,
+                opensocial.Person.Field.THUMBNAIL_URL
+            ];
+            var req = opensocial.newDataRequest();
+            
+            req.add(req.newFetchPersonRequest(uid, params), "person");
+            req.send(function(response) {
+                if (response.hadError()) {
+                    getGame()['onGetProfile_' + id](id); //getGame().onGetProfile(id);
+                    
+                } else {
+                    var item = response.get("person");
+                    if (item.hadError()) {
+                        getGame()['onGetProfile_' + id](id);; //getGame().onGetProfile(id);
+                    } else {
+                        var user = item.getData();
+                        
+                        var profile = {};
+                        
+                        var _id = user.getId();
+                        if(_id == undefined){
+                            getGame()['onGetProfile_' + id ](id); //getGame().onGetProfile(id);
+                            return;
+                        }
+                        
+                        profile['_id'] = user.getId().split(':')[1];
+                        profile['first_name'] = user.getDisplayName();
+                        profile['last_name'] = '';
+                        profile['photo'] = user.getField(opensocial.Person.Field.THUMBNAIL_URL);
+                      
+                        //Get Normal Avatar
+                        var idSpec = opensocial.newIdSpec();
+                        idSpec.setField(opensocial.IdSpec.Field.USER_ID, [user.getId()]);
+                        idSpec.setField(opensocial.IdSpec.Field.GROUP_ID, opensocial.IdSpec.GroupId.SELF);
+                        
+                        var avatar_params = {};
+                        avatar_params[mbga.Avatar.Field.EMOTION] = mbga.Enum.Avatar.Emotion.SMILE;
+                        avatar_params[mbga.Avatar.Field.TYPE] = mbga.Enum.Avatar.Type.IMAGE;
+                        avatar_params[mbga.Avatar.Field.EXTENSION] = mbga.Enum.Avatar.Extension.GIF;
+
+                        var opt_params = {};
+                        opt_params[mbga.AvatarRequestFields.AVATAR] = avatar_params;
+
+                        mbga.requestFetchAvatar(idSpec, opt_params, function(res) {
+                            if (res.hadError()) {
+                                // error
+                            } else {
+                                var avatar = res.getData();
+                                var url = avatar.getUrl();        
+                                profile['photo'] = url;
+                                getGame()['onGetProfile_'+profile['_id'] ](profile); //getGame().onGetProfile(profile);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+        
+
+        function initNetwork(){
+            getFriends(function(){
+                var network = {
+                    appFriends:appFriends,
+                    allFriends:allFriends,
+                    friends:friends,
+                    otherFriends:otherFriends,
+                    profile:profile
+                };
+				console.log('network:');
+                console.log(appFriends);
+				console.log(allFriends);
+				console.log(friends);
+				console.log(profile);
+                getGame().initNetwork(network);
+            });
+        }
+        
+        function getGame() {
+            return document.getElementById("dreams");
+        }
+        
+        
+        gadgets.util.registerOnLoadHandler(init);            
+        
+        function showInviteBox(){
+            opensocial.requestShareApp(  
+                "VIEWER_FRIENDS",  
+                null,
+                function(data) {  
+                    if (data.hadError()) {  
+                        // error 
+                    } else {  
+                        // ...
+                    }  
+                }
+            );  
+        }
+        
+        function wallPost(data, response){
+			console.log('in WallPost');
+            console.log(data);
+            var params = {};
+            params[opensocial.Activity.Field.TITLE] = data.title.substr(0,24);
+            params[opensocial.Activity.Field.BODY] = data.msg.substr(0,140);
+            params[opensocial.Activity.Field.USER_ID] = data.oid;
+            
+            var activity = opensocial.newActivity(params);
+            opensocial.requestCreateActivity(activity, opensocial.CreateActivityPriority.LOW, function(_response) {
+                if (_response.hadError()) {
+					console.log('error')
+                    // error
+                } else {
+					console.log('js: Wallpost Complete successfully');
+                    console.log(_response);
+					console.log('in wallpost   hasCallback '+ data.hasCallback);
+					if(data.hasCallback){
+						getGame().onWallPostComplete(_response);
+						}
+                }
+            });            
+        }
+        
+        
+        function getCookie(name){
+            if(name == null ||name == ''){
+                console.log($.cookie());
+                return $.cookie();
+            }else{
+                console.log($.cookie(name));
+                return $.cookie(name);
+            }
+        }
+        
+        function setCookie(name, data, expires){
+            if(expires == null) expires = 1;
+            $.cookie(name, data, { expires: expires});
+        }
+        
+        function removeCookie(name){
+            $.removeCookie(name);
+        }
+                
+    </script>
+    
+    ]]></Content>
+</Module>
