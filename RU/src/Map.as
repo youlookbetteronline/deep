@@ -587,7 +587,6 @@ package
 			//addChild(mEffects);
 			addChild(mTreasure);
 			
-			
 			mLand = new Sprite();
 			mField = new Sprite();
 			mSort = new Sprite();
@@ -600,6 +599,7 @@ package
 			mUnits.addChild(mFog);
 			//mUnits.addChild(mEffects);
 			mUnits.addChild(mIcon);
+			
 			
 			//mEffects.addChild(centerPoint);
 			

@@ -3,9 +3,11 @@ package wins
 	import api.com.odnoklassniki.sdk.share.Share;
 	import buttons.Button;
 	import core.Load;
+	import core.Numbers;
 	import core.Size;
 	import flash.display.Bitmap;
 	import flash.display.Shape;
+	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.text.TextField;
 	import models.PostmanModel;
@@ -24,6 +26,9 @@ package wins
 		private var _description:TextField;
 		private var _sendBttn:Button;
 		private var _takeBttn:Button;
+		private var _counterContainer:Sprite = new Sprite();
+		private var _counterBack:Bitmap;
+		private var _counterText:TextField;
 		public function PostmanWindow(settings:Object=null) 
 		{
 			_model = settings.model;
@@ -67,6 +72,7 @@ package wins
 		{
 			drawImage();
 			drawButtons();
+			drawCounter();
 			build();
 		}
 		
@@ -140,8 +146,37 @@ package wins
 			_sendBttn.addEventListener(MouseEvent.CLICK, onSendEvent)
 		}
 		
+		private function drawCounter():void 
+		{
+			_counterBack = new Bitmap(Window.textures.backForNumber);
+			_counterContainer.addChild(_counterBack);
+			
+			_counterText = Window.drawText(String(Numbers.countProps(_model.post)),{
+				color			:0xffffff,
+				borderColor		:0x325f03,
+				borderSize		:2,
+				fontSize		:20,
+				width			:26,
+				textAlign		:'center'
+			})
+			
+			_counterText.x = _counterBack.x + (_counterBack.width - _counterText.width) / 2;
+			_counterText.y = _counterBack.y + (_counterBack.height - _counterText.height) / 2 + 3;
+			
+			_counterContainer.addChild(_counterText);
+		}
+		
 		private function onTakeEvent(e:MouseEvent):void 
 		{
+			if (Numbers.countProps(_model.post) == 0)
+			{
+				Window.closeAll();
+				new BubbleSimpleWindow({
+					title	:Locale.__e('flash:1474469531767'),
+					label	:Locale.__e('flash:1517998075864')
+				}).show();
+				return;
+			}
 			Window.closeAll();
 			new PostmanGetWindow({
 				model	:_model,
@@ -174,9 +209,14 @@ package wins
 			_takeBttn.x = settings.width / 2 + 10;
 			_takeBttn.y = settings.height - _takeBttn.height - 55;
 			
+			_counterContainer.x = _takeBttn.x + _takeBttn.width - 50;
+			_counterContainer.y = _takeBttn.y - _counterContainer.height / 2;
+			
 			bodyContainer.addChild(_description);
 			bodyContainer.addChild(_sendBttn);
 			bodyContainer.addChild(_takeBttn);
+			if (Numbers.countProps(_model.post) != 0)
+				bodyContainer.addChild(_counterContainer);
 		}
 	}
 

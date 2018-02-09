@@ -197,9 +197,9 @@ package
 							 SP: 288515432894543642,		AM:7537684}
 		*/
 
-		public static const ID:* = '96391814';//'30035157';// '774242479407105';
-		public static const SERVER:* = 'DM';
-		public static const SOCIAL:* = 'DM';	
+		public static const ID:* = '29060311';//'30035157';// '774242479407105';
+		public static const SERVER:* = 'VK';
+		public static const SOCIAL:* = 'VK';	
 		public static var lang:String = 'ru'; //de en es fr it nl pl pt tr ru
 		
 		public static function get data():Object
@@ -260,6 +260,8 @@ package
 				
 			Log.alert('flashVars');
 			Log.alert(flashVars);
+			Cc.log('____________flashVars_______________')
+			Cc.log(flashVars)
 			
 			this.addEventListener(AppEvent.ON_GAME_COMPLETE, onGameComplete);
 			this.addEventListener(AppEvent.ON_MAP_COMPLETE, onMapComplete);
@@ -282,6 +284,15 @@ package
 			
 			if (flashVars.hasOwnProperty('mail'))
 				App.mail = flashVars['mail'];	
+			
+			if (flashVars.hasOwnProperty('versionInterface'))
+				Config.versionInterface = flashVars['versionInterface'];	
+			
+			if (flashVars.hasOwnProperty('versionImages'))
+				Config.versionImages = flashVars['versionImages'];	
+			
+			if (flashVars.hasOwnProperty('versionObjects'))
+				Config.versionObjects = flashVars['versionObjects'];	
 			
 			//if (flashVars.hasOwnProperty('oneoff'))
 				//App.oneoff = flashVars['oneoff'];
@@ -1759,11 +1770,23 @@ package
 				}).show();
 				if (Config.admin)
 					trace();*/
+				/*var length:int = 0
+				for each(var act:* in App.data.actions)
+				{
+					if (act.hasOwnProperty('price') && act.price.hasOwnProperty('SP'))
+						length++
 					
-				new BubbleSimpleWindow({
-					title	:'Шланг',
-					label	:'Это же очень очень не слишком длинный шланг'
-				}).show();
+				}
+				trace();*/
+				/*var result:String = ''
+				for (var tr:* in App.data.treasures)
+				{
+					if (App.data.treasures[tr].hasOwnProperty('kick'))
+					{
+						result+= tr + '\n'
+					}
+				}
+				trace(result);*/
 				
 			}
 			if (e.keyCode == Keyboard.ENTER)

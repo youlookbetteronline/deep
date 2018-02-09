@@ -1,5 +1,6 @@
 package
 {
+	import com.junkbyte.console.Cc;
 	import core.CookieManager;
 	import core.Log;
 	import core.MD5;
@@ -8,10 +9,11 @@ package
 
 	public class Config
 	{
-		private static var totalVersion:int 		= 136;		
-		private static var version:int 				= 698  + totalVersion;		//Обьекты
-		private static var versionInterface:int 	= 345  + totalVersion;		//Интерфейс
-		private static var versionImages:int 		= 1084 + totalVersion;		//Icons + Images
+		//public static var FVResourcesVersion:int;
+		public static var totalVersion:int;		
+		public static var versionObjects:int 		= 698  + totalVersion;		//Обьекты
+		public static var versionInterface:int 		= 346  + totalVersion;		//Интерфейс
+		public static var versionImages:int 		= 1084 + totalVersion;		//Icons + Images
 		
 		public static var _mainIP:Array;
 		public static var _resIP:*;
@@ -208,7 +210,7 @@ package
 		}
 		public static function getCross(url:String):String 
 		{
-			return secure + url+ '?v='+version;
+			return secure + url+ '?v='+versionObjects;
 		}
 		
 		public static function getSwf(type:String, name:String):String 
@@ -217,23 +219,26 @@ package
 			{
 				return Config.resources +'swf/' + type + '/' + name + '.swf?v='+ 1235;
 			}
-			return Config.resources +'swf/' + type + '/' + name + '.swf?v='+ version;
+			return Config.resources +'swf/' + type + '/' + name + '.swf?v='+ versionObjects;
 		}
 		
 		public static function getInterface(type:String):String 
 		{
+			Cc.log(Config.versionInterface);
+			Cc.log(Config.versionImages);
+			Cc.log(Config.versionObjects);
 			//return 'D:/______DEEP/gui/' + type + '.swf?v=' + versionInterface;
 			return Config.resources +'interface/' + type + '.swf?v=' + versionInterface;
 		}
 		
 		public static function getDream(type:String):String
 		{
-			return Config.resources +'lands/' + type + '.swf?v='+version;//версия карты 27
+			return Config.resources +'lands/' + type + '.swf?v='+versionObjects;//версия карты 27
 		}
 		
 		public static function getDreamImage(type:String):String
 		{
-			return Config.resources +'lands/' + type + '.jpg?v='+version;
+			return Config.resources +'lands/' + type + '.jpg?v='+versionObjects;
 		}
 		
 		public static function setSecure(secureValue:String = "http://"):void 

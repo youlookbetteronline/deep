@@ -114,7 +114,7 @@ package units
 			}
 			if (bridgeDecor.indexOf(this.sid) != -1)
 				open = true;
-			if (App.user.worldID == User.NEPTUNE_MAP || App.user.worldID == User.HALLOWEEN_MAP || App.user.worldID == User.SWEET_MAP)
+			if (App.user.worldID == User.NEPTUNE_MAP || App.user.worldID == User.HALLOWEEN_MAP || App.user.worldID == User.SWEET_MAP || App.user.worldID == 3333)
 				stockable = false;
 		}
 		

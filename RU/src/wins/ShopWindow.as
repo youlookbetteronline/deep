@@ -207,9 +207,9 @@ package wins
 				{
 					for (var __sid:* in _itemsData[_sect])
 					{
-						if (__sid == 3170)
+						if (__sid == 2474)
 							trace();
-						if (__sid != 's' && _itemsData[_sect][__sid] == 1 && App.data.storage[__sid] != null && App.data.storage[__sid].type != 'Material' && App.data.storage[__sid].type != 'Lamp') 
+						if (__sid != 's' && _itemsData[_sect][__sid] != 0 && App.data.storage[__sid] != null && App.data.storage[__sid].type != 'Material' && App.data.storage[__sid].type != 'Lamp') 
 						{
 							openInWorld.push(__sid);
 						}
@@ -359,7 +359,7 @@ package wins
 						item.visible = 1
 					if (item['sid'] == 2622)
 						continue;
-					if (item['sid'] == 625)
+					if (item['sid'] == 2474)
 						trace();
 					if (ShopWindow.sarcofitons.indexOf(int(item.sid)) != -1)
 					{
@@ -373,8 +373,8 @@ package wins
 						if (item.visible == 0 && item.type != 'Resource') 
 							continue;
 						
-						//if (!World.canBuyOnThisMap(item.sID))
-							//continue;
+						if (!World.canBuyOnThisMap(item.sID))
+							continue;
 					}else{
 						if (item.type == 'Collection') 
 							continue;

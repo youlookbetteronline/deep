@@ -19,6 +19,7 @@ package models
 		private var _takeCallback:Function;
 		private var _friends:Object;
 		private var _post:Object;
+		private var _limit:int;
 		public function PostmanModel(target:Postman) 
 		{
 			this._target = target;
@@ -110,6 +111,11 @@ package models
 		public function set takeCallback(value:Function):void 
 		{
 			_takeCallback = value;
+		}
+		
+		public function get limit():int 
+		{
+			return _target.info.maxgifts;
 		}
 	}
 

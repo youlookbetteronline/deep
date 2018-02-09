@@ -193,7 +193,7 @@ package
 		public static var arial:Class;
 		
 		public static const VERSION:String = '13.01.1';
-		
+			
 		/* 
 		 * Олег     		{DM: 29060311, FB: 973881489414432}
 		 * Tonyas     		{DM: 83730403, FB: 830321993812336}
@@ -205,7 +205,7 @@ package
 		*/
 		//ФБшный ДИП
 		public static const ID:* = '973881489414432';//'30035157';// '774242479407105';
-		public static const SERVER:* = 'FBD';
+		public static const SERVER:* = 'FB';
 		public static const SOCIAL:* = 'FB';
 		public static var lang:String = 'en'; //de en es fr it nl pl pt tr ru
 		 
@@ -257,6 +257,8 @@ package
 			
 			Log.alert('flashVars');
 			Log.alert(flashVars);
+			Cc.log('____________flashVars_______________')
+			Cc.log(flashVars)
 			
 			this.addEventListener(AppEvent.ON_GAME_COMPLETE, onGameComplete);
 			this.addEventListener(AppEvent.ON_MAP_COMPLETE, onMapComplete);
@@ -279,6 +281,15 @@ package
 			
 			if (flashVars.hasOwnProperty('mail'))
 				App.mail = flashVars['mail'];	
+			
+			if (flashVars.hasOwnProperty('versionInterface'))
+				Config.versionInterface = flashVars['versionInterface'];	
+			
+			if (flashVars.hasOwnProperty('versionImages'))
+				Config.versionImages = flashVars['versionImages'];	
+			
+			if (flashVars.hasOwnProperty('versionObjects'))
+				Config.versionObjects = flashVars['versionObjects'];	
 			
 			if (flashVars.hasOwnProperty('oneoff'))
 				App.oneoff = flashVars['oneoff'];

@@ -137,6 +137,11 @@ package units
 			_helpTarget = value;
 		}
 		
+		public function get model():CraftfloorsModel 
+		{
+			return _model;
+		}
+		
 		private function parseTips():Object 
 		{
 			return{
@@ -262,7 +267,7 @@ package units
 				Errors.show(error, data);
 				return;
 			}
-			Window.closeAll()
+			//Window.closeAll()
 			App.user.stock.takeAll(data.__take)
 			_model.slots = Numbers.objectToArray(data.slots);
 			updateSlots();
@@ -358,6 +363,8 @@ package units
 		
 		override public function click():Boolean 
 		{
+			if (App.user.mode == User.GUEST) 
+				return true;
 			new CraftfloorsWindow({
 				target:	this,
 				model:	_model,

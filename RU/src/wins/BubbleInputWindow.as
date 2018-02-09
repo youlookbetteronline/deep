@@ -99,7 +99,10 @@ package wins
 		
 		private function onConfirm(e:MouseEvent):void 
 		{
+			if (e.currentTarget.mode == DISABLED)
+				return;
 			settings.confirm(_inputField.text)
+			e.currentTarget.state = DISABLED;
 		}
 		private function build():void 
 		{

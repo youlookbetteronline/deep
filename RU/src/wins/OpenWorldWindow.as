@@ -25,6 +25,8 @@ package wins {
 			
 			settings["width"] = 60;
 			settings["height"] = 370;
+			if (App.user.stock.checkAll(settings.content))
+				settings["height"] = 290
 			settings["background"] = 'capsuleWindowBacking';
 			settings["popup"] = true;
 			settings["callback"] = settings["callback"] || null;
@@ -131,7 +133,7 @@ package wins {
 		override public function contentChange():void {
 			var offsetX:int = 0;
 			for (var s:* in settings.content) {
-				var background:Bitmap = Window.backing(160, 245, 10, "banksBackingItem");
+				var background:Bitmap = Window.backing(160, settings.height - 135, 10, "banksBackingItem");
 				container.addChild(background);
 				
 				var inItem:SimpleItem = new SimpleItem(int(s), {

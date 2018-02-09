@@ -642,6 +642,7 @@ package wins.elements
 					case 'University':
 					case 'Friendfloors':
 					case 'Craftfloors':
+					case 'Postman':
 					case 'Manufacture':
 						drawFindBttn();	
 						return;
@@ -794,6 +795,17 @@ package wins.elements
 				var crinstances:Array;
 				crinstances = Map.findUnits([item.sID]);
 				if (crinstances.length >= aveableCount)
+				{
+					return true;
+				}else 
+					return false;
+			}
+			
+			if (item.type == 'Postman')
+			{
+				var postinstances:Array;
+				postinstances = Map.findUnits([item.sID]);
+				if (postinstances.length >= aveableCount)
 				{
 					return true;
 				}else 
@@ -985,7 +997,7 @@ package wins.elements
 		public function get aveableCount():int
 		{
 			if ((item.type == 'Tribute' || item.type == 'Golden' || item.type == 'Plant' || item.type == 'Walkgolden' || 
-			item.type == 'Walkhero' || item.type == 'Craftfloors' || item.type == 'Bathyscaphe' || item.type == 'Animal') 
+			item.type == 'Walkhero' || item.type == 'Craftfloors' || item.type == 'Postman' || item.type == 'Bathyscaphe' || item.type == 'Animal') 
 			&& item.hasOwnProperty('gcount') && item.gcount != '')
 				return item.gcount
 			switch(item.type)
@@ -1158,6 +1170,17 @@ package wins.elements
 				var crInst:Array = Map.findUnits([item.sID]);
 				
 				if (crInst.length >= aveableCount)
+				{
+					drawText(Locale.__e('flash:1481298353832'));
+					return false;
+				}
+			}
+			
+			if (item.type == 'Postman')
+			{
+				var postInst:Array = Map.findUnits([item.sID]);
+				
+				if (postInst.length >= aveableCount)
 				{
 					drawText(Locale.__e('flash:1481298353832'));
 					return false;
@@ -1985,7 +2008,7 @@ package wins.elements
 				QuestsRules.quest9_1();
 			}
 			
-			if (App.user.worldID == User.NEPTUNE_MAP || (App.user.worldID == User.SWEET_MAP && item.market == 14))
+			if (App.user.worldID == User.NEPTUNE_MAP || (App.user.worldID == User.SWEET_MAP && item.market == 14) || (App.user.worldID == 3333 && item.market == 14))
 			{
 				switch(item.type) 
 				{

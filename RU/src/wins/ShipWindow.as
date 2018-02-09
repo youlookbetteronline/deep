@@ -324,7 +324,7 @@ package wins
 			/*else
 			{*/
 				for (var s:* in App.user.stock.data) {
-					if (App.user.stock.data[s] == 0) continue; 
+					if (App.user.stock.data[s] == 0 || App.user.stock.data[s] == '__take') continue; 
 					
 					switch(App.data.storage[s].type) {
 						case 'Material':

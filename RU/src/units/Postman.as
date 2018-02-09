@@ -131,7 +131,8 @@ package units
 			var item:BonusItem = new BonusItem(Numbers.firstProp(data.bonus).key, Numbers.firstProp(data.bonus).val);
 			//var point:Point = Window.localToGlobal(reward);
 			item.cashMove(new Point(App.self.stage.mouseX, App.self.stage.mouseY), App.self.windowContainer);
-			
+			App.user.stock.addAll(data.bonus);
+			App.ui.upPanel.update(['moxie']);
 			updateData(data)
 			if (params.callback)
 				params.callback()

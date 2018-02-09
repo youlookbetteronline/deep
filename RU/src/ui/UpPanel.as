@@ -2547,6 +2547,31 @@ package ui
 				}
 				
 			}
+			else if (App.data.storage[App.user.worldID].cookie[0] == 3348)
+			{
+				var __postunits:Array = [3317]
+				var _postunits:Array = Map.findUnits(__postunits);
+				if (_postunits.length > 0)
+				{
+					var _postunit:* = _postunits[int(Math.random() * _postunits.length)];
+				
+					App.map.focusedOnCenter(_postunit, false, function():void 
+					{
+						_postunit.showPointing("top",  _postunit.dx , _postunit.dy);
+						
+						setTimeout(function():void {
+							_postunit.hidePointing();
+						}, 2000);
+					});
+				}
+				else
+				{
+					new ShopWindow({
+						find:	__postunits
+					}).show();
+				}
+				
+			}
 			else if (App.data.storage[App.user.worldID].cookie[0] == 3269)
 			{
 				new CollectionWindow({find:	[3273]}).show();

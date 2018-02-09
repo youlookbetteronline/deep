@@ -598,6 +598,11 @@ package wins
 			settings.target.helpTarget = 0;
 		}
 		
+		public function defaultClose(e:MouseEvent = null):void 
+		{
+			super.close(e);
+		}
+		
 		public function get model():CraftfloorsModel{return _model;}
 		
 	}
@@ -797,6 +802,8 @@ internal class Slot extends LayerX
 					fontBorderColor	:0x7f3d0e
 				});
 				_bttn.addEventListener(MouseEvent.CLICK, onStorageEvent)
+				if (_bttn.mode == Button.DISABLED)
+					return;
 
 		}
 		if (!_bttn)
@@ -808,6 +815,7 @@ internal class Slot extends LayerX
 	
 	private function onStorageEvent(e:MouseEvent):void 
 	{
+		e.currentTarget.state = Button.DISABLED;
 		_model.storageCallback(_slotID, _window.contentChange);
 	}
 	
@@ -970,7 +978,7 @@ internal class Craft extends LayerX
 			Hints.text(Locale.__e('flash:1517313165257'), Hints.TEXT_RED, new Point(App.self.mouseX, App.self.mouseY));
 			return;
 		}
-		_window.close();
+		_window.defaultClose();
 		new FormulaWindow({
 			model:	_model,
 			fID:	_fID,

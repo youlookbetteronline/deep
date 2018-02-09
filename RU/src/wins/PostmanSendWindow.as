@@ -39,7 +39,8 @@ package wins
 				settings = {};
 			}
 			settings["width"]				= 495;
-			settings["height"] 				= 470;
+			drawDescription();
+			settings["height"] 				= 405 + _description.textHeight;
 			settings['fontColor'] 			= 0x004762;
 			settings['fontBorderColor'] 	= 0xffffff;
 			settings['fontBorderSize']		= 4;
@@ -66,7 +67,6 @@ package wins
 		
 		override public function drawBody():void 
 		{
-			drawDescription();
 			drawBubbleBg();
 			contentChange();
 			drawGifts();
@@ -167,7 +167,7 @@ package wins
 		{
 			_bubbleBg = backing(440, 260, 46, 'blueLightBacking');
 			_bubbleBg.x = (settings.width - _bubbleBg.width) / 2;
-			_bubbleBg.y = 110;
+			_bubbleBg.y = settings.height - _bubbleBg.height - 95;
 			bodyContainer.addChild(_bubbleBg);
 		}
 		
@@ -194,10 +194,10 @@ package wins
 			paginator.y += 25;
 			
 			_description.x = (settings.width - _description.width) / 2;
-			_description.y = 45;
+			_description.y = 42;
 			
 			_friendsContainer.x = 55
-			_friendsContainer.y = 150;
+			_friendsContainer.y = _bubbleBg.y + 35;
 			
 			bodyContainer.addChild(_description);
 			bodyContainer.addChild(_friendsContainer);
@@ -219,6 +219,8 @@ import models.PostmanModel;
 import ui.Hints;
 import wins.Window;
 import wins.BubbleInputWindow;
+import wins.BubbleSimpleWindow;
+import wins.SimpleWindow;
 
 internal class Friend extends LayerX
 {
@@ -316,6 +318,15 @@ internal class Friend extends LayerX
 	
 	private function onClick(e:MouseEvent):void 
 	{
+		if (_model.friends[_settings.friend.uid].post >= _model.limit)
+		{
+			new BubbleSimpleWindow({
+				popup	:true,
+				title	:Locale.__e('flash:1474469531767'),
+				label	:Locale.__e('flash:1406275629192')
+			}).show();
+			return;
+		}
 		if (e.currentTarget.mode == Button.DISABLED)
 		{
 			Hints.text(Locale.__e('flash:1517844853393', App.data.storage[_model.mtake.sid].title), Hints.TEXT_RED, new Point(App.self.mouseX, App.self.mouseY));
@@ -323,7 +334,7 @@ internal class Friend extends LayerX
 		}
 		new BubbleInputWindow({
 			title		:Locale.__e('flash:1517330407319'),
-			maxLength	:80,
+			maxLength	:65,
 			popup		:true,
 			confirm		:onSendAction
 		}).show();

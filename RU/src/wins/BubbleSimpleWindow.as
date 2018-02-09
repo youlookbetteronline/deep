@@ -1,6 +1,8 @@
 package wins 
 {
+	import buttons.Button;
 	import flash.display.Bitmap;
+	import flash.events.MouseEvent;
 	import flash.text.TextField;
 	/**
 	 * ...
@@ -8,7 +10,10 @@ package wins
 	 */
 	public class BubbleSimpleWindow extends Window 
 	{
-		private var _label:TextField
+		private var _label:TextField;
+		private var _leftBttn:Button;
+		private var _rightBttn:Button;
+		private var _confirmBttn:Button;
 		public function BubbleSimpleWindow(_settings:Object=null) 
 		{
 			if (settings == null)
@@ -30,6 +35,10 @@ package wins
 			settings["width"]				= 480;
 			drawDescription();
 			settings["height"] 				= 140 + _label.textHeight;
+			settings["leftBttnText"] 		= settings.leftBttnText || Locale.__e('flash:1382952380299');
+			settings["rightBttnText"] 		= settings.rightBttnText || Locale.__e('flash:1383041104026');
+			settings["confirmBttnText"] 	= settings.confirmBttnText || Locale.__e('flash:1382952380242');
+			settings["dialog"]				= settings.dialog || false;
 			super(settings);
 		}
 		
@@ -42,6 +51,10 @@ package wins
 		override public function drawBody():void 
 		{
 			build();
+			if (settings.dialog)
+				drawDialogButtons()
+			else
+				drawConfirmButton()
 		}
 		
 		private function drawDescription():void 
@@ -56,6 +69,92 @@ package wins
 				wrap			:true,
 				multiline		:true
 			})
+		}
+		
+		private function drawDialogButtons():void 
+		{
+			
+			_leftBttn = new Button({
+				caption			:settings.leftBttnText,
+				fontColor		:0xffffff,
+				width			:170,
+				height			:51,
+				fontSize		:32,
+				bgColor			:[0xbcec63, 0x68bc21],
+				bevelColor		:[0xe0ffad, 0x4e8b2c],
+				fontBorderColor	:0x085c10
+			});
+			
+			_rightBttn = new Button({
+				caption			:settings.rightBttnText,
+				fontColor		:0xffffff,
+				width			:170,
+				height			:51,
+				fontSize		:32,
+				bgColor			:[0xfed131, 0xf8ab1a],
+				bevelColor		:[0xf7fe9a, 0xcb6b1e],
+				fontBorderColor	:0x6e411e
+			});
+			
+			_leftBttn.y = settings.height - _leftBttn.height - 20;
+			_leftBttn.x = settings.width / 2 - _leftBttn.width - 15;
+			
+			_rightBttn.y = settings.height - _rightBttn.height - 20;
+			_rightBttn.x = settings.width / 2 + 15;
+			
+			bodyContainer.addChild(_leftBttn);
+			bodyContainer.addChild(_rightBttn);
+			
+			_leftBttn.addEventListener(MouseEvent.CLICK, onLeftClick)
+			_rightBttn.addEventListener(MouseEvent.CLICK, onRightEvent)
+		}
+		
+		private function onLeftClick(e:MouseEvent):void 
+		{
+			if (settings.leftBttnEvent)
+				settings.leftBttnEvent
+			else
+				close();
+		}
+		
+		private function onRightEvent(e:MouseEvent):void 
+		{
+			if (settings.rightBttnEvent)
+				settings.rightBttnEvent
+			else
+				close();
+				
+			
+		}
+		
+		private function drawConfirmButton():void 
+		{
+			
+			_confirmBttn = new Button({
+				caption			:settings.confirmBttnText,
+				fontColor		:0xffffff,
+				width			:170,
+				height			:51,
+				fontSize		:32,
+				bgColor			:[0xfed131, 0xf8ab1a],
+				bevelColor		:[0xf7fe9a, 0xcb6b1e],
+				fontBorderColor	:0x6e411e
+			});
+			
+			_confirmBttn.y = settings.height - _confirmBttn.height - 20;
+			_confirmBttn.x = (settings.width - _confirmBttn.width) / 2;
+			
+			bodyContainer.addChild(_confirmBttn);
+			
+			_confirmBttn.addEventListener(MouseEvent.CLICK, onConfirmEvent)
+		}
+		
+		private function onConfirmEvent(e:MouseEvent):void 
+		{
+			if (settings.confirmBttnEvent)
+				settings.confirmBttnEvent
+			else
+				close();
 		}
 		
 		private function build():void 

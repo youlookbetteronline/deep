@@ -3,12 +3,15 @@ package wins
 	import buttons.Button;
 	import buttons.ImageButton;
 	import buttons.ImagesButton;
+	import com.adobe.images.BitString;
 	import core.Numbers;
+	import core.Size;
 	import flash.display.Bitmap;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.text.TextField;
 	import flash.ui.Keyboard;
 	import models.PostmanModel;
 	import units.Postman;
@@ -25,6 +28,9 @@ package wins
 		private var _friendsContainer:Sprite = new Sprite();
 		private var _askButton:ImageButton;
 		private var _sendBttn:Button;
+		private var _popupContainer:LayerX = new LayerX();
+		private var _popupBack:Bitmap;
+		private var _popupText:TextField;
 		public function PostmanGetWindow(settings:Object=null) 
 		{
 			_model = settings.model;
@@ -41,7 +47,7 @@ package wins
 			}
 			
 			settings['content'] 			= parseContent;
-			settings["width"]				= 490;
+			settings["width"]				= 580;
 			settings["height"] 				= 520;
 			if (settings.content.length < 4)
 			{
@@ -70,12 +76,12 @@ package wins
 		private function get parseContent():Array 
 		{
 			var result:Array = [];
-			for each(var _post:* in _model.post)
+			for (var _post:* in _model.post)
 			{
 				var obj:Object = {};
-				obj['postID'] = Numbers.firstProp(_post).key;
-				obj['messageID'] =  _post[obj['postID']].msg;
-				obj['friendID'] = _post[obj['postID']].fID;
+				obj['postID'] = _post;
+				obj['messageID'] =  _model.post[_post].msg;
+				obj['friendID'] = _model.post[_post].fID;
 				result.push(obj);
 			}
 			return result;
@@ -98,6 +104,7 @@ package wins
 			settings.content = parseContent;
 			paginator.itemsCount = settings.content.length;
 			paginator.update();
+			drawPopup();
 			for each(var item:* in _friends){
 				item.parent.removeChild(item);
 				item = null;
@@ -118,6 +125,43 @@ package wins
 				_friendsContainer.addChild(_friend)
 				_friends.push(_friend);
 				Y += 95;
+			}
+			
+		}
+		
+		private function drawPopup():void 
+		{
+			if (_popupBack && _popupBack.parent)
+				_popupBack.parent.removeChild(_popupBack);
+			if (_popupText && _popupText.parent)
+				_popupText.parent.removeChild(_popupText);
+			_popupBack = new Bitmap(Window.textures.popupBack)
+			Size.size(_popupBack, 140, 100);
+			_popupBack.smoothing = true;
+			_popupContainer.addChild(_popupBack);
+			
+			_popupText = Window.drawText(Locale.__e('flash:1382952379798')+':'+ '\n' + String(settings.content.length) + '/'+String(_model.limit),{
+				fontSize	:26,
+				color		:0xffe55d,
+				borderColor	:0x0a4961,
+				textAlign	:'center',
+				autoSize	:'center',
+				textLeading	:-8,
+				width		:120
+			})
+			
+			_popupText.x = _popupBack.x + (_popupBack.width - _popupText.width) / 2;
+			_popupText.y = _popupBack.y + (_popupBack.height - _popupText.height) / 2;
+			_popupContainer.addChild(_popupText);
+			
+			_popupContainer.x = settings.width - 130;
+			_popupContainer.y = -100;
+			bodyContainer.addChild(_popupContainer);
+			
+			_popupContainer.tip = function():Object{
+				return {
+					title: Locale.__e('flash:1518014530739', _model.limit)
+				}
 			}
 		}
 		
@@ -157,14 +201,19 @@ import buttons.Button;
 import buttons.ImageButton;
 import core.AvaLoad;
 import core.Load;
+import core.Numbers;
 import core.Size;
 import flash.display.Bitmap;
 import flash.display.Shape;
 import flash.display.Sprite;
 import flash.events.MouseEvent;
 import flash.filters.GlowFilter;
+import flash.geom.Point;
 import models.PostmanModel;
+import ui.Hints;
 import wins.Window;
+import wins.BubbleSimpleWindow;
+import wins.BubbleInputWindow;
 import flash.text.TextField;
 
 internal class Friend extends LayerX
@@ -177,11 +226,13 @@ internal class Friend extends LayerX
 	private var _icon:Bitmap;
 	private var _message:TextField;
 	private var _bttn:ImageButton;
+	private var _repplyBttn:Button;
 	private var _friend:*;
 	private var _model:PostmanModel;
+	private var _janeProfile:*;
 	
 	private var _settings:Object = {
-		width	:425,
+		width	:525,
 		height	:90
 	};
 	
@@ -191,8 +242,9 @@ internal class Friend extends LayerX
 		{
 			_settings[property] = settings[property]
 		}
+		this._janeProfile = App.user.friends.data['1'];
 		this._friend = App.user.friends.data[_settings.friend]
-		this._name = _friend.aka.split(" ")[0];
+		this._name = _friend?_friend.aka.split(" ")[0]:_janeProfile.aka.split(" ")[0];
 		this._model = _settings.model
 		drawBackground();
 		drawAvatar();
@@ -231,7 +283,7 @@ internal class Friend extends LayerX
 		_avatarContainer.y = (_background.height - _avatarContainer.height) / 2;
 		_avatarContainer.x = 20;
 		addChild(_avatarContainer);
-		new AvaLoad(_friend.photo, function(data:Bitmap):void{
+		new AvaLoad(_friend?_friend.photo:_janeProfile.photo, function(data:Bitmap):void{
 			_avatar = new Bitmap();
 			_avatar.mask = maska
 			_avatar.bitmapData = data.bitmapData;
@@ -290,7 +342,7 @@ internal class Friend extends LayerX
 		_bttn = new ImageButton(Window.textures.presentIcon)
 		Size.size(_bttn, 60, 60);
 		_bttn.bitmap.smoothing = true;
-		_bttn.x = _background.x + _background.width - 65;
+		_bttn.x = _background.x + _background.width - 165;
 		_bttn.y = _background.y + (_background.height - _bttn.height) / 2;
 		addChild(_bttn);
 		_bttn.startBlink();
@@ -300,16 +352,83 @@ internal class Friend extends LayerX
 			}
 		}
 		
+		_repplyBttn = new Button({
+			caption			:Locale.__e('Подарить в ответ'),
+			fontColor		:0xffffff,
+			width			:86,
+			height			:46,
+			fontSize		:18,
+			textAlign		:'center',
+			bgColor			:[0xfed131, 0xf8ab1a],
+			bevelColor		:[0xf7fe9a, 0xcb6b1e],
+			fontBorderColor	:0x6e411e
+		})
+		
+		_repplyBttn.x = _bttn.x + _repplyBttn.width - 20;
+		_repplyBttn.y = _background.y + (_background.height - _repplyBttn.height) / 2;
+		addChild(_repplyBttn);
+		
 		_bttn.addEventListener(MouseEvent.CLICK, takeEvent)
+		_repplyBttn.addEventListener(MouseEvent.CLICK, repplyEvent)
+		
+		if (App.user.stock.count(_model.mtake.sid) < _model.mtake.count || !_friend)
+			_repplyBttn.state = Button.DISABLED;
 	}
 	
 	private function takeEvent(e:MouseEvent):void 
 	{
+		if (e.currentTarget.mode == Button.DISABLED)
+			return;
 		_model.takeCallback(_settings.post, onTakeEvent)
+		e.currentTarget.state = Button.DISABLED
 	}
 	
 	private function onTakeEvent():void 
 	{
-		_settings.window.contentChange();
+		_bttn.mode = Button.NORMAL
+		if (Numbers.countProps(_model.post) == 0)
+			Window.closeAll();
+		else
+			_settings.window.contentChange();
+	}
+	
+	private function repplyEvent(e:MouseEvent):void 
+	{
+		if (_model.friends[_settings.friend].post >= _model.limit)
+		{
+			new BubbleSimpleWindow({
+				popup	:true,
+				title	:Locale.__e('flash:1474469531767'),
+				label	:Locale.__e('flash:1406275629192')
+			}).show();
+			return;
+		}
+		
+		if (e.currentTarget.mode == Button.DISABLED)
+		{
+			if (!_friend)
+				return;
+			Hints.text(Locale.__e('flash:1517844853393', App.data.storage[_model.mtake.sid].title), Hints.TEXT_RED, new Point(App.self.mouseX, App.self.mouseY));
+			return;
+		}
+		
+		new BubbleInputWindow({
+			title		:Locale.__e('flash:1517330407319'),
+			maxLength	:65,
+			popup		:true,
+			confirm		:onRepplyAction
+		}).show();
+	}
+	
+	private function onRepplyAction(text:String):void 
+	{
+		_model.sendCallback(text, _settings.friend, sendCallback)
+	}
+	
+	private function sendCallback():void 
+	{
+		Window.closeAll();
+		var item:BonusItem = new BonusItem(_model.mtake.sid, _model.mtake.count);
+		item.cashMove(new Point(App.self.stage.mouseX, App.self.stage.mouseY), App.self.windowContainer, true);
 	}
 }

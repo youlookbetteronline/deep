@@ -1965,9 +1965,17 @@ package
 		private var BubbleBlueBacking:Class;
 		public var bubbleBlueBacking:BitmapData = new BubbleBlueBacking().bitmapData;
 		
+		[Embed(source="Graphics2/Backings/PopupBack.png")]
+		private var PopupBack:Class;
+		public var popupBack:BitmapData = new PopupBack().bitmapData;
+		
 		[Embed(source="Graphics2/elements/PurpleClose.png")]
 		private var PurpleClose:Class;
 		public var purpleClose:BitmapData = new PurpleClose().bitmapData;
+		
+		[Embed(source="Graphics2/elements/BackForNumber.png")]
+		private var BackForNumber:Class;
+		public var backForNumber:BitmapData = new BackForNumber().bitmapData;
 		
 		public function Windows():void
 		{
