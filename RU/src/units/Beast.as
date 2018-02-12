@@ -9,6 +9,7 @@ package units
 	import models.BeastModel;
 	import ui.UnitIcon;
 	import wins.BeastWindow;
+	import wins.SimpleWindow;
 	/**
 	 * ...
 	 * @author ...
@@ -29,6 +30,28 @@ package units
 				return parseTips();
 			}
 			touchableInGuest = true;
+		}
+		
+		override public function remove(_callback:Function = null):void
+		{
+			if (!removable || App.user.mode != User.OWNER)
+				return;
+			var callback:Function = _callback;
+			if (applyRemove == false && App.user.mode == User.OWNER)
+			{
+				onApplyRemove(callback)
+			}
+			else{
+				new SimpleWindow( {
+					title: Locale.__e("flash:1382952379842"),
+					text: Locale.__e("flash:1382952379968", [info.title]),
+					label: SimpleWindow.ATTENTION,
+					dialog: true,
+					confirm: function():void {
+						onApplyRemove(callback);
+					}
+				}).show();
+			}
 		}
 		
 		private function initModel(params:Object):void 

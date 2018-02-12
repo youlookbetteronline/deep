@@ -54,10 +54,10 @@ package chat
 					//return '31.131.252.76' // d-ok3
 					
 					//return '88.99.244.36':31731
-					return '136.243.154.35' //vk1
+					return '88.99.61.235' //vk1
 					break;
 			}
-			return '136.243.154.35';
+			return '88.99.61.235';
 		}
 		
 		public function Chat(token:String, settings:Object) {

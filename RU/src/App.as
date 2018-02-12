@@ -81,6 +81,7 @@ package
 	import wins.BanksWindow;
 	import wins.BigsaleWindow;
 	import wins.BonusBankWindow;
+	import wins.BonusLackWindow;
 	import wins.BonusVisitingWindow;
 	import wins.BubbleInputWindow;
 	import wins.BubbleSimpleWindow;
@@ -198,8 +199,8 @@ package
 		*/
 
 		public static const ID:* = '29060311';//'30035157';// '774242479407105';
-		public static const SERVER:* = 'VK';
-		public static const SOCIAL:* = 'VK';	
+		public static const SERVER:* = 'DM';
+		public static const SOCIAL:* = 'DM';	
 		public static var lang:String = 'ru'; //de en es fr it nl pl pt tr ru
 		
 		public static function get data():Object
@@ -1787,6 +1788,9 @@ package
 					}
 				}
 				trace(result);*/
+				new BonusLackWindow({
+					bonus:	{3393:2, 3326:4, 2:150, 3:15, 59:1}
+				}).show();
 				
 			}
 			if (e.keyCode == Keyboard.ENTER)
@@ -1891,7 +1895,7 @@ package
 				{
 					for (var dr:* in quest.dream)
 					{
-						if (quest.dream[dr] != '' && App.data.storage[quest.dream[dr]].type == 'Zones' && !quest.tutorial )
+						if (quest.dream[dr] != '' && App.data.storage[quest.dream[dr]].type != 'Lands' && !quest.tutorial )
 						{
 							resStr = resStr + quest.ID + ' '
 							break;

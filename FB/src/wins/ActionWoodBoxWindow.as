@@ -237,8 +237,8 @@ package wins
 			Size.size(redLine, oldPriceLabel.textWidth + 5, oldPriceLabel.height + 20);
 			redLine.smoothing = true;
 			redLine.x = oldPriceLabel.x + 5;
-			redLine.y = oldPriceLabel.y + oldPriceLabel.textHeight - redLine.height - 2;
-			redLine.rotation = 11;
+				redLine.y = oldPriceLabel.y + oldPriceLabel.textHeight - redLine.height - 8;
+			redLine.rotation = -5;
 			bodyContainer.addChild(redLine);
 			
 			

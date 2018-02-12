@@ -525,6 +525,7 @@ package units
 				Load.clearCache(Config.getSwf(type, info.view));
 				data = null;
 			}
+			
 		}
 		
 		override public function moveAction():void

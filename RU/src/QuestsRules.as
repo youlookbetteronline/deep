@@ -77,6 +77,7 @@ package
 			
 			if (!Map.ready)
 				return;
+			App.map.allSorting();
 			QuestsRules.qID = qID;
 			QuestsRules.mID = mID;
 			

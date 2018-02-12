@@ -860,6 +860,10 @@ package units
 				Load.clearCache(Config.getSwf(bType, bView));
 				data = null;
 			}
+			
+			calcDepth();
+				
+			App.map.allSorting()
 		}
 		
 		override public function buyAction(setts:*=null):void
@@ -2138,7 +2142,7 @@ package units
 			if (craftCounter == _arrCraft.length) 
 			{
 				//Hints.text(Locale.__e('flash:1474037570702'), Hints.TEXT_RED, new Point(App.self.mouseX, App.self.mouseY));//Нельзя!
-				if (App.social != 'FB')
+				//if (App.social != 'FB')
 					onSkinEvent(null);
 				return;
 			}

@@ -59,7 +59,8 @@ package units
 			super(object);
 			//walk = walkFunction;
 			//update = updateFunction;
-			//addEventListener(Event.REMOVED_FROM_STAGE, onRemoveFromStage);			
+			//addEventListener(Event.REMOVED_FROM_STAGE, onRemoveFromStage);		
+			
 		}
 		
 		/*public function onRemoveFromStage(e:Event):void 
@@ -457,7 +458,9 @@ package units
 			if (anim.rest && _framesType == "rest1" && this.type == 'Techno') 
 			{
 				_framesType = "rest";
-			}this
+			}
+			if (!_framesType)
+				_framesType = 'walk';
 			var cadr:uint 	= anim[_framesType].chain[frame];
 			
 			if (anim[_framesType].frames[framesDirection] == undefined) 

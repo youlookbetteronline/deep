@@ -814,7 +814,7 @@ package units
 		}
 		
 		override public function onLoad(data:*):void 
-		{		this.sid	
+		{		
 			textures = data;
 			updateLevel();
 			
@@ -863,6 +863,11 @@ package units
 				Load.clearCache(Config.getSwf(bType, bView));
 				data = null;
 			}
+			
+			
+			calcDepth();
+				
+			App.map.allSorting()
 		}
 		
 		override public function buyAction(setts:*=null):void

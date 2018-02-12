@@ -149,7 +149,7 @@ package wins
 			if (App.user.quests.tutorial)
 			{
 				_applyBttn.showGlowing();
-				_applyBttn.showPointing('bottom', 150, 55, _applyBttn.parent, '', null, false, true);
+				_applyBttn.showPointing('bottom', 0, 55, _applyBttn.parent, '', null, false, true);
 			}
 			
 			

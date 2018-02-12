@@ -1026,6 +1026,8 @@ package wins
 				
 				if (App.data.storage[s].type == 'Plant') 
 				{
+					if (s == 555)
+						trace();
 					for (var sids:* in App.data.storage[s].outs)
 					{
 						if (int(sid) == sids)
@@ -1270,6 +1272,8 @@ package wins
 				
 				if (App.data.storage[s].type == 'Arcane')
 				{
+					if (finded.length != 0)
+						continue
 					for (var arctreasure:* in App.data.treasures[App.data.storage[s].treasure][App.data.storage[s].treasure].item)
 					{
 						if (App.data.treasures[App.data.storage[s].treasure][App.data.storage[s].treasure].item[arctreasure] == int(sid))
@@ -1373,6 +1377,9 @@ package wins
 					}
 				}
 				
+				if (finded.length == 0)
+					trace();
+				
 				
 			}
 			
@@ -1401,6 +1408,7 @@ package wins
 				case 'Box':
 				case 'Lamp':
 				case 'Buildgolden':
+				case 'Plant':
 					finded.push(sid);
 				break;
 			}		

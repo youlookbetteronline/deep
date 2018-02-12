@@ -550,11 +550,11 @@ package wins
 			{
 				if (s == '') continue;
 				
-				if (s == 2480 && !Config.admin)
-					continue;
+				/*if (s == 2480 && !Config.admin)
+					continue;*/
 				
-				if (s == 1446)
-					trace();
+				/*if (s == 2480)
+					trace();*/
 				
 				if (!availableByTime(s))
 					continue;
@@ -1319,6 +1319,25 @@ internal class TravelItem extends WorldItem {
 	
 	override public function onClick(e:MouseEvent = null):void 
 	{
+		if (App.data.storage[sID].hasOwnProperty('reqquest') &&
+		App.data.storage[sID]['reqquest'] != "" &&
+		!App.user.quests.data.hasOwnProperty(App.data.storage[sID]['reqquest']))
+		{
+			var needComplete:int = App.data.quests[App.data.storage[sID]['reqquest']].parent
+			new SimpleWindow( {
+				title			:Locale.__e("flash:1474469531767"),
+				label			:SimpleWindow.ATTENTION,
+				text			:Locale.__e("flash:1497521725898",[App.data.quests[needComplete].title]) + '\n' + Locale.__e('flash:1507967972859'),
+				faderAsClose	:false,
+				popup			:true,
+				dialog			:true,
+				confirm			:function():void{
+					utils.Finder.questInUser(needComplete, true);
+				}
+			}).show();
+			
+			return;
+		}
 		/*if (sID == 2404)
 			return;*/
 		if (!params.clickable || block) return;

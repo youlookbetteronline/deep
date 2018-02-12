@@ -118,7 +118,7 @@ package
 			
 			if (!Map.ready)
 				return;
-			
+			App.map.allSorting();
 			/*if (firstStart) {
 				firstStart = false;
 				switch(qID) 

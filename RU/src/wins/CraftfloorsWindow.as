@@ -815,6 +815,8 @@ internal class Slot extends LayerX
 	
 	private function onStorageEvent(e:MouseEvent):void 
 	{
+		if (_bttn.mode == Button.DISABLED)
+			return;
 		e.currentTarget.state = Button.DISABLED;
 		_model.storageCallback(_slotID, _window.contentChange);
 	}

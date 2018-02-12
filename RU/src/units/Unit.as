@@ -411,6 +411,7 @@ package units
 				
 			if(App.self.fakeMode)
 				this.fake = true;
+			
 		}
 		
 		public function makeOpen():void 
