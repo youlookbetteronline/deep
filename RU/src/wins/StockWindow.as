@@ -283,7 +283,9 @@ package wins
 			};
 			
 			var section:String = "all";
-			for(var ID:* in App.user.stock.data) {
+			for (var ID:* in App.user.stock.data) {
+				if (ID == 3396)
+					trace()
 				var count:int = App.user.stock.data[ID];
 				var item:Object = App.data.storage[ID];
 

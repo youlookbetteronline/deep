@@ -5,6 +5,7 @@ package units
 	import core.Numbers;
 	import core.Post;
 	import core.TimeConverter;
+	import flash.display.Bitmap;
 	import flash.events.Event;
 	import flash.geom.Point;
 	import ui.Cloud;
@@ -21,16 +22,15 @@ package units
 		private var _started:int = 0;
 		public var _tribute:Boolean = false;
 		private var died:Boolean = false;
-		
 		private var launched:int = 0;
 		private var capacity:int = 0;
 		private var lifetime:int = 0;
 		
 		private var _hasResetCapacity:Boolean;	// нужен ли ресет по капасити
 		private var _hasResetLifetime:Boolean;	// нужен ли ресет по лайфтайму
-		
+
 		public static const CTREE:int = 2988;
-		
+
 		public function get started():int 
 		{
 			return _started;
@@ -61,6 +61,16 @@ package units
 				level = object.level;
 			touchableInGuest = false;
 			init();
+			//removable = true;
+		}
+		
+		override public function get bmp():Bitmap {
+			if (multiBitmap && multiBitmap.bitmapData && multiBitmap.bitmapData.getPixel(multiBitmap.mouseX, multiBitmap.mouseY) != 0)
+				return multiBitmap;
+			if (bitmap.bitmapData && bitmap.bitmapData.getPixel(bitmap.mouseX, bitmap.mouseY) != 0)
+				return bitmap;
+				
+			return bitmap;
 		}
 		
 		override public function onRemoveFromStage(e:Event):void 
@@ -91,6 +101,12 @@ package units
 			if (!died)
 				showIcon();
 		}
+		
+		/*override public function calcState(node:AStarNodeVO):int 
+		{
+			return EMPTY;
+			return super.calcState(node);
+		}*/
 		
 		override protected function tips():Object
 		{
@@ -800,6 +816,7 @@ package units
 				clearAnimation();
 				showIcon();
 				ordered = false;
+				checkOnAnimationInit();
 				
 			}
 		}

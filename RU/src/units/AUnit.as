@@ -250,7 +250,8 @@ package units
 			if (animated) return;
 				
 			for each(var name:String in framesTypes) {
-				
+				if (!textures.animation.animations.hasOwnProperty(name))
+					continue;
 				multipleAnime[name]['length'] = textures.animation.animations[name].chain.length;
 				multipleAnime[name].bitmap.visible = true;
 				multipleAnime[name]['frame'] = 0;

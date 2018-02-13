@@ -1780,11 +1780,11 @@ package
 				}
 				trace();*/
 				/*var result:String = ''
-				for (var tr:* in App.data.treasures)
+				for each(var tr:* in App.data.storage)
 				{
-					if (App.data.treasures[tr].hasOwnProperty('kick'))
+					if (tr.type == 'Tribute' && tr.hasOwnProperty('reset') && tr.reset != '' && tr.reset != '0')
 					{
-						result+= tr + '\n'
+						result+= tr.sID + '\n'
 					}
 				}
 				trace(result);*/

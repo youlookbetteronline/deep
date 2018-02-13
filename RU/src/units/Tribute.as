@@ -816,6 +816,7 @@ package units
 				clearAnimation();
 				showIcon();
 				ordered = false;
+				checkOnAnimationInit();
 				
 			}
 		}

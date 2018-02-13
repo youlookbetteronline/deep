@@ -8,10 +8,10 @@ package wins {
 	import flash.events.MouseEvent;
 	import flash.text.TextField;
 	import ui.UserInterface;
+	import wins.elements.SimpleItem;
 	import wins.elements.UnlockItem;
 	
 	public class OpenWorldWindow extends Window {
-		private var inItem:MaterialItem;
 		
 		public var worldID:int;
 		public var openBttn:Button;
@@ -25,11 +25,12 @@ package wins {
 			
 			settings["width"] = 60;
 			settings["height"] = 370;
+			if (App.user.stock.checkAll(settings.content))
+				settings["height"] = 290
 			settings["background"] = 'capsuleWindowBacking';
 			settings["popup"] = true;
 			settings["callback"] = settings["callback"] || null;
 			settings["hasPaginator"] = false;
-			
 			settings["description"] = Locale.__e("flash:1382952380232");
 			settings["fontSize"] = 36;
 			settings["fontBorderColor"] = 0x104d0a;
@@ -37,21 +38,19 @@ package wins {
 			settings["title"] = App.data.storage[worldID].title;
 			settings['width'] += 140 * Numbers.countProps(settings.content) + 90;
 			settings['exitTexture'] = 'closeBttnMetal';
-			
 			super(settings);
 		}
 		
 		override public function drawBackground():void {
 			if (settings.background!=null) 
 			{
-			var background:Bitmap = backing(settings.width, settings.height, 40, settings.background);
-			layer.addChild(background);	
+				var background:Bitmap = backing(settings.width, settings.height, 40, settings.background);
+				layer.addChild(background);	
 			}
 		}
 		
 		override public function drawExit():void {
 			super.drawExit();
-			
 			exit.x = settings.width - exit.width + 12;
 			exit.y = -12;
 		}
@@ -89,12 +88,6 @@ package wins {
 		}
 		
 		override public function drawBody():void {
-			
-			/*var background2:Bitmap = Window.backing(settings.width - 90, 245, 10, "paperClear");
-			bodyContainer.addChildAt(background2, 0);
-			background2.x = (settings.width - background2.width) / 2;
-			background2.y = 15;*/
-			
 			openBttn = new Button( {
 				width:		180,
 				height:		52,
@@ -114,7 +107,6 @@ package wins {
 			buyBttn.x  = (settings.width - buyBttn.width) / 2;
 			buyBttn.y = settings.height - 90;
 			bodyContainer.addChild(buyBttn);
-			openBttn.addEventListener(MouseEvent.CLICK, onBuy);
 			onUpdateOutMaterial();
 			
 			container = new Sprite();
@@ -136,55 +128,38 @@ package wins {
 			subTitle.y = -7;
 			
 			contentChange();
-			App.self.addEventListener(AppEvent.ON_CHANGE_STOCK, onUpdateOutMaterial)
 		}
 		
 		override public function contentChange():void {
+			var offsetX:int = 0;
 			for (var s:* in settings.content) {
-				var background:Bitmap = Window.backing(160, 230, 10, "banksBackingItem");
-				//var background:Bitmap = Window.backing(160, 230, 10, "itemBacking");
-				//partBcList.push(background);
+				var background:Bitmap = Window.backing(160, settings.height - 135, 10, "banksBackingItem");
 				container.addChild(background);
 				
-				inItem = new MaterialItem({
-					sID:int(s),
-					need:settings.content[s],
-					window:this, 
-					type:MaterialItem.IN,
-					color:0x5a291c,
-					borderColor:0xfaf9ec,
-					bitmapDY: -10,
-					bgItemY:38,
-					bgItemX:20
-				}, null);
-				
-				
-				inItem.background.visible = false;
-				inItem.x = container.numChildren * (inItem.background.width - 10) - 58;
-				inItem.y = 30; 
-				inItem.checkStatus();
-				inItem.background.visible = false;
-				background.x = inItem.x - (background.width - inItem.width) / 2 - 17 ;
-				if(App.data.storage[inItem.sID].mtype == 6)
-					background.x = inItem.x - (background.width - inItem.width) / 2;
-				background.y = inItem.y - 40;
-				
+				var inItem:SimpleItem = new SimpleItem(int(s), {
+					item:{width:110, height:110},
+					count:{need:settings.content[s], align:'center', dy: 20},
+					bttns:{dy: 20},
+					bg:{hasBg: false},
+					window:this
+				});
+				background.x = offsetX;
+				inItem.x = background.x + (background.width - inItem.WIDTH) / 2;
+				inItem.y = 20
+				inItem.addEventListener(WindowEvent.ON_CONTENT_UPDATE, onUpdateOutMaterial)
+				offsetX += background.width + 15;
 				container.addChild(inItem);
 			}
-			
 			container.x = (settings.width - container.width) / 2;
-			container.y = 65;
+			container.y = 45;
 		}
 		
-		public function onUpdateOutMaterial(e:* = null):void {
-			//openBttn.visible = true;
+		public function onUpdateOutMaterial(e:WindowEvent = null):void {
 			buyBttn.visible = false;
 			if (App.user.stock.checkAll(settings.content)) {
 				openBttn.state = Button.NORMAL;
-				//buyBttn.visible = false;	
 			} else {
 				openBttn.state = Button.DISABLED;
-				//buyBttn.visible = true;
 			}
 		}
 		
@@ -195,22 +170,11 @@ package wins {
 			World.openMap(worldID, onOpenComplete, 1);
 		}
 		
-		private function onBuy(e:MouseEvent):void {
-			//World.openMap(worldID, onOpenComplete, 1);
-		}
-		
 		private function onOpenComplete():void {
 			if (App.user.worlds.hasOwnProperty(worldID)) {
 				Window.closeAll();	
 				Travel.goTo(worldID);
 			}
-			//close();
-		}
-		
-		override public function dispose():void 
-		{
-			App.self.removeEventListener(AppEvent.ON_CHANGE_STOCK, onUpdateOutMaterial)
-			super.dispose();
 		}
 	}		
 }

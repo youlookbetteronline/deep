@@ -17,6 +17,7 @@ package
 	import units.Barter;
 	import units.Bridge;
 	import units.Building;
+	import units.Craftfloors;
 	import units.Decor;
 	import units.Field;
 	import units.Lantern;
@@ -867,7 +868,7 @@ package
 									var obj:Object = App.data.storage[sID];
 									switch(missions[mID].event) {
 										case 'buy': 
-											if (['Building','Friendfloors','Booster','Portal','Hippodrome','Bathyscaphe','University','Manufacture','Twigwam','Port', 'Pharmacy', 'Thappy', 'Field', 'Factory', 'Mining', 'Moneyhouse','Fatman', 'Golden', 'Storehouse', 'Fplant', 'Tradeshop','Hut','Tribute','Floors','Oracle', 'Mfloors', 'Happy', 'Barter', 'Ahappy', 'Table', 'Gamble'].indexOf(unit.type) != -1) {
+											if (['Building','Friendfloors','Craftfloors','Booster','Portal','Hippodrome','Bathyscaphe','University','Manufacture','Twigwam','Port', 'Pharmacy', 'Thappy', 'Field', 'Factory', 'Mining', 'Moneyhouse','Fatman', 'Golden', 'Storehouse', 'Fplant', 'Tradeshop','Hut','Tribute','Floors','Oracle', 'Mfloors', 'Happy', 'Barter', 'Ahappy', 'Table', 'Gamble'].indexOf(unit.type) != -1) {
 												if(scored[quest.id] == undefined){
 													scored[quest.id] = { };
 												}
@@ -929,7 +930,7 @@ package
 													send = true;
 												}
 												
-											}else if (['Friendfloors'].indexOf(unit.type) != -1) 
+											}else if (['Friendfloors', 'Craftfloors'].indexOf(unit.type) != -1) 
 											{
 												if (unit['model']['floor'] >= missions[mID].need) {
 													if(scored[quest.id] == undefined){
@@ -2218,7 +2219,7 @@ package
 						currentTarget = target;
 						
 						var doClick:Boolean = false;
-						if ((thisTarget is Building) && !(thisTarget is Tribute) && !(thisTarget is Barter)) 
+						if ((thisTarget is Building || thisTarget is Craftfloors) && !(thisTarget is Tribute) && !(thisTarget is Barter)) 
 						{
 							if(eventType != "move")
 								doClick = true;
@@ -2234,7 +2235,7 @@ package
 						}
 						
 						if (doClick && thisTarget.open && thisTarget.type != 'Resource'){
-							if (thisTarget.hasProduct && !tutorial)
+							if (thisTarget.hasOwnProperty('hasProduct') && thisTarget.hasProduct && !tutorial)
 								thisTarget.click();
 							
 							thisTarget.helpTarget = find;

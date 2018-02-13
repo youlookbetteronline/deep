@@ -52,7 +52,7 @@ package units
 	{
 		public static const BUILD:String = 'build';
 		public static const BOOST:String = 'boost';
-		public static const ALWAYS_ANIMATED:Array = [183, 306, 500, 988, 1722, 1884, 1891, 1890, 1889, 1888, 2081, 2315, 2207, 2399, 2622, 2739, 2799, 2804, 3061, 3067];	// Постоянная анимация при окончании постройки
+		public static const ALWAYS_ANIMATED:Array = [183, 306, 500, 988, 1722, 1884, 1891, 1890, 1889, 1888, 2081, 2315, 2207, 2399, 2622, 2739, 2799, 2804, 3061, 3067, 3317];	// Постоянная анимация при окончании постройки
 		
 		public static const TRAVEL_COURTS:Array = [1679, 1685, 1686];	// Молянки для походной локи
 		public static const CHANK_ARRAY:Array = [1687]
@@ -63,7 +63,7 @@ package units
 		public static const CAPSULE:int = 500;
 		public static const APOTHECARY:int = 602;
 		public static const BARTER:int = 1078;
-		private static const PERMANENT_ANIMATED:Array = [1837, 2887, 3211, 3252, 3266]
+		private static const PERMANENT_ANIMATED:Array = [1837, 2887, 3211, 3252, 3266, 3317]
 		public var pest:Pest;
 		//public static pestAlive:Boolean = false;
 		
@@ -1082,7 +1082,7 @@ package units
 			if (textures && textures['animation'] && ((level >= totalLevels || permanentAnimated /*- craftLevels*/) /*|| this.sid == 236*/)) 
 			{
 				initAnimation();
-				if (crafted > 0 || this.type == 'Hippodrome' || this.type == 'Booster' || this.type == 'Buildgolden' || ALWAYS_ANIMATED.indexOf(sid) != -1) 
+				if (crafted > 0 || this.type == 'Hippodrome' || this.type == 'Booster' || this.type == 'Buildgolden' || this.type == 'Postman' || ALWAYS_ANIMATED.indexOf(sid) != -1) 
 				{
 					beginAnimation();
 				}

@@ -187,6 +187,8 @@ package
 		private var university:University;
 		private var manufacture:Manufacture;
 		private var decor:Decor;
+		private var craftfloors:Craftfloors;
+		private var postman:Postman;
 		private var field:Field;
 		private var walkhero:Walkhero;
 		private var animal:Animal;

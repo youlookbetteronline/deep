@@ -1969,6 +1969,10 @@ package
 		private var PopupBack:Class;
 		public var popupBack:BitmapData = new PopupBack().bitmapData;
 		
+		[Embed(source="Graphics2/Backings/CircleBlueBacking.png")]
+		private var CircleBlueBacking:Class;
+		public var circleBlueBacking:BitmapData = new CircleBlueBacking().bitmapData;
+		
 		[Embed(source="Graphics2/elements/PurpleClose.png")]
 		private var PurpleClose:Class;
 		public var purpleClose:BitmapData = new PurpleClose().bitmapData;

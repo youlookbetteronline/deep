@@ -127,6 +127,7 @@ package
 		public static var ref_link:String = "";
 		
 		public static var blink:String = "";
+		public static var dump:String = "";
 		public static var oneoff:String = "";
 		public static var mail:String = "";
 		
@@ -204,7 +205,7 @@ package
 		 * Marcel Pijakowski:	FB: 1884987568449576
 		*/
 		//ФБшный ДИП
-		public static const ID:* = '2284344394924794';//'30035157';// '774242479407105';
+		public static const ID:* = '973881489414432';//'30035157';// '774242479407105';
 		public static const SERVER:* = 'FB';
 		public static const SOCIAL:* = 'FB';
 		public static var lang:String = 'en'; //de en es fr it nl pl pt tr ru
@@ -278,6 +279,9 @@ package
 			
 			if (flashVars.hasOwnProperty('blink'))
 				App.blink = flashVars['blink'];
+			
+			if (flashVars.hasOwnProperty('dump'))
+				App.dump = flashVars['dump'];
 			
 			if (flashVars.hasOwnProperty('mail'))
 				App.mail = flashVars['mail'];	
@@ -908,6 +912,7 @@ package
 			
 			//App.blink = 'b58a46ddd5ca1a';
 			checkBlink();
+			checkDump();
 			//if (!App.user.quests.isTutorial && App.data.hasOwnProperty('blinks') && App.data.blinks.hasOwnProperty(App.blink)) {
 				//var bbonus:Object = App.data.blinks[App.blink]; 
 				//if (bbonus.start < App.time && bbonus.start + bbonus.duration * 3600 > App.time && !App.user.blinks.hasOwnProperty(App.blink)) {
@@ -947,6 +952,14 @@ package
 						}
 					}
 				}
+			}
+			
+		}
+		
+		private function checkDump():void 
+		{
+			if (App.dump){
+				Log.alert('Dump ' + App.dump);
 			}
 			
 		}
@@ -1691,23 +1704,7 @@ package
 					//App.console.openDebug();
 				//}
 			//}
-			if (e.keyCode == Keyboard.S && e.shiftKey && e.ctrlKey && Config.admin) 
-			{
-				if(App.map.mField.parent)
-					App.map.mField.parent.removeChild(App.map.mField);
-				if(App.map.mSort.parent)
-					App.map.mSort.parent.removeChild(App.map.mSort);
-				if(App.map.mFog.parent)
-					App.map.mFog.parent.removeChild(App.map.mFog);
-				if(App.map.mIcon.parent)
-					App.map.mIcon.parent.removeChild(App.map.mIcon);
-				if(App.map.mTreasure.parent)
-					App.map.mTreasure.parent.removeChild(App.map.mTreasure);
-					
-				var bmMap:Bitmap = new Bitmap(new BitmapData(App.map.bitmap.width, App.map.bitmap.height, true, 0x0));
-				bmMap.bitmapData.draw(App.map, new Matrix(1, 0, 0, 1, -App.map.bitmap.x, -App.map.bitmap.y));
-				Saver.savePNG(bmMap.bitmapData, 'Map');
-			}
+			
 			
 			//Раскрыть на весь экран
 			if (e.keyCode == Keyboard.F && e.ctrlKey) 
@@ -1759,6 +1756,24 @@ package
 			
 			if (!Config.admin)
 				return;
+				
+			if (e.keyCode == Keyboard.S && e.shiftKey && e.ctrlKey && Config.admin) 
+			{
+				if(App.map.mField.parent)
+					App.map.mField.parent.removeChild(App.map.mField);
+				if(App.map.mSort.parent)
+					App.map.mSort.parent.removeChild(App.map.mSort);
+				if(App.map.mFog.parent)
+					App.map.mFog.parent.removeChild(App.map.mFog);
+				if(App.map.mIcon.parent)
+					App.map.mIcon.parent.removeChild(App.map.mIcon);
+				if(App.map.mTreasure.parent)
+					App.map.mTreasure.parent.removeChild(App.map.mTreasure);
+					
+				var bmMap:Bitmap = new Bitmap(new BitmapData(App.map.bitmap.width, App.map.bitmap.height, true, 0x0));
+				bmMap.bitmapData.draw(App.map, new Matrix(1, 0, 0, 1, -App.map.bitmap.x, -App.map.bitmap.y));
+				Saver.savePNG(bmMap.bitmapData, 'Map');
+			}
 			
 			if (e.keyCode == Keyboard.I)
 			{
@@ -1789,30 +1804,6 @@ package
 				//new CollectionMsgWindow({sid:1030}).show();
 			}
 			
-			if (e.keyCode == Keyboard.A) 
-			{
-				var user:Object = { };
-				user['first_name'] = App.user.first_name;
-				user['last_name'] = App.user.last_name;
-				user['photo'] = App.user.photo;
-				user['attraction'] = 200;//settings.target.kicks;
-				
-				Post.send( {
-					ctr:		'user',
-					act:		'attraction',
-					uID:		App.user.id,
-					wID:		App.map.id,
-					sID:		1489,
-					id:			1,
-					rate:		App.data.storage[1489].type + '_' + String(1489),
-					user:		JSON.stringify(user)
-				}, function(error:int, data:Object, params:Object):void {
-					if (error) return;
-					
-					//if (data['users']) settings.target.usersLength = data.users;
-				});
-				//new BonusVisitingWindow( { bonus:{7:1,2:100}/*data.bonus*/, wakeUpBonus:true } ).show();
-			}
 			
 			if (e.keyCode == Keyboard.Y) 
 			{

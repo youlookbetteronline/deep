@@ -922,6 +922,7 @@ package
 					return;
 				}
 				App.user.stock.takeAll(result.__take);
+				App.map.focusedOn(App.user.hero);
 				Treasures.bonus(result.bonus, new Point(App.user.hero.x, App.user.hero.y));
 			});
 		}

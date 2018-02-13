@@ -56,7 +56,7 @@ package wins
 			settings['hasFader'] = true;
 			settings['autoClose'] = true;
 			settings['qID'] = settings.qID || 2;
-			settings['exitTexture'] = 'snowExit';
+			//settings['exitTexture'] = 'snowExit';
 			settings["hasBubbles"] = true;
 			settings["bubblesCount"] = 10;
 			settings["bubbleLeftX"] =  - 90;
@@ -65,7 +65,6 @@ package wins
 			
 			super(settings);
 			this.addEventListener(MouseEvent.CLICK, coordsCursor);
-			
 			settings.content = App.ui.leftPanel.questsPanel.shownList;
 			
 			for (var item:* in settings.content) 
@@ -116,15 +115,15 @@ package wins
 		override public function drawBody():void 
 		{
 			drawMessage();
-			var btmp:Bitmap = Window.backingShort(150,'snowButtonLeft')
-			okBttn = new ImageButton(btmp.bitmapData)
-			/*okBttn = new Button( {
+			//var btmp:Bitmap = Window.backingShort(150,'snowButtonLeft')
+			//okBttn = new ImageButton(btmp.bitmapData)
+			okBttn = new Button( {
 				width:150,
 				height:50,
 				fontSize:28,
 				hasDotes:false,
 				caption:Locale.__e("flash:1382952380242")
-			});*/
+			});
 			
 			var bttnText:TextField = Window.drawText(Locale.__e("flash:1382952380242"), {
 				fontSize:28,
@@ -231,14 +230,14 @@ package wins
 			
 			contentChange();
 			okBttn.x = (settings.width - okBttn.width) / 2;
-			okBttn.y = background.height - okBttn.height + 37;
+			okBttn.y = background.height - okBttn.height + 13;
 			
 			bttnText.x = okBttn.x + (okBttn.width - bttnText.width) / 2;
 			bttnText.y = okBttn.y + (okBttn.height - bttnText.height) / 2 - 6;
 			
 			
 			bodyContainer.addChild(okBttn);
-			bodyContainer.addChild(bttnText);
+			//bodyContainer.addChild(bttnText);
 			//drawMirrowObjs('decSeaweed', settings.width + 55, - 55, bgHeight - 177, true, true, false, 1, 1, layer);
 			switch(App.data.personages[quest.character].preview) 
 			{
@@ -649,7 +648,7 @@ package wins
 				layer.removeChild(background)
 			if (background2)
 				layer.removeChild(background2)
-			if (snowBottomLeft)
+			/*if (snowBottomLeft)
 				layer.removeChild(snowBottomLeft)
 			if (snowBottomRight)
 				layer.removeChild(snowBottomRight)
@@ -658,7 +657,7 @@ package wins
 			if (snowCenter)
 				layer.removeChild(snowCenter);
 			if (snowRight)
-				layer.removeChild(snowRight);
+				layer.removeChild(snowRight);*/
 			
 			background = Window.backing(settings.width, bgHeight , 50, 'workerHouseBacking');
 			
@@ -679,30 +678,30 @@ package wins
 			
 			snowLeft = new Bitmap(Window.textures.snowLeft);
 			snowLeft.y -= 35;
-			layer.addChild(snowLeft);
+			//layer.addChild(snowLeft);
 			
 			snowCenter = new Bitmap(Window.textures.snowCenter);
 			snowCenter.y -= 34;
 			snowCenter.x = 205;
-			layer.addChild(snowCenter);
+			//layer.addChild(snowCenter);
 			
 			snowRight = new Bitmap(Window.textures.snowRight);
 			snowRight.y -= 29;
 			snowRight.x = 365;
-			layer.addChildAt(snowRight, layer.getChildIndex(background2) + 1);
+			//layer.addChildAt(snowRight, layer.getChildIndex(background2) + 1);
 			
 			
 			
 			snowBottomLeft = new Bitmap(Window.textures.snowBottomCorner);
 			snowBottomLeft.y = background.height - 158 + 65;
 			snowBottomLeft.x = -112
-			layer.addChildAt(snowBottomLeft, 0);
+			//layer.addChildAt(snowBottomLeft, 0);
 			
 			snowBottomRight = new Bitmap(Window.textures.snowBottomCorner);
 			snowBottomRight.scaleX = -1;
 			snowBottomRight.y = background.height - 160 + 62;
 			snowBottomRight.x = 550
-			layer.addChildAt(snowBottomRight, 0);
+			//layer.addChildAt(snowBottomRight, 0);
 			
 			//bodyContainer.swapChildren(character, bodyContainer.getChildAt(0));
 			//bodyContainer.addChild(character);

@@ -18,6 +18,7 @@ package
 	import flash.utils.clearTimeout;
 	import flash.utils.setTimeout;
 	import flash.utils.Timer;
+	import ui.FriendsPanel;
 	import ui.Hints;
 	import com.greensock.TweenLite;
 	import ui.UserInterface;
@@ -264,7 +265,7 @@ package
 				onCash();
 		}
 		
-		public function cashMove(place:Point, layer:*):void
+public function cashMove(place:Point, layer:*, toFriend:Boolean = false):void
 		{
 			clearTimeout(cashTimeout);
 			stopBlick();
@@ -282,7 +283,11 @@ package
 				toOwner();
 				return;
 			}*/
-			
+			if (toFriend)
+			{
+				toFriendsPanel();
+				return;
+			}
 			switch(sID) {
 				case Stock.COINS:	toCoinsBar(); App.ui.upPanel.update(['coins']); break;
 				case Stock.MOXIE: 	toMoxieBar(); App.ui.upPanel.update(['moxie']); break;
@@ -319,6 +324,17 @@ package
 			
 			var p:Object = { x:moveTo.x, y:moveTo.y };
 			tween(this, p, remove);
+		}
+		
+		private function toFriendsPanel():void 
+		{
+			SoundsManager.instance.playSFX('takeMaterial');
+			var panel:FriendsPanel = App.ui.bottomPanel.friendsPanel;
+			var p:Object = {
+				x:panel.x + panel.width/2,
+				y:panel.y
+			}
+			tween(this, p, remove, [panel, 0xFFFF00]);
 		}
 		
 		private function toDestinationObject():void {

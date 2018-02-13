@@ -63,7 +63,7 @@ package units
 		public static const CAPSULE:int = 500;
 		public static const APOTHECARY:int = 602;
 		public static const BARTER:int = 1078;
-		private static const PERMANENT_ANIMATED:Array = [1837, 2887, 3211, 3252, 3266, 3317]
+		private static const PERMANENT_ANIMATED:Array = [1837, 2887, 3211, 3252, 3266, 3317, 3397]
 		public var pest:Pest;
 		//public static pestAlive:Boolean = false;
 		

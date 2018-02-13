@@ -20,7 +20,7 @@ package wins.elements
 		 * @param	compareWithStock	Сравнивать со значением на складе
 		 * @param	stockEnableColorize	Подсветить красным если не хватает
 		 */
-		public function PriceLabel(price:Object, compareWithStock:Boolean = false, stockEnableColorize:Boolean = false) 
+		public function PriceLabel(price:Object, compareWithStock:Boolean = false, stockEnableColorize:Boolean = false,  settings:Object = null) 
 		{
 			if (!price) return;
 			
@@ -29,6 +29,11 @@ package wins.elements
 				var count:String = price[id];
 				var colors:Object = { color:0xffdc39, borderColor:0x6d4b15 };
 				
+				if (settings && settings.textColor)
+					colors.color = settings.textColor;
+				if (settings && settings.borderColor)
+					colors.borderColor = settings.borderColor;
+					
 				if (App.user.stock.count(id) < price[id]) {
 					//if (compareWithStock) {
 						//count = Locale.__e('flash:1382952380278', [App.user.stock.count(id), price[id]]);

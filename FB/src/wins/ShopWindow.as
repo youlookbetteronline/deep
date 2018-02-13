@@ -14,6 +14,7 @@ package wins
 	import flash.utils.setTimeout;
 	import ui.UserInterface;
 	import ui.WorldPanel;
+	import units.Craftfloors;
 	import units.Lantern;
 	import units.Table;
 	import units.Tribute;
@@ -1234,6 +1235,22 @@ package wins
 					}
 				}
 				
+				if (App.data.storage[s].type == 'Craftfloors')
+				{
+					for each(var level:* in App.data.storage[s].levels)
+					{
+						if (level && level.option && level.option.craft)
+						{
+							for each (var fID:* in level.option.craft)
+							{
+								if (App.data.crafting[fID].out == int(sid))
+									finded.push(s);
+							}
+						}
+						
+					}
+				}
+				
 				if (App.data.storage[s].type == 'Barter')
 				{
 					for each(var bart:* in App.data.barter)
@@ -1297,6 +1314,8 @@ package wins
 				}*/
 				if (App.data.storage[s].type == 'Arcane')
 				{
+					if (finded.length != 0)
+						continue
 					for (var arctreasure:* in App.data.treasures[App.data.storage[s].treasure][App.data.storage[s].treasure].item)
 					{
 						if (App.data.treasures[App.data.storage[s].treasure][App.data.storage[s].treasure].item[arctreasure] == int(sid))
@@ -1308,7 +1327,8 @@ package wins
 							}
 							else
 							{
-								new SimpleWindow( {
+								findMaterialSource(s, window)
+								/*new SimpleWindow( {
 									hasTitle:		true,
 									label:			SimpleWindow.ATTENTION,
 									text:			Locale.__e("flash:1482142336166") + '\n' + Locale.__e('flash:1511430664847'),
@@ -1318,7 +1338,7 @@ package wins
 										utils.Finder.questInUser(894, true);
 										return;
 									}
-								}).show();	
+								}).show();	*/
 							}
 							return true;
 						}
@@ -1406,6 +1426,7 @@ package wins
 			switch(App.data.storage[sid].type)
 			{
 				case 'Building':
+				case 'Craftfloors':
 				case 'Manufacture':
 				case 'University':
 				case 'Barter':
@@ -1485,14 +1506,16 @@ package wins
 							}
 							
 						}
-						
-						if (ready)
+						if (onMap[onMap.length - 1] is Craftfloors)
+							App.user.quests.findTarget(onMapSIDs, false, null, false, sid, false, 'ready');
+							//App.user.quests.findTarget(onMapSIDs, true , {'id':id}, true, sid, false, 'ready');
+						else if (ready)
 						{
 							if(id != 0){
 								App.user.quests.findTarget(onMapSIDs, false, {'id':id}, false, sid, false, 'ready'); //вызов с проверкой на готовность здания
 							}else
 								App.user.quests.findTarget(onMapSIDs, false, null, false, sid, false, 'ready'); //вызов с проверкой на готовность здания
-						} else {
+						}  else {
 							if (exception) 
 							{
 								App.user.quests.findTarget(onMapSIDs, false, null, false , sid, false, '', exception);	

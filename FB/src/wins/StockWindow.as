@@ -1483,7 +1483,12 @@ internal class StockItem extends Sprite {
 				}
 			}
 		}
-		if ((!World.canBuyOnThisMap(item.sid) || App.user.worldID == User.NEPTUNE_MAP || (App.user.worldID == User.SWEET_MAP && item.market == 14)) && item.type != 'Energy'&& item.type != 'Material')
+		if ((!World.canBuyOnThisMap(item.sid) || 
+		App.user.worldID == User.NEPTUNE_MAP || 
+		(App.user.worldID == User.SWEET_MAP && item.type == 14) || 
+		(App.user.worldID == 3333 && (item.type == 'Golden' || item.type == 'Walkgolden'))) && 
+		item.type != 'Energy' && 
+		item.type != 'Material')
 			drawFindBttn();
 		
 		drawCount();
@@ -1699,6 +1704,8 @@ internal class StockItem extends Sprite {
 			_wrlds.splice(_wrlds.indexOf(User.NEPTUNE_MAP), 1);
 		if (_wrlds.indexOf(User.SWEET_MAP) != -1 && item.shop == 14)
 			_wrlds.splice(_wrlds.indexOf(User.SWEET_MAP), 1);
+		if (_wrlds.indexOf(3333) != -1 && App.user.worldID == 3333 && (item.type == 'Golden' || item.type == 'Walkgolden'))
+			_wrlds.splice(_wrlds.indexOf(3333), 1);
 			
 		if (_wrlds.indexOf(1388) != -1 && !App.user.worlds.hasOwnProperty(1388))
 			Finder.findOnMap([Numbers.firstProp(App.data.storage[1388].items[0]).key]);
@@ -2032,7 +2039,7 @@ internal class StockItem extends Sprite {
 			{
 				new DarkPergamentWindow({
 					sID: 		item.sID,
-					opentext: 	item.opentext,
+					opentext: 	item.opentext[int(Math.random() * item.opentext.length)],
 					title:	item.titletext,
 					popup:		true
 				}).show();
