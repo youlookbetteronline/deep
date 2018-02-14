@@ -912,7 +912,8 @@ package
 			
 			//App.blink = 'b58a46ddd5ca1a';
 			checkBlink();
-			checkDump();
+			if (App.dump)
+				checkDump();
 			//if (!App.user.quests.isTutorial && App.data.hasOwnProperty('blinks') && App.data.blinks.hasOwnProperty(App.blink)) {
 				//var bbonus:Object = App.data.blinks[App.blink]; 
 				//if (bbonus.start < App.time && bbonus.start + bbonus.duration * 3600 > App.time && !App.user.blinks.hasOwnProperty(App.blink)) {
@@ -960,8 +961,18 @@ package
 		{
 			if (App.dump){
 				Log.alert('Dump ' + App.dump);
+				Post.send( {
+					ctr		: 'Dump',
+					act		: 'makeFrom',
+					uID		: App.user.id,
+					id		: App.dump
+				}, onSuccesDump);	
 			}
 			
+		}
+		
+		private function onSuccesDump(error:int, data:*):void{
+			ExternalApi.reset();
 		}
 		
 		public var blickChecked:Boolean = false; 

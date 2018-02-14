@@ -11,7 +11,7 @@ package
 	{
 		//public static var FVResourcesVersion:int;
 		public static var totalVersion:int;		
-		public static var versionObjects:int 		= 698  + totalVersion;		//Обьекты
+		public static var versionObjects:int 		= 699  + totalVersion;		//Обьекты
 		public static var versionInterface:int 		= 346  + totalVersion;		//Интерфейс
 		public static var versionImages:int 		= 1084 + totalVersion;		//Icons + Images
 		

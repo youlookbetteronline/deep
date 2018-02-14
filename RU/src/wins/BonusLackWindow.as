@@ -1,10 +1,13 @@
 package wins 
 {
+	import buttons.Button;
 	import com.adobe.images.BitString;
 	import core.Load;
 	import core.Numbers;
 	import flash.display.Bitmap;
 	import flash.display.Sprite;
+	import flash.events.MouseEvent;
+	import flash.geom.Point;
 	import flash.text.TextField;
 	/**
 	 * ...
@@ -17,6 +20,7 @@ package wins
 		private var _itemsContainer:Sprite = new Sprite();
 		private var _items:Vector.<BubbleItem>;
 		private var _item:BubbleItem;
+		private var _bttn:Button;
 		public function BonusLackWindow(settings:Object=null) 
 		{
 			settings = settingsInit(settings);
@@ -29,7 +33,7 @@ package wins
 			if (settings == null) {
 				settings = {};
 			}
-			settings["width"]				= 680;
+			settings["width"]				= 80 + Numbers.countProps(settings.bonus)*120;
 			settings["height"] 				= 355;
 			settings["hasPaginator"] 		= false;
 			settings["hasPaper"] 			= false;
@@ -64,6 +68,7 @@ package wins
 			drawPersonage();
 			drawDescription();
 			contentChange();
+			drawButtons();
 			build();
 			
 		}
@@ -90,6 +95,40 @@ package wins
 				multiline		:true,
 				wrap			:true
 			})
+		}
+		
+		private function drawButtons():void 
+		{
+			_bttn = new Button({
+				caption			:Locale.__e('flash:1382952379737'),
+				fontColor		:0xffffff,
+				width			:170,
+				height			:51,
+				fontSize		:32,
+				bgColor			:[0xfed131, 0xf8ab1a],
+				bevelColor		:[0xf7fe9a, 0xcb6b1e],
+				fontBorderColor	:0x6e411e
+			});
+			
+			_bttn.addEventListener(MouseEvent.CLICK, onClick)
+		}
+		
+		private function onClick(e:MouseEvent):void 
+		{
+			close()
+		}
+		
+		override public function close(e:MouseEvent = null):void 
+		{
+			super.close(e);
+			App.user.stock.addAll(settings.bonus);
+			for (var _sid:* in settings.bonus) 
+			{
+				var item:BonusItem = new BonusItem(_sid, settings.bonus[_sid]);
+				var point:Point = new Point(App.self.mouseX, App.self.mouseY)
+				point.y += 80;
+				item.cashMove(point, App.self.windowContainer);
+			}
 		}
 		
 		override public function contentChange():void 
@@ -128,11 +167,26 @@ package wins
 			
 			bodyContainer.addChild(_description);
 			bodyContainer.addChild(_itemsContainer)
+			
+			_bttn.x = (settings.width - _bttn.width) / 2;
+			_bttn.y = settings.height - _bttn.height - 20;
+			bodyContainer.addChild(_bttn);
 		}
 	}
 }
+import com.greensock.TweenLite;
+import com.greensock.TweenMax;
+import com.greensock.easing.Elastic;
+import com.greensock.easing.Linear;
+import com.greensock.easing.Strong;
+import com.greensock.plugins.TransformAroundPointPlugin;
+import com.greensock.plugins.TweenPlugin;
+import core.Load;
 import core.Numbers;
+import core.Size;
 import flash.display.Bitmap;
+import flash.display.Sprite;
+import flash.geom.Point;
 import flash.text.TextField;
 import wins.Window;
 
@@ -146,6 +200,7 @@ internal class BubbleItem extends LayerX
 	private var _count:int;
 	private var _item:Object;
 	private var _background:Bitmap;
+	private var _icon:Bitmap;
 	private var _countText:TextField
 	private var _titleText:TextField
 	public function BubbleItem(settings:Object)
@@ -156,8 +211,8 @@ internal class BubbleItem extends LayerX
 		this._count = Numbers.firstProp(_settings.item).val;	
 		this._item = App.data.storage[_sid];
 		drawBackground();
-		drawIcon();
 		drawTitle();
+		drawIcon();
 		drawCount();
 		
 		build();
@@ -171,7 +226,61 @@ internal class BubbleItem extends LayerX
 	
 	private function drawIcon():void 
 	{
+		Load.loading(Config.getIcon(_item.type, _item.view), onLoadIcon)
+	}
+	
+	private function onLoadIcon(data:Bitmap):void 
+	{
 		
+		TweenPlugin.activate([TransformAroundPointPlugin]);
+		_icon = new Bitmap(data.bitmapData);
+		var defScale:int = 1;
+		var defWidth:int = _icon.width
+		Size.size(_icon, 70, 70);
+		var changeScale:Number = _icon.width / defWidth;
+		_icon.smoothing = true;
+		
+		_icon.x = (WIDTH - _icon.width) / 2;
+		_icon.y = (HEIGHT - _icon.width) / 2;
+		addChild(_icon);
+		
+		_titleText.x = (WIDTH - _titleText.width) / 2;
+		_titleText.y = -30;
+		
+		addChild(_titleText);
+		var lPoint:Point = new Point(_icon.x + _icon.width / 2, _icon.y + _icon.height / 2);
+		//var lTween:TweenMax = new TweenMax(_iconSprite, 2, {scaleX:0.1, transformAroundPoint: { point:lPoint}, ease:Linear.easeNone, onComplete:function():void{}});
+		var lTween:TweenLite =  TweenLite.to(_icon, 1.5, { 
+			transformAroundPoint: { 
+				point:lPoint, 
+				scaleX: -changeScale/*/2*/
+			}, 
+			ease:Linear.easeNone, 
+			onComplete:backTween	
+		});
+		
+		function backTween():void
+		{
+			lTween = TweenLite.to(_icon, 1.5, { 
+				transformAroundPoint: { 
+					point:lPoint, 
+					scaleX: changeScale
+				}, 
+				ease:Linear.easeNone, 
+				onComplete:tween	
+			});
+		}
+		function tween():void
+		{
+			lTween =  TweenLite.to(_icon, 1.5, { 
+				transformAroundPoint: { 
+					point:lPoint, 
+					scaleX: -changeScale/*/2*/
+				}, 
+				ease:Linear.easeNone, 
+				onComplete:backTween	
+			});
+		}
 	}
 	
 	private function drawTitle():void 
@@ -196,8 +305,7 @@ internal class BubbleItem extends LayerX
 			multiline		:true,
 			wrap			:true,*/
 			textAlign		:'center',
-			autoSize		:'center',
-			textLeading		:-14
+			textLeading		:-18
 		})
 	}
 	
@@ -218,14 +326,25 @@ internal class BubbleItem extends LayerX
 		addChild(_background);
 		
 		_countText.x = (WIDTH - _countText.width) / 2;
-		_countText.y = HEIGHT;
+		_countText.y = HEIGHT - 5;
 		
 		addChild(_countText);
 		
-		_titleText.x = (WIDTH - _countText.width) / 2;
-		_titleText.y = -30;
 		
-		addChild(_titleText);
+		
+		if (_icon)
+		{
+			_icon.x = (WIDTH - _icon.width) / 2;
+			_icon.y = (HEIGHT - _icon.width) / 2;
+			addChild(_icon);
+			
+			_titleText.x = (WIDTH - _countText.width) / 2;
+			_titleText.y = -30;
+		
+			addChild(_titleText);
+		}
+		
+		
 	}
 	
 	public function get WIDTH():int { return _settings.width; }
