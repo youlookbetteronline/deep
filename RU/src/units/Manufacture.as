@@ -73,7 +73,6 @@ package units
 			{
 				obj[univ.sid] = univ.id;
 			}
-			trace();
 			return obj;
 		}
 		

@@ -41,7 +41,7 @@ package wins
 	import units.Unit;
 	
 	
-	public class Window extends Sprite
+	public class Window extends LayerX
 	{
 		public static const DISABLED:int = 0;
 		public static const ENABLED:int = 1;
@@ -2509,6 +2509,21 @@ package wins
 				dispatchEvent(new WindowEvent("onBeforeClose"));
 				dispose();
 			}
+		}
+		
+		public function disposeChilds(list:*):void 
+		{
+			if (!list)
+				return;
+			for each(var item:DisplayObject in list){
+				if (item && item.parent)
+					item.parent.removeChild(item);
+				item = null;
+			}
+			list = new (getDefinitionByName(getQualifiedClassName(list)) as Class)
+			trace();
+			//list =  new classType();
+			
 		}
 	}
 }

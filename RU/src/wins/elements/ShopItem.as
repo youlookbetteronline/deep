@@ -632,6 +632,7 @@ package wins.elements
 					case 'Walkhero':
 					case 'Building':
 					case 'Golden':
+					case 'Happy':
 					case 'Walkgolden':
 					case 'Beast':
 					case 'Animal':
@@ -997,7 +998,7 @@ package wins.elements
 		public function get aveableCount():int
 		{
 			if ((item.type == 'Tribute' || item.type == 'Golden' || item.type == 'Plant' || item.type == 'Walkgolden' || 
-			item.type == 'Walkhero' || item.type == 'Craftfloors' || item.type == 'Postman' || item.type == 'Bathyscaphe' || item.type == 'Animal') 
+			item.type == 'Walkhero' || item.type == 'Craftfloors' || item.type == 'Postman'|| item.type == 'Happy' || item.type == 'Bathyscaphe' || item.type == 'Animal') 
 			&& item.hasOwnProperty('gcount') && item.gcount != '')
 				return item.gcount
 			switch(item.type)

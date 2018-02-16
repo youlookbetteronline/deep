@@ -708,7 +708,6 @@ internal class StockList extends Sprite {
 				count:		data[index].count,
 				window:this
 			});
-			trace(index);
 			container.addChild(item);
 			item.x = X;
 			item.y = Y;

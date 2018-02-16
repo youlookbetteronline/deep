@@ -68,7 +68,23 @@ package utils
 				{
 					if (App.data.quests[tempQuest] && App.data.quests[tempQuest].hasOwnProperty('dream')&& App.data.quests[tempQuest].dream != null && App.data.quests[tempQuest].dream.indexOf(App.user.worldID) == -1)
 					{
-						Locker.notFindQuest(tempQuest);
+						if (App.data.quests[tempQuest] && App.data.quests[tempQuest].hasOwnProperty('dream') && !App.data.quests[tempQuest].dream[0])
+						{
+							App.ui.leftPanel.questsPanel.focusedOnQuest(tempQuest, 0);
+							Window.closeAll();
+							return;
+						}
+						else
+						{
+							Locker.notFindQuest(tempQuest);
+							return;
+						}
+						
+					}
+					else if (App.data.quests[tempQuest] && App.data.quests[tempQuest].hasOwnProperty('dream') && App.data.quests[tempQuest].dream == null)
+					{
+						App.ui.leftPanel.questsPanel.focusedOnQuest(tempQuest, 0);
+						Window.closeAll();
 						return;
 					}
 					App.ui.leftPanel.questsPanel.focusedOnQuest(tempQuest, 0);

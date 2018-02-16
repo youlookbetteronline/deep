@@ -217,7 +217,7 @@ package
 		{
 			if (type == 'Sound') 
 			{
-				return Config.resources +'swf/' + type + '/' + name + '.swf?v='+ 1235;
+				return Config.resources +'swf/' + type + '/' + name + '.swf?v='+ 1236;
 			}
 			return Config.resources +'swf/' + type + '/' + name + '.swf?v='+ versionObjects;
 		}

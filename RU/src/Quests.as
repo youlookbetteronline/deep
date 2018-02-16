@@ -644,11 +644,6 @@ package
 			var messages:Array = [];
 			
 			for (var id:* in App.data.quests) {
-				
-				//if (id == 253)
-					//trace(1);
-				if (id == 954)
-					trace();
 				if (data[id] != undefined && data[id].finished == 0) {
 					
 					if(currentQID == 0){

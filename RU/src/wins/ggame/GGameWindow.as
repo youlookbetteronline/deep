@@ -321,7 +321,6 @@ package wins.ggame
 				}
 			}
 			_stickObject.showGlowingOnce(colorGlowing, 1);
-			trace();
 			onItemMoveComplete(event);
 			onStockChange(null);
 		}

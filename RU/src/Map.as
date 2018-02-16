@@ -1362,8 +1362,7 @@ package
 				if (inGrid({x:_res.x, z:_res.z}))
 				{
 					node = App.map._aStarNodes[_res.x][_res.z];
-					if (node.sector.id == 708)
-						trace();
+					
 					node.sector.defResources[_res.id] = _res;
 				}
 			}

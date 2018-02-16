@@ -214,11 +214,12 @@ package wins
 				return;
 			}
 			
-			new AddFriendWindow({
+			/*new AddFriendWindow({
 				model:	_model,
-				target:	settings.target
+				target:	settings.target,
+				popup:	true
 			}).show();
-			return;
+			return;*/
 			new FriendsListWindow({
 				popup:		true,
 				target:		settings.target,

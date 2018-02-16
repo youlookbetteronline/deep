@@ -1745,6 +1745,38 @@ package
 					App.console.openDebug();
 				}
 			}*/
+			
+			if (e.keyCode == Keyboard.ENTER)
+			{
+				if (App.user.mode == User.PUBLIC && !ChatField.self)
+				{
+					ChatField.show();
+				}
+			}
+			
+			//Раскрыть на весь экран
+			if (e.keyCode == Keyboard.P && e.ctrlKey) 
+			{
+				App.ui.systemPanel.onScreenshotEvent();
+			}
+			if (e.keyCode == Keyboard.F && e.ctrlKey) 
+			{
+				App.ui.systemPanel.onFullscreenEvent();				
+			}
+			
+			
+			if (e.keyCode == Keyboard.U && e.ctrlKey) 
+			{
+				if(App.ui.visible){
+					App.ui.visible = false;
+				}else{
+					App.ui.visible = true;
+				}
+			}
+			
+			if (!Config.admin || Window.isOpen)
+				return;
+			
 			if (e.keyCode == Keyboard.L)
 			{
 				//App.network.saveScreenshot();
@@ -1793,37 +1825,6 @@ package
 				}).show();
 				
 			}
-			if (e.keyCode == Keyboard.ENTER)
-			{
-				if (App.user.mode == User.PUBLIC && !ChatField.self)
-				{
-					ChatField.show();
-				}
-			}
-			
-			//Раскрыть на весь экран
-			if (e.keyCode == Keyboard.P && e.ctrlKey) 
-			{
-				App.ui.systemPanel.onScreenshotEvent();
-			}
-			if (e.keyCode == Keyboard.F && e.ctrlKey) 
-			{
-				App.ui.systemPanel.onFullscreenEvent();				
-			}
-			
-			
-			if (e.keyCode == Keyboard.U && e.ctrlKey) 
-			{
-				if(App.ui.visible){
-					App.ui.visible = false;
-				}else{
-					App.ui.visible = true;
-				}
-			}
-			
-			if (!Config.admin || Window.isOpen)
-				return;
-				
 			
 			if (e.keyCode == Keyboard.L && e.ctrlKey) {
 				//Treasures.convertToObject('friendalert');

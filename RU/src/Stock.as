@@ -1355,12 +1355,8 @@ package
 		
 		public static function isHarvest(sid:int):Boolean 
 		{
-			if (sid == 340)
-				trace();
 			for each(var itm:* in App.data.storage)
 			{
-				if (itm.sID == 1166)
-					trace();
 				if (itm.type == 'Plant')
 				{
 					if (itm.outs && itm.outs.hasOwnProperty(sid))

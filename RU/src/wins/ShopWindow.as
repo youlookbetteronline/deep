@@ -18,6 +18,7 @@ package wins
 	import units.Lantern;
 	import units.Table;
 	import units.Tribute;
+	import units.University;
 	import utils.ObjectsContent;
 	import utils.Saver;
 	import wins.elements.BankMenu;
@@ -1344,6 +1345,52 @@ package wins
 						}
 					}
 				}
+				
+				if (App.data.storage[s].type == 'Manufacture')
+				{
+					var manuf:* = App.data.storage[s];
+					for each(var cr:* in manuf.devel[1].craft)
+					{
+						if (App.data.crafting[cr].out == sid)
+						{
+							finded.push(s)
+							break;
+						}
+					}
+					
+					for each(var unID:* in manuf.university)
+					{
+						var univ:* = App.data.storage[unID];
+						var reqs:* = univ.instance.devel[1].req;
+						for (var _lvl:* in reqs)
+						{
+							for each(var _cr:* in reqs[_lvl].craft)
+							{
+								if (App.data.crafting[_cr].out == sid)
+								{
+									finded.push(s)
+									break;
+								}
+							}
+							
+						}
+					}
+					trace()
+				}
+				
+				/*if (App.data.storage[s].type == 'University')
+				{
+					var univ:* = App.data.storage[s];
+					var reqs:* = univ.instance.devel[1].req;
+					for (var _lvl:* in reqs)
+					{
+						for each(var cr:* in reqs[_lvl].craft)
+						{
+							if (App.data.crafting
+						}
+						
+					}
+				}*/
 				
 				if (App.data.storage[s].free) 
 				{
