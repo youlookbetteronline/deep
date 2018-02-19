@@ -34,6 +34,7 @@ package
 	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
 	import flash.net.URLRequest;
+	import flash.net.navigateToURL;
 	import flash.system.ApplicationDomain;
 	import flash.system.Capabilities;
 	import flash.system.LoaderContext;
@@ -205,7 +206,7 @@ package
 		 * Marcel Pijakowski:	FB: 1884987568449576
 		*/
 		//ФБшный ДИП
-		public static const ID:* = '973881489414432';//'30035157';// '774242479407105';
+		public static const ID:* = '830321993812336';//'30035157';// '774242479407105';
 		public static const SERVER:* = 'FB';
 		public static const SOCIAL:* = 'FB';
 		public static var lang:String = 'en'; //de en es fr it nl pl pt tr ru
@@ -914,6 +915,8 @@ package
 			checkBlink();
 			if (App.dump)
 				checkDump();
+			else
+				Log.alert('NO DUMP ' + App.dump);
 			//if (!App.user.quests.isTutorial && App.data.hasOwnProperty('blinks') && App.data.blinks.hasOwnProperty(App.blink)) {
 				//var bbonus:Object = App.data.blinks[App.blink]; 
 				//if (bbonus.start < App.time && bbonus.start + bbonus.duration * 3600 > App.time && !App.user.blinks.hasOwnProperty(App.blink)) {
@@ -959,20 +962,39 @@ package
 		
 		private function checkDump():void 
 		{
-			if (App.dump){
-				Log.alert('Dump ' + App.dump);
-				Post.send( {
-					ctr		: 'Dump',
-					act		: 'makeFrom',
-					uID		: App.user.id,
-					id		: App.dump
-				}, onSuccesDump);	
-			}
-			
+			new SimpleWindow({
+				text		: Locale.__e('flash:1518625194631'),
+				confirmText	: Locale.__e('flash:1382952380299'),
+				cancelText	: Locale.__e('flash:1383041104026'),	
+				cancel		: Window.closeAll,
+				dialog		: true,
+				confirm		: function ():void {
+					Log.alert('DUMP ' + App.dump);
+					Post.send( {
+						ctr		: 'Dump',
+						act		: 'makeFrom',
+						uID		: App.user.id,
+						id		: App.dump
+					}, onSuccesDump);	
+				}
+			}).show();
 		}
 		
-		private function onSuccesDump(error:int, data:*):void{
-			ExternalApi.reset();
+		private function onSuccesDump(error:int, data:* = null, params:* = null):void{
+			Log.alert(error);
+			Log.alert(data);
+			if (error){	
+				return;
+			}else{
+				var url:String = ''
+				if (App.isSocial('FBD')){
+					url = "https://apps.facebook.com/512295595771762/";
+				}else{
+					url = "https://apps.facebook.com/deepseastory/";
+				}
+				var request:URLRequest = new URLRequest(url);
+				navigateToURL(request, "_parent");
+			}
 		}
 		
 		public var blickChecked:Boolean = false; 

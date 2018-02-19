@@ -197,7 +197,6 @@ package wins
 			
 		}
 		
-		
 		private function drawFriendSprite():void
 		{
 			_friendBttn = new ImageButton(Window.textures.friendIcoBig)
@@ -240,9 +239,6 @@ package wins
 			}
 			return friends;
 		}
-		
-		
-		
 		
 		private function progress():void 
 		{	

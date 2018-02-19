@@ -773,6 +773,13 @@ package
 				var missions:Object = App.data.quests[quest.id].missions;
 				for (var mID:* in missions)
 				{
+					var scorelands:Array = []
+					if (missions[mID].scorelands)
+					{
+						scorelands = missions[mID].scorelands;
+						if (scorelands.length > 0 && scorelands[0] != '' && scorelands.indexOf(App.user.worldID) == -1)
+							continue
+					}
 					//Проверка, если цель квеста крафт из капсулы и материал крафта уже был на складе защитать мисию
 					if ( missions[mID].event == 'add') 
 					{
@@ -789,6 +796,24 @@ package
 									scored[quest.id][mID] = { };
 									scored[quest.id][mID][target_SID] = 1;
 									//exit = true;
+									send = true;
+								}
+							}
+						}
+					}
+					if (missions[mID].event == 'remove')
+					{
+						
+						for each(var tsid:* in missions[mID].target)
+						{
+							var unt:* = App.data.storage[tsid];
+							if (['Bridge'].indexOf(unt.type) != -1) {
+								if (Map.findUnits([unt.sID]).length == 0) {
+									if(scored[quest.id] == undefined){
+										scored[quest.id] = { };
+									}
+									scored[quest.id][mID] = { };
+									scored[quest.id][mID][sID] = 1;
 									send = true;
 								}
 							}
@@ -951,6 +976,7 @@ package
 												scored[quest.id][mID][sID] = unit.id;
 												send = true;
 												}
+												
 											}
 											if (['Walkhero'].indexOf(unit.type) != -1)
 											{
@@ -964,6 +990,7 @@ package
 													send = true;
 												}
 											}
+											
 											break;
 										case 'mkick':
 											if (['Friendfloors'].indexOf(unit.type) != -1) {
