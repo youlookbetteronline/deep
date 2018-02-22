@@ -1,6 +1,7 @@
 package utils 
 {
 	import flash.display.Sprite;
+	import wins.ShopWindow;
 	import wins.SimpleWindow;
 	import wins.Window;
 	import wins.WorldsWindow;
@@ -47,6 +48,27 @@ package utils
 						popup:	true
 					}).show();
 				}
+			}).show();
+			return;
+		}
+		
+		public static function notEnoughOnStock(sID:int, closewins:Boolean = true):void
+		{
+			if (App.self.windowContainer.numChildren > 0 && closewins)
+				Window.closeAll();
+			new SimpleWindow( {
+				title		:Locale.__e("flash:1474469531767"),
+				label		:SimpleWindow.ATTENTION,
+				text		:Locale.__e('flash:1482139038489', App.data.storage[sID].title),
+				popup		:true,
+				dialog		:true,
+				confirm		:function():void {
+								Window.closeAll();
+								ShopWindow.findMaterialSource(sID);
+							},
+				cancel		:function():void {
+								Window.closeAll();
+							}
 			}).show();
 			return;
 		}

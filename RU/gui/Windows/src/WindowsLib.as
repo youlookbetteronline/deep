@@ -1577,6 +1577,10 @@ package
 		private var GlowBig:Class;
 		public var glowBig:BitmapData = new GlowBig().bitmapData;
 	
+		[Embed(source="Graphics2/Glows/GlowYellowStrong.png")]
+		private var GlowYellowStrong:Class;
+		public var glowYellowStrong:BitmapData = new GlowYellowStrong().bitmapData;
+	
 		[Embed(source="Graphics2/Glows/GlowSale.png")]
 		private var GlowSale:Class;
 		public var glowSale:BitmapData = new GlowSale().bitmapData;
@@ -1893,6 +1897,10 @@ package
 		private var BlueAsk:Class;
 		public var blueAsk:BitmapData = new BlueAsk().bitmapData;
 		
+		[Embed(source="Graphics2/elements/Infinity.png")]
+		private var Infinity:Class;
+		public var infinity:BitmapData = new Infinity().bitmapData;
+		
 		[Embed(source="Graphics2/elements/YellowClock.png")]
 		private var YellowClock:Class;
 		public var yellowClock:BitmapData = new YellowClock().bitmapData;
@@ -1944,6 +1952,10 @@ package
 		[Embed(source="Graphics2/Backings/BlueBackingSmallBL.png")]
 		private var BlueBackingSmallBL:Class;
 		public var blueBackingSmallBL:BitmapData = new BlueBackingSmallBL().bitmapData;
+		
+		[Embed(source="Graphics2/Backings/BlueBackSmall.png")]
+		private var BlueBackSmall:Class;
+		public var blueBackSmall:BitmapData = new BlueBackSmall().bitmapData;
 		
 		[Embed(source="Graphics2/Backings/BlueBackingSmallTL.png")]
 		private var BlueBackingSmallTL:Class;

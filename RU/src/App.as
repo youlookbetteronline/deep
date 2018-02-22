@@ -83,6 +83,7 @@ package
 	import wins.BonusBankWindow;
 	import wins.BonusLackWindow;
 	import wins.BonusVisitingWindow;
+	import wins.BubbleActionWindow;
 	import wins.BubbleInputWindow;
 	import wins.BubbleSimpleWindow;
 	import wins.DailyFriendsWindow;
@@ -1820,10 +1821,12 @@ package
 					}
 				}
 				trace(result);*/
-				new BonusLackWindow({
+				/*new BonusLackWindow({
 					bonus:	{3393:2, 3326:4, 2:150, 3:15, 59:1}
+				}).show();*/
+				new BubbleActionWindow({
+					
 				}).show();
-				
 			}
 			
 			if (e.keyCode == Keyboard.L && e.ctrlKey) {
@@ -2228,6 +2231,8 @@ package
 						}
 						else
 						{
+							if (sID == 1777)
+								trace();
 							if(App.data.storage[sID] != null)
 								App.data.storage[sID].visible = 0;
 						}

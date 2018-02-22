@@ -498,8 +498,8 @@ package units
 			if (!tm.currentTarget)
 				return;
 			var jobTime:Number = tm.currentTarget.target.info.jobtime;
-			if (jobTime <= 0) jobTime = 2;
-			jobTime = 1.5;
+			if (!jobTime || jobTime <= 0) 
+				jobTime = 1;
 			if (progressBar == null) 
 			{
 				progressBar = new ProgressBar(jobTime, 110);

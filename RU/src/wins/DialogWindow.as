@@ -464,7 +464,9 @@ internal class Dialog extends LayerX {
 	}
 	
 	private function relocate():void {
-		drawTitlePersonage();
+		if (!App.isSocial('SP')){
+			drawTitlePersonage();
+		}
 		setTimeout(function():void {
 			if (personageIcon) {
 				personageIcon.y = back.y + back.height * 0.5;

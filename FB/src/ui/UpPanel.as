@@ -42,6 +42,7 @@ package ui
 	import wins.BonusOnlineWindow;
 	import wins.CalendarWindow;
 	import wins.CollectionBonusList;
+	import wins.CollectionWindow;
 	import wins.LevelUpWindow;
 	import wins.TopWindow;
 	import wins.TravelWindow;
@@ -2514,6 +2515,11 @@ package ui
 						_unit.hidePointing();
 					}, 2000);
 				});
+			}
+			else if (App.data.storage[App.user.worldID].cookie[0] == 3269)
+			{
+				new CollectionWindow({find:	[3273]}).show();
+				
 			}
 			else if (App.data.storage[App.user.worldID].cookie[0] == 3036)
 			{

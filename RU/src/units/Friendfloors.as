@@ -46,6 +46,7 @@ package units
 			_model.lifetime = params.lifetime || 0;
 			_model.mkickCallback = mkickEvent;
 			_model.fkickCallback = fkickEvent;
+			_model.fakefkickCallback = fakefkickEvent;
 			_model.growCallback = growEvent;
 			_model.totalFloor = Numbers.countProps(info.levels);
 			_model.friends = params.friends || {};
@@ -278,6 +279,34 @@ package units
 			App.user.stock.takeAll(data.__take);
 			_model.window.contentChange();
 			Treasures.bonus(data.bonus, new Point(this.x, this.y));
+			params.callback();
+		}
+		
+		private function fakefkickEvent(ffID:int, callbackFunc:Function):void 
+		{
+			Post.send({
+				ctr		:this.type,
+				act		:'fakefkick',
+				uID		:App.user.id,
+				id		:this.id,
+				wID		:App.user.worldID,
+				sID		:this.sid,
+				ffID	:ffID
+			}, onFakefkickEvent, {
+				callback: callbackFunc
+			});
+		}
+		
+		private function onFakefkickEvent(error:int, data:Object, params:Object):void 
+		{
+			if (error)
+			{
+				Errors.show(error, data);
+				return;
+			}
+			_model.friends = data.friends  
+			App.user.stock.takeAll(data.__take);
+			_model.window.contentChange();
 			params.callback();
 		}
 		

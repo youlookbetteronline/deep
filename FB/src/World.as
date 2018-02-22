@@ -8,6 +8,7 @@ package
 	import core.WallPost;
 	import flash.display.Sprite;
 	import flash.geom.Point;
+	import flash.utils.clearTimeout;
 	import flash.utils.describeType;
 	import flash.utils.getDefinitionByName;
 	import flash.utils.setTimeout;
@@ -256,7 +257,20 @@ package
 								new SimpleWindow( {
 									title:Locale.__e("flash:1474469531767"),
 									label:SimpleWindow.ATTENTION,
-									text:Locale.__e("flash:1382952380332")
+									text:Locale.__e("flash:1382952380332"),
+									confirm:function():void
+									{
+										var timeout:uint;
+										var obj:Object = Fog.fogCenter(needZones[0]);
+										var needObj:Object = IsoConvert.screenToIso(obj.x, obj.y, true )
+										var point:Point = new Point(needObj.x, needObj.z)
+										App.map.focusedOnPoint(point);
+										Fog.zones[needZones[0]].startBlink();
+										timeout = setTimeout(function():void{
+											Fog.zones[needZones[0]].stopBlink();
+											clearTimeout(timeout);
+										}, 5000);
+									}
 								}).show();
 								return false;
 							}
@@ -859,17 +873,25 @@ package
 		}
 		public static function worldsWhereEnabled(sid:*):Array 
 		{
+			
 			var worldsWhereEnable:Array = [];
+			if (sid == 2622)
+			{
+				worldsWhereEnable.push(User.HOME_WORLD)
+				worldsWhereEnable.push(User.HOLIDAY_LOCATION)
+				
+			}
 			for (var i:* in App.user.maps) 
 			{
 				for (var mapa:* in App.user.maps[i].ilands)
 				{
 					if (World.canBuyOnThatMap(sid, mapa))
 					{
-						if ((App.data.storage[mapa].hasOwnProperty('expire') && App.data.storage[mapa].expire[App.social] > App.time) || !App.data.storage[mapa].hasOwnProperty('expire'))
+						if ((App.data.storage[mapa].hasOwnProperty('expire') && App.data.storage[mapa].expire[App.social] > App.time) || (App.data.storage[mapa].hasOwnProperty('expire') && App.data.storage[mapa].expire[App.social] < App.time && App.data.storage[mapa].visibleitems) ||!App.data.storage[mapa].hasOwnProperty('expire'))
 						{
 							worldsWhereEnable.push(mapa);
 						}
+						
 					}
 				}
 			}

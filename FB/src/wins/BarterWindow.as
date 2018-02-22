@@ -742,7 +742,7 @@ internal class BarterItem extends LayerX
 	}
 	private function drawButtons():void
 	{
-		if (App.data.storage[sID].mtype == 3)
+		if (App.data.storage[sID].mtype == 3 || App.data.storage[sID].mtype == 4 || App.data.storage[sID].mtype == 6 || App.data.storage[sID].mtype == 8)
 			return;
 		var bttnSettings:Object = {caption: Locale.__e("flash:1382952379751"), width: 100, height: 38, fontSize: 24, scale: 0.8, hasDotes: false}
 		

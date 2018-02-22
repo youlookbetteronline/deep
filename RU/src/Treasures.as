@@ -10,6 +10,7 @@ package
 	import flash.utils.setTimeout;
 	import ui.SystemPanel;
 	import units.Lantern;
+	import units.Unit;
 	import wins.Window;
 	
 	/**
@@ -454,6 +455,47 @@ package
 				if (App.data.storage[treas.item[counter]].type == 'Collection')
 					continue;
 				result[treas.item[counter]] = treas.count[counter];
+			}
+			return result;
+		}
+		
+		public static function bonusPerTime(sID:int, time:uint = 2592000):Object
+		{
+			var result:Object = {};
+			var unit:* = App.data.storage[sID];
+			var reward:*;
+			var storageCount:int;
+			switch (unit.type)
+			{
+				case 'Golden':
+				case 'Walkgolden':
+					storageCount = Math.ceil(time / unit.time);
+					result = averageDropTreasure(unit.shake, storageCount)
+			}
+			return result;
+		}
+		
+		public static function averageDropTreasure(treasure:String, count:int = 1):Object 
+		{
+			var result:Object = new Object();
+			var treas:* = App.data.treasures[treasure][treasure];
+			for (var counter:* in treas.item)
+			{
+				if (App.data.storage[treas.item[counter]].type == 'Collection')
+				{
+					var countCollection:int = int(treas.count[counter] * treas['try'][counter] * treas['probability'][counter] / 100 * count / 5);
+					var needCollection:* = App.data.storage[treas.item[counter]]
+					for (var cID:* in needCollection.reward)
+					{
+						if (result.hasOwnProperty(cID))
+							result[cID] = result[cID] + needCollection.reward[cID] * countCollection
+						else
+							result[cID] = needCollection.reward[cID] * countCollection
+					}
+				}
+				else
+					result[treas.item[counter]] = int(treas.count[counter] * treas['try'][counter] * treas['probability'][counter] / 100 * count);
+
 			}
 			return result;
 		}

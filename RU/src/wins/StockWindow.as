@@ -225,14 +225,12 @@ package wins
 				for (var i:* in sections[section].items) {
 					
 					var sid:int = sections[section].items[i].sid;
-					if (App.data.storage[sid].type == 'Collection')
+					if (App.data.storage[sid].type == 'Collection' || App.data.storage[sid].type == 'Petfood')
 						collectionArray.push(sid);
 					if (settings.find != null && settings.find.indexOf(sid) != -1 && section !='all') 
 					{
-						//paginator.page = i / paginator.onPageCount;
-						//paginator.update();
 						history.section = section;
-						history.page = (int(i) - collectionArray.length) / settings.itemsOnPage;
+						history.page = int((i - collectionArray.length) / settings.itemsOnPage);
 						
 						settings.section = history.section;
 						settings.page = history.page;
@@ -284,16 +282,13 @@ package wins
 			
 			var section:String = "all";
 			for (var ID:* in App.user.stock.data) {
-				if (ID == 3396)
+				if (ID == 3386)
 					trace()
 				var count:int = App.user.stock.data[ID];
 				var item:Object = App.data.storage[ID];
 
 				if(item == null)	continue;
 				if (count < 1) 		continue;
-				
-				
-				if (notShow(ID)) continue;
 				//Пропускаем деньги
 				//if ('gct'.indexOf(item.type) != -1) continue;
 
@@ -306,10 +301,10 @@ package wins
 						}*/else if (item.mtype == 3) {
 							if( mode != StockWindow.MINISTOCK) {
 								continue
-							 }else {
-								 //Пропускаем системные
+							}else {
+								//Пропускаем системные
 								continue; 
-							 }
+							}
 						
 						}
 						else if (item.mtype == 4 && User.inExpedition)
@@ -1043,7 +1038,6 @@ package wins
 				bodyContainer.addChild(item);
 				item.x = Xs;
 				item.y = Ys;
-				App.data.storage	
 				items.push(item);
 				Xs += item.background.width+15;
 				if (itemNum == int(settings.itemsOnPage / 2) - 1)	{
@@ -1086,19 +1080,6 @@ package wins
 			}else{
 				paginator.y = int(settings.height - paginator.height + 60);
 			}
-		}
-		
-		private function notShow(sID:int):Boolean 
-		{
-			return false
-			switch(sID) {
-				case 100000:
-				
-						return true;
-					break;
-			}
-			
-			return false;
 		}
 	}
 }
@@ -1363,7 +1344,7 @@ internal class StockItem extends Sprite {
 			closeBttn.y = 10;
 		}
 		
-		if (['Walkhero', 'Happy','Photostand','GGame','Banker','Picker','Beast','Thappy','Building','Hippodrome','Booster','Barter','Plant','Changeable','Farm','Gardener', 'Mfield', 'Fatman','Helper', 'Tribute','Decor'/*'Golden'*/,'Animal','Ganimal','Resource','Table','Collector','Bridge','Firework', 'Techno', 'Box', 'Moneyhouse', 'Field', 'Floors','Resource','Tree','Gamble','Port','Tent','Walkgolden','Zoner','Oracle', 'Changeable', 'Mfloors', 'Boss', 'Booker', 'Technological', 'Ahappy', 'Mhelper', 'Table', 'Pharmacy', 'Ctribute'].indexOf(item.type) != -1){
+		if (['Walkhero','Friendfloors', 'Happy','Photostand','GGame','Banker','Picker','Beast','Thappy','Building','Hippodrome','Booster','Barter','Plant','Changeable','Farm','Gardener', 'Mfield', 'Fatman','Helper', 'Tribute','Decor'/*'Golden'*/,'Animal','Ganimal','Resource','Table','Collector','Bridge','Firework', 'Techno', 'Box', 'Moneyhouse', 'Field', 'Floors','Resource','Tree','Gamble','Port','Tent','Walkgolden','Zoner','Oracle', 'Changeable', 'Mfloors', 'Boss', 'Booker', 'Technological', 'Ahappy', 'Mhelper', 'Table', 'Pharmacy', 'Ctribute'].indexOf(item.type) != -1){
 			giftBttn.visible = false;
 			wishlistBttn.visible = false;
 			//priceBttn.visible = false;

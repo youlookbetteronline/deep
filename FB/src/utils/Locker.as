@@ -33,7 +33,7 @@ package utils
 		{
 			if (App.self.windowContainer.numChildren > 0 && closewins)
 				Window.closeAll();
-			var _wID:int = App.user.worldID;
+			var _wID:Array = [App.user.worldID];
 			if (App.data.quests[qID].dream && App.data.quests[qID].dream[0])
 				_wID = App.data.quests[qID].dream;
 			new SimpleWindow( {
@@ -45,7 +45,7 @@ package utils
 					new WorldsWindow( {
 						title: Locale.__e('flash:1415791943192'),
 						sID:	null,
-						only:	[_wID],
+						only:	_wID,
 						popup:	true
 					}).show();
 				}

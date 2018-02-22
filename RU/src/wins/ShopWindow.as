@@ -208,7 +208,7 @@ package wins
 				{
 					for (var __sid:* in _itemsData[_sect])
 					{
-						if (__sid == 2474)
+						if (__sid == 3215)
 							trace();
 						if (__sid != 's' && _itemsData[_sect][__sid] != 0 && App.data.storage[__sid] != null && App.data.storage[__sid].type != 'Material' && App.data.storage[__sid].type != 'Lamp') 
 						{
@@ -356,11 +356,11 @@ package wins
 					item['sid'] = id;
 					//if (item['sid'] == 2563)
 						//trace();
-					if (item['sid'] == 1777)
-						item.visible = 1
+					/*if (item['sid'] == 1777 || item['sid'] == 3215)
+						item.visible = 1*/
 					if (item['sid'] == 2622)
 						continue;
-					if (item['sid'] == 2474)
+					if (item['sid'] == 3215)
 						trace();
 					if (ShopWindow.sarcofitons.indexOf(int(item.sid)) != -1)
 					{
@@ -1022,13 +1022,23 @@ package wins
 			}
 			for (var s:* in App.data.storage)
 			{
-				if ((App.data.storage[s].order && App.data.storage[s].order == 0) || s == 0)
+				if ((App.data.storage[s].order && App.data.storage[s].order == 0) || s == 0 || (App.data.storage[s].hasOwnProperty('stopfind') && App.data.storage[s].stopfind == 1))
 					continue;
 				
 				if (App.data.storage[s].type == 'Plant') 
 				{
-					if (s == 555)
-						trace();
+					if (App.data.storage[s].hasOwnProperty('treasure') && App.data.storage[s].treasure)
+					{
+						for each(var pl_tresh:* in App.data.treasures[App.data.storage[s].treasure][App.data.storage[s].treasure].item)
+						{
+							if (pl_tresh == int(sid))
+							{
+								finded.push(s);
+								findPlant = true;
+								break;
+							}
+						}
+					}
 					for (var sids:* in App.data.storage[s].outs)
 					{
 						if (int(sid) == sids)
@@ -1235,6 +1245,32 @@ package wins
 					{
 						if (c_tresh == int(sid))
 							finded.push(s);
+					}
+				}
+				
+				
+				if (App.data.storage[s].type == 'Walkhero')
+				{
+					var wh:* = App.data.storage[s]
+					
+					for each (var whlvl:* in wh.levels)
+					{
+						for each(var whlvl_tresh:* in App.data.treasures[whlvl.bonus][whlvl.bonus].item)
+						{
+							if (whlvl_tresh == int(sid))
+							{
+								finded.push(s);
+								break;
+							}
+						}
+					}
+					for each(var wh_tresh:* in App.data.treasures[App.data.storage[s].treasure][App.data.storage[s].treasure].item)
+					{
+						if (wh_tresh == int(sid))
+						{
+							finded.push(s);
+							break;
+						}
 					}
 				}
 				

@@ -10,6 +10,7 @@ package utils
 	import wins.ActionWoodWindow;
 	import wins.BanksWindow;
 	import wins.BigsaleWindow;
+	import wins.BubbleActionWindow;
 	import wins.MaterialActionWindow;
 	import wins.PremiumActionWindow;
 	import wins.PromoWindow;
@@ -505,6 +506,12 @@ package utils
 			if (action.bg && action.bg == 'SaleLimitWindow')
 			{
 				new SaleLimitWindow( { pID:pID } ).show();
+				return;
+			}
+			
+			if (action.bg && action.bg == 'BubbleActionWindow')
+			{
+				new BubbleActionWindow( { pID:pID } ).show();
 				return;
 			}
 			

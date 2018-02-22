@@ -1406,10 +1406,16 @@ internal class StockItem extends Sprite {
 			applyBttn.x = (background.width - applyBttn.width) * 0.5;
 		}
 		
-		if ((item.hasOwnProperty('mtype') && item.mtype == 5)) 
+		if ((item.hasOwnProperty('mtype') && (item.mtype == 5 || item.mtype == 8))) 
 		{
 			giftBttn.visible = false;
 			wishlistBttn.visible = false;
+		}
+		
+		if (item.hasOwnProperty('mtype') && item.mtype == 8)
+		{
+			sellSprite.visible = false;
+			closeBttn.visible = false;
 		}
 		
 		if (item.type == 'Boss') 

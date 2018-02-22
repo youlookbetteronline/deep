@@ -643,6 +643,7 @@ package
 							data[sID] -= count;
 							if (consider(sID))	value -= count;
 							App.self.dispatchEvent(new AppEvent(AppEvent.ON_CHANGE_FANTASY));
+							//App.ui.upPanel.update(['fants']);
 						break;
 					case Stock.FANT:						
 						data[sID] -= count;

@@ -1346,6 +1346,14 @@ package
 					return;
 				}
 			});
-		}		
+		}
+		
+		public static function canBuySell(sid:int):Boolean
+		{
+			var item:Object = App.data.storage[sid]
+			if (item.mtype == 3 || item.mtype == 4 || item.mtype == 6 || item.mtype == 8)
+				return false
+			return true;
+		}
 	}	
 }

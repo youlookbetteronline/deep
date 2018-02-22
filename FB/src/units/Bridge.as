@@ -147,6 +147,12 @@ package units
 					travelRailing3.buyAction();
 					travelRailing3.take();
 				}
+				if (this.sid == 3268)
+				{
+					var travelRailing4:Unit = Unit.add( {gift:false, sid:3280, buy:true, x:187, z:160} );
+					travelRailing4.buyAction();
+					travelRailing4.take();
+				}
 				if (this.sid == 808)
 				{
 					var railing:Unit = Unit.add( {gift:false, sid:929, buy:true, x:87, z:27 } );

@@ -460,6 +460,8 @@ package units
 			{
 				if (info.speedup == "")
 					return false;
+				if (info.stopboost)
+					return true;
 				if (sid == 1133 || sid == 1832)
 				{
 					var imageName:String = '';
@@ -472,6 +474,8 @@ package units
 					{
 						imageName = 'Painting1';
 					}
+					
+					
 					
 					new EaselSpeedWindow( {
 						title			:info.title,

@@ -338,7 +338,7 @@ package wins
 				}
 				preloader.x = settings.width / 2;
 				preloader.y = settings.height / 2;
-				Load.loading(Config.getImage('content', 'map_2', 'jpg'), onLoad);
+				Load.loading(Config.getImage('content', App.user.maps[paginator.page].image, 'jpg'), onLoad);
 			}
 			
 			image.bitmapData = images[paginator.page].bmd;

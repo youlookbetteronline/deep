@@ -159,8 +159,6 @@ package wins
 		
 		private function build():void 
 		{
-			titleLabel.y += 45;
-			
 			exit.y += 13;
 			exit.x -= 15;
 			

@@ -593,12 +593,19 @@ package
 			mFog = new Sprite();
 			mIcon = new Sprite();
 			
+			var fogshape:Shape = new Shape();
+			fogshape.graphics.beginFill(0x6d97ac, 1)
+			fogshape.graphics.drawRect(0, 0, App.self.width, App.self.height);
+			fogshape.graphics.endFill();
+			mFog.addChild(fogshape);
+			
 			mUnits.addChild(mLand);
 			mUnits.addChild(mField);
 			mUnits.addChild(mSort);
-			mUnits.addChild(mFog);
 			//mUnits.addChild(mEffects);
 			mUnits.addChild(mIcon);
+			mFog.cacheAsBitmap = true;
+			//mUnits.addChild(mFog);
 			
 			
 			//mEffects.addChild(centerPoint);

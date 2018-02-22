@@ -1773,6 +1773,16 @@ package
 			}
 		}
 		
+		public function focusedOnPoint(point:Point):void
+		{
+			var tweenTime:Number = 1.0;
+			var target:Object = IsoConvert.isoToScreen(point.x, point.y, true);
+			var targetX:Object = -target.x * scaleX + App.self.stage.stageWidth / 2;
+			var targetY:Object = -target.y * scaleX + App.self.stage.stageHeight / 2;
+			TweenLite.to(this, tweenTime, { x:targetX, y:targetY } );
+			
+		}
+		
 		private function initMonster():void 
 		{
 			var boxes:Array = findUnits([2335]);

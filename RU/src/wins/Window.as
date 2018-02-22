@@ -2513,15 +2513,18 @@ package wins
 		
 		public function disposeChilds(list:*):void 
 		{
+			/*var classString:String =  getQualifiedClassName(list)
+			var classType:Class = getDefinitionByName(classString) as Class
 			if (!list)
-				return;
+				list = new classType;*/
 			for each(var item:DisplayObject in list){
 				if (item && item.parent)
 					item.parent.removeChild(item);
 				item = null;
 			}
-			list = new (getDefinitionByName(getQualifiedClassName(list)) as Class)
-			trace();
+			/*
+			list = new classType;
+			trace();*/
 			//list =  new classType();
 			
 		}

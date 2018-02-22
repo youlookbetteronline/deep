@@ -1206,11 +1206,11 @@ package units
 		
 		override public function click():Boolean
 		{
-			if (this.sid == 3288 && this.level == 6 && !Config.admin)
+			/*if (this.sid == 3288 && this.level == 6 && !Config.admin)
 			{
 				Locker.availableUpdate();
 				return false;
-			}
+			}*/
 			if (pest && pest.alive)//Вредитель
 				return false;
 			hidePointing();
@@ -1329,11 +1329,11 @@ package units
 				{
 					if (hasUpgraded)
 					{
-						if (this.sid == 3288 && this.level == 6 && !Config.admin)
+						/*if (this.sid == 3288 && this.level == 6 && !Config.admin)
 						{
 							Locker.availableUpdate();
 							return false;
-						}
+						}*/
 						/*if (this.sid == Unit.BATHYSCAPHE)
 						{
 							if (level == 8 && !Config.admin)

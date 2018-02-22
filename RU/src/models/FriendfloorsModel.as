@@ -17,6 +17,7 @@ package models
 		private var _freeze:Boolean = false;
 		private var _mkickCallback:Function;
 		private var _fkickCallback:Function;
+		private var _fakefkickCallback:Function;
 		private var _growCallback :Function;
 		private var _window:FriendfloorsWindow;
 		
@@ -148,6 +149,16 @@ package models
 		public function set lifetime(value:int):void 
 		{
 			_lifetime = value;
+		}
+		
+		public function get fakefkickCallback():Function 
+		{
+			return _fakefkickCallback;
+		}
+		
+		public function set fakefkickCallback(value:Function):void 
+		{
+			_fakefkickCallback = value;
 		}
 		
 	}

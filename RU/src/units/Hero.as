@@ -307,22 +307,38 @@ package units
 				
 			addAnimation();
 			App.map.allSorting();
+			//drawAntiFog();
+		}/*
+		
+		override public function set x(value:Number):void 
+		{
+			super.x = value;
+			circle.x = x;
+			
 		}
+		
+		override public function set y(value:Number):void 
+		{
+			super.y = value;
+			circle.y = y;
+		}*/
 		
 		public var circle:Shape = new Shape();
 		public function drawAntiFog():void 
 		{
-			var radius:int = 130; 
+			var radius:int = 300; 
 			
 			circle.graphics.beginFill(0, 1);
 			circle.graphics.drawCircle(0, 0, radius);
 			circle.graphics.endFill();
-			circle.filters = [new BlurFilter(40, 40)];
+			circle.filters = [new BlurFilter(120, 120)];
 			App.map.mFog.addChild(circle);
 			var point:Object = IsoConvert.isoToScreen(coords.x, coords.z, true);
 			circle.cacheAsBitmap = true;
 			circle.x = point.x;
 			circle.y = point.y;
+			circle.cacheAsBitmap = true;
+			App.map.mFog.alpha = .8
 			circle.blendMode = BlendMode.ERASE;
 		}
 		

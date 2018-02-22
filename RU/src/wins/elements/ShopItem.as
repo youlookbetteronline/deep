@@ -822,8 +822,7 @@ package wins.elements
 					if (fld.hasOwnProperty('plant') && fld.plant && fld.plant.hasOwnProperty('sid') && fld.plant.sid == item.sID)
 						countPlant++
 				}
-				if (item.sID == 1777)
-					trace()
+				
 				if (countPlant >= aveableCount)
 					return false;
 			}
@@ -1139,12 +1138,29 @@ package wins.elements
 					return false;
 			}
 			
-			if (item.type == 'Plant')
+			/*if (item.type == 'Plant')
 			{
 				var plantInst:Array = Map.findUnits([item.sID]);
 				
 				if (plantInst.length >= aveableCount)
 					return false;
+			}*/
+			if (item.type == 'Plant')
+			{
+				if (!item.gcount)
+					return true;
+				var _fields:Array = Map.findFieldUnits([76, 2198]);
+				var _countPlant:int = 0;
+				for each(var fld:* in _fields)
+				{
+					if (fld.hasOwnProperty('plant') && fld.plant && fld.plant.hasOwnProperty('sid') && fld.plant.sid == item.sID)
+						_countPlant++
+				}
+				if (_countPlant >= aveableCount)
+				{
+					drawText(Locale.__e('flash:1510647870090') + ' ' + String(_countPlant) + '/' + String(item.gcount)); // Нигде не доступно
+					return false;
+				}	
 			}
 			
 			if (item.type == 'Picker')

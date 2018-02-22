@@ -892,10 +892,11 @@ package
 				{
 					if (World.canBuyOnThatMap(sid, mapa))
 					{
-						if ((App.data.storage[mapa].hasOwnProperty('expire') && App.data.storage[mapa].expire[App.social] > App.time) || !App.data.storage[mapa].hasOwnProperty('expire'))
+						if ((App.data.storage[mapa].hasOwnProperty('expire') && App.data.storage[mapa].expire[App.social] > App.time) || (App.data.storage[mapa].hasOwnProperty('expire') && App.data.storage[mapa].expire[App.social] < App.time && App.data.storage[mapa].visibleitems) ||!App.data.storage[mapa].hasOwnProperty('expire'))
 						{
 							worldsWhereEnable.push(mapa);
 						}
+						
 					}
 				}
 			}

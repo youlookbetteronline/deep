@@ -79,7 +79,7 @@ package wins
 		
 		private function drawTexts():void 
 		{
-			_descriptionText = Window.drawText(Locale.__e('flash:1397573560652') + ': ' + _model.floor + '/' + _model.totalFloor, {
+			_descriptionText = Window.drawText(Locale.__e('flash:1397573560652') + ': ' + _model.floor + '/' + (_model.totalFloor + 1), {
 				fontSize		:44,
 				color			:0xffffff,
 				borderColor		:0x7e3e13,
@@ -212,13 +212,16 @@ package wins
 				Hints.text(Locale.__e('flash:1510137461363'), Hints.TEXT_RED, new Point(App.self.mouseX, App.self.mouseY));
 				return;
 			}
-			
-			/*new AddFriendWindow({
-				model:	_model,
-				target:	settings.target,
-				popup:	true
-			}).show();
-			return;*/
+			var friendData:Array = getFriends();
+			if (friendData.length == 0 || !friendData)
+			{
+				new AddFriendWindow({
+					model:	_model,
+					target:	settings.target,
+					popup:	true
+				}).show();
+			return;
+			}
 			new FriendsListWindow({
 				popup:		true,
 				target:		settings.target,

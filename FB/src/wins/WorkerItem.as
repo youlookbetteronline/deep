@@ -941,6 +941,10 @@ package wins{
 				searchBttn.visible = false;
 			}
 			
+			if (info.mtype == 6 || info.mtype == 8){
+				buyBttn.visible = false;
+			}
+			
 			/*if (App.social == 'YB') {
 				askBttn.visible = false;
 				buyBttn.y -= 20;
