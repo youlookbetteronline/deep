@@ -481,11 +481,14 @@ internal class Dialog extends LayerX {
 					default:
 						personageIcon.y -= 56;
 				}
-				if (side)
-					titlePersonage.x = back.x + back.width - titlePersonage.width / 2;//personageIcon.x + (personageIcon.width - titlePersonage.width) / 2;
-				else
-					titlePersonage.x = back.x - titlePersonage.width / 2 
-				titlePersonage.y = personageIcon.y + personageIcon.height - 20;
+				
+				if (!App.isSocial('SP')){
+					if (side)
+						titlePersonage.x = back.x + back.width - titlePersonage.width / 2;//personageIcon.x + (personageIcon.width - titlePersonage.width) / 2;
+					else
+						titlePersonage.x = back.x - titlePersonage.width / 2 
+					titlePersonage.y = personageIcon.y + personageIcon.height - 20;
+				}
 			}
 		}, 10);
 		

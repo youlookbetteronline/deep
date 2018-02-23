@@ -188,9 +188,9 @@ package
 		public static const VERSION:String = '13.01.1';
 		
 		/* 	
-		 * Олег Ыыыыы  		{DM: 29060311, FB: 973881489414432}
-		 * Олег Кумыс  		{DM: 96391814, FB: 973881489414432}
-		 * Tonyas     		{DM: 83730403, FB: 830321993812336}
+		 * Oleg  		{DM: 29060311, FB: 973881489414432}
+		 * Tonya     		{DM: 83730403, FB: 830321993812336}
+		 * Katya QA			{DM: 473082136, VK: 473082136, OK: 591572354588, MM: 4809123519620259436, FS: 93523010, FB: 109458176544397}
 		 * Якита     		{DM: 145579072, FB:640899449454407}
 		 * Sasha     		{DM: 437526134, FB:1850121798639095}
 		 * Nypko Nyp		{VK: 217827748}
@@ -201,7 +201,7 @@ package
 
 		public static const ID:* = '29060311';//'30035157';// '774242479407105';
 		public static const SERVER:* = 'DM';
-		public static const SOCIAL:* = 'DM';	
+		public static const SOCIAL:* = 'VK';	
 		public static var lang:String = 'ru'; //de en es fr it nl pl pt tr ru
 		
 		public static function get data():Object

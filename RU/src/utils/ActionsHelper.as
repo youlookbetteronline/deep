@@ -30,7 +30,8 @@ package utils
 	 */
 	public class ActionsHelper 
 	{
-		
+		public static const CURRENCY:int = 1;
+		public static const MATERIAL:int = 2;
 		public function ActionsHelper() 
 		{
 			
@@ -682,6 +683,13 @@ package utils
 					_checkPaygroup = true;
 			}
 			return _checkPaygroup
+		}
+		
+		public static function getActionType(aID:int):int{
+			if (App.data.actions[aID].hasOwnProperty('price') && App.data.actions[aID].price.hasOwnProperty(App.social))
+				return CURRENCY;
+			else 
+				return MATERIAL;
 		}
 		
 		public static function priceLable(price:Number):Object 

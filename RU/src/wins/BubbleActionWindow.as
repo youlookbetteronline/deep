@@ -1,5 +1,6 @@
 package wins 
 {
+	import api.ExternalApi;
 	import buttons.Button;
 	import buttons.MoneyButton;
 	import com.greensock.TweenMax;
@@ -8,6 +9,7 @@ package wins
 	import com.greensock.plugins.TweenPlugin;
 	import core.Load;
 	import core.Numbers;
+	import core.Post;
 	import core.Size;
 	import core.TimeConverter;
 	import flash.display.Bitmap;
@@ -15,12 +17,15 @@ package wins
 	import flash.events.MouseEvent;
 	import flash.filters.DropShadowFilter;
 	import flash.geom.Point;
+	import flash.net.URLRequest;
+	import flash.net.navigateToURL;
 	import flash.text.TextField;
+	import utils.ActionsHelper;
 	/**
 	 * ...
 	 * @author ...
 	 */
-	public class BubbleActionWindow extends Window 
+	public class BubbleActionWindow extends AddWindow 
 	{
 		private var _aID:int;
 		private var _action:Object;
@@ -37,23 +42,19 @@ package wins
 		private var _rewardItem:RewardItem;
 		private var _rewardItems:Vector.<RewardItem>;
 		private var _bttn:Button;
+		private var _atype:int;
+		private var _leftTimeContainer:Sprite = new Sprite;
+		private var _leftTimeText:TextField
+		private var _leftTimeBack:Bitmap
 		public function BubbleActionWindow(settings:Object=null) 
 		{
 			this._aID = settings.pID;
+			this._atype = ActionsHelper.getActionType(_aID);
 			this._action = App.data.actions[settings.pID];
 			this._actionItem = Numbers.firstProp(_action.items).key
-			settings = settingsInit(settings);
-			super(settings);
-		}
-		
-		private function settingsInit(settings:Object = null):Object
-		{
-			if (settings == null) {
-				settings = {};
-			}
-			
 			settings["width"]				= 480;
-			settings["height"] 				= 520;
+			drawDescription()
+			settings["height"] 				= needRewardPerTime?430 + _description.textHeight:295 + _description.textHeight;
 			settings["background"]			= 'bubbleBlueBacking'
 			settings['fontColor'] 			= 0x004762;
 			settings['fontBorderColor'] 	= 0xffffff;
@@ -64,8 +65,8 @@ package wins
 			settings["hasPaper"] 			= false;
 			settings["hasArrows"]			= false;
 			settings["hasButtons"]			= false;
+			super(settings);
 			
-			return settings;
 		}
 		
 		override public function drawBackground():void 
@@ -78,10 +79,46 @@ package wins
 		{
 			drawItem();
 			drawItemInfo();
-			drawDescription();
 			drawReward();
 			drawButton();
+			drawLeftTime()
 			build();
+		}
+		
+		private function drawLeftTime():void 
+		{
+			_leftTimeBack = new Bitmap(Window.textures.popupBack)
+			Size.size(_leftTimeBack, 128, 120)
+			_leftTimeBack.smoothing = true;
+			_leftTimeContainer.addChild(_leftTimeBack);
+			
+			
+			var timeLeft:uint = _action.time + _action.duration * Numbers.HOUR - App.time;
+			_leftTimeText = Window.drawText(Locale.__e('flash:1393581955601') + '\n' + TimeConverter.timeToCuts(timeLeft),{
+				fontSize		:32,
+				color			:0xfff330,
+				borderColor		:0x224076,
+				borderSize		:3,
+				textAlign		:'center',
+				width:115
+			})
+			_leftTimeText.x = (_leftTimeBack.width - _leftTimeText.width) / 2;
+			_leftTimeText.y = (_leftTimeBack.height - _leftTimeText.height) / 2;
+			_leftTimeContainer.addChild(_leftTimeText)
+			App.self.setOnTimer(actionTimer)
+		}
+		
+		private function actionTimer():void 
+		{
+			var timeLeft:uint = _action.time + _action.duration * Numbers.HOUR - App.time;
+			if (timeLeft < 0)
+			{
+				close();
+				App.user.updateActions();
+				App.self.setOffTimer(actionTimer);
+				return;
+			}
+			_leftTimeText.text = Locale.__e('flash:1393581955601') + '\n' + TimeConverter.timeToCuts(timeLeft)
 		}
 		
 		private function drawItem():void 
@@ -135,7 +172,7 @@ package wins
 			_labelBack.smoothing = true;
 
 			_labelBack.x = (settings.width - _labelBack.width) / 2;
-			_labelBack.y = _glowImage.y + _glowImage.height - 100;
+			_labelBack.y = 125;
 			_labelBack.filters = [new DropShadowFilter(3, 90, 0x000000, .2, 1, 1, 1, 1)]
 			
 			_label.x = _labelBack.x + (_labelBack.width - _label.width) / 2;
@@ -237,20 +274,16 @@ package wins
 				borderColor		:0x224076,
 				borderSize		:4,
 				textAlign		:'center',
-				width			:settings.width - 90,
+				width			:390,
 				multiline		:true,
 				wrap			:true
 			});
-			
-			_description.y = _itemInfoContainer.y + _itemInfoContainer.height + 3;
-			_description.x = (settings.width - _description.width) / 2;
-			bodyContainer.addChild(_description);
 		}
 		
 		
 		private function drawReward():void
 		{
-			_rewardTitle = Window.drawText('За 2 месяца можно получить до:',{
+			_rewardTitle = Window.drawText(_action.rewardpertime.text,{
 				fontSize		:28,
 				color			:0xfff330,
 				borderColor		:0x224076,
@@ -258,7 +291,7 @@ package wins
 				textAlign		:'center',
 				width			:settings.width - 90
 			})
-			_rewardDesc = Window.drawText('*включает награду за обмен собраных коллекций:',{
+			_rewardDesc = Window.drawText(Locale.__e('flash:1519398814696'),{
 				fontSize		:16,
 				color			:0x224076,
 				border			:false,
@@ -266,7 +299,7 @@ package wins
 				width			:settings.width - 90
 			})
 			
-			content = Treasures.bonusPerTime(_actionItem);
+			content = Treasures.bonusPerTime(_actionItem, _action.rewardpertime.time);
 			settings.content = Numbers.objectToArraySidCount(content);
 			disposeChilds(_rewardItems);
 			_rewardItems = new Vector.<RewardItem>
@@ -283,25 +316,54 @@ package wins
 		
 		private function drawButton():void 
 		{
-			_bttn = new MoneyButton({
-				caption			: Locale.__e('flash:1518780998508') + '\n',
-				width			:168,
-				height			:55,
-				fontSize		:30,
-				fontCountSize	:30,
-				radius			:20,
-				countText		:10,
-				/*boostsec		:1,
-				mID				:Numbers.firstProp(_item.price).key, */
-				multiline		:false,
-				wrap			:false,
-				notChangePos	:true,
-				iconDY			:2,
-				bevelColor		:[0xcce8fa, 0x3b62c2],
-				bgColor			:[0x65b7ef, 0x567ed0]
-			})
-		
-			_bttn.addEventListener(MouseEvent.CLICK, onClick);
+			switch (_atype)
+			{
+				case ActionsHelper.CURRENCY:
+					var price:Number = _action.price[App.social];
+					var priceLable:Object = ActionsHelper.priceLable(price);
+					var bttnSettings:Object = {
+						fontSize	:((App.isJapan())) ? 20 : 28,
+						width		:168,
+						height		:55,
+						hasDotes	:false,
+						caption		:Locale.__e(priceLable.text, [priceLable.price])
+					};
+					_bttn = new Button(bttnSettings);
+					if (Payments.byFants)
+						_bttn.fant();
+					
+					if(App.isSocial('MX')){
+						var mixiLogo:Bitmap = new Bitmap(Window.textures.mixieLogo);
+						_bttn.topLayer.addChild(mixiLogo);
+						_bttn.fitTextInWidth(_bttn.width - (mixiLogo.width + 10));
+						_bttn.textLabel.width = _bttn.textLabel.textWidth + 5;
+						_bttn.textLabel.x = (_bttn.width - (_bttn.textLabel.width + mixiLogo.width + 5)) / 2 + mixiLogo.width + 5;
+						mixiLogo.x = _bttn.textLabel.x - mixiLogo.width - 5 ;
+						mixiLogo.y = (_bttn.height - mixiLogo.height) / 2;
+					}
+					_bttn.addEventListener(MouseEvent.CLICK, buyEvent);
+					break;
+				case ActionsHelper.MATERIAL:
+					_bttn = new MoneyButton({
+						caption			: Locale.__e('flash:1382952379751') + '\n',
+						width			:168,
+						height			:55,
+						fontSize		:30,
+						fontCountSize	:30,
+						radius			:20,
+						countText		:String(Numbers.firstProp(_action.mprice[App.social]).val),
+						mID				:Numbers.firstProp(_action.mprice[App.social]).val, 
+						multiline		:false,
+						wrap			:false,
+						notChangePos	:true,
+						iconScale		:.7,
+						iconDY			:2,
+						bevelColor		:[0xcce8fa, 0x3b62c2],
+						bgColor			:[0x65b7ef, 0x567ed0]
+					});
+					_bttn.addEventListener(MouseEvent.CLICK, buyEvent);
+			}
+
 		}
 		
 		private function onClick(e:MouseEvent):void 
@@ -318,7 +380,12 @@ package wins
 			
 			if (_itemImage)
 				addImage();
+			
 				
+			_description.y = _itemInfoContainer.y + _itemInfoContainer.height + 3;
+			_description.x = (settings.width - _description.width) / 2;
+			bodyContainer.addChild(_description);
+			
 			_rewardTitle.x = (settings.width - _rewardTitle.width) / 2;
 			_rewardTitle.y = 335;
 			
@@ -335,10 +402,29 @@ package wins
 			_bttn.y = settings.height - 50;
 			
 			bodyContainer.addChild(_bttn);
+			
+			_leftTimeContainer.x = 0;
+			_leftTimeContainer.y = -60;
+			bodyContainer.addChild(_leftTimeContainer);
 		}
+		
+		override public function drawPromoPanel():void {return; }
+	
+		private function get needRewardPerTime():Boolean
+		{
+			if (_action.hasOwnProperty('rewardpertime') && _action.rewardpertime.hasOwnProperty('text') && _action.rewardpertime.text != '')
+				return true;
+			return false;
+		}
+		
+		
 	}
 }
+import core.Load;
+import core.Numbers;
+import core.Size;
 import flash.display.Bitmap;
+import flash.text.TextField;
 import wins.Window;
 
 internal class RewardItem extends LayerX
@@ -346,11 +432,28 @@ internal class RewardItem extends LayerX
 	private var _settings:Object = {
 		side:	71
 	}
-	private var _back:Bitmap
+	private var _sid:int;
+	private var _count:int;
+	private var _info:Object;
+	private var _back:Bitmap;
+	private var _icon:Bitmap;
+	private var _countText:TextField;
+
 	public function RewardItem(item:Object)
 	{
+		this._sid = Numbers.firstProp(item).key
+		this._count = Numbers.firstProp(item).val
+		this._info = App.data.storage[_sid];
 		drawBack();
+		drawIcon();
+		drawCount();
 		build();
+		this.tip = function():Object{
+				return{
+					title:_info.title,
+					text:_info.description
+				}
+			}
 	}
 	
 	private function drawBack():void 
@@ -358,9 +461,50 @@ internal class RewardItem extends LayerX
 		_back = Window.backing(SIDE, SIDE, 30, 'blueBackSmall');
 	}
 	
+	private function drawIcon():void 
+	{
+		Load.loading(Config.getIcon(_info.type, _info.preview), onLoad)
+	}
+	
+	private function onLoad(data:Bitmap):void 
+	{
+		_icon = new Bitmap(data.bitmapData);
+		Size.size(_icon, 45, 45);
+		_icon.smoothing = true;
+		addIcon();
+	}
+	
+	private function addIcon():void 
+	{
+		if (_icon && _icon.parent)
+			_icon.parent.removeChild(_icon)
+		_icon.x = (SIDE - _icon.width) / 2;
+		_icon.y = (SIDE - _icon.height) / 2 - 5;
+		addChild(_icon)
+		drawCount();
+	}
+	
+	private function drawCount():void
+	{
+		if (_countText && _countText.parent)
+			_countText.parent.removeChild(_countText);
+		_countText = Window.drawText('x'+String(_count),{
+			fontSize		:22,
+			color			:0xffffff,
+			borderColor		:0x224076,
+			textAlign		:'center',
+			width			:SIDE
+		});
+		_countText.x = (SIDE - _countText.width) / 2;
+		_countText.y = SIDE - 30;
+		addChild(_countText)
+	}
+	
 	private function build():void 
 	{
 		addChild(_back);
+		if (_icon)
+			addIcon();
 	}
 	
 	public function get SIDE():int{return _settings.side;}

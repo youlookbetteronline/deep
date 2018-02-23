@@ -213,7 +213,7 @@ package wins
 				default:
 					var object:Object;
 					
-					if (action.mprice)
+					if (action.hasOwnProperty('mprice') && action.mprice.hasOwnProperty(App.social) && (!action.hasOwnProperty('price') || !action.price.hasOwnProperty(App.social)))
 					{
 						if (App.user.stock.takeAll(action.mprice[App.social]))
 						{
