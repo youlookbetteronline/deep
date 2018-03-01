@@ -2,6 +2,7 @@ package utils
 {
 	import core.Numbers;
 	import core.Post;
+	import wins.TopBubbleWindow;
 	import wins.TopWindow;
 	/**
 	 * ...
@@ -113,7 +114,20 @@ package utils
 				k++
 			}
 			var top100DescText:String =  App.data.top[top].description;// Locale.__e('flash:1467807241824');
+			content = content.sortOn('points', Array.NUMERIC | Array.DESCENDING);
 			//getReward();
+			//new TopBubbleWindow({
+				//popup		:true,
+				//title		:info.title,
+				//expire		:expire, 
+				//content		:content,
+				//description	:top100DescText,
+				//max			:topNumber,
+				//info		:info,
+				//sid			:targetSid,
+				//top			:App.data.top[top]
+			//}).show();
+			//return;
 			new TopWindow( {
 				target		:null,
 				title		:info.title,

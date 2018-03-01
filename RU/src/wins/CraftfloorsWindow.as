@@ -448,6 +448,42 @@ package wins
 			//contentChange();
 		}
 		
+		/*private function drawLeftTime():void 
+		{
+			_leftTimeBack = new Bitmap(Window.textures.popupBack)
+			Size.size(_leftTimeBack, 128, 120)
+			_leftTimeBack.smoothing = true;
+			_leftTimeContainer.addChild(_leftTimeBack);
+			
+			
+			var timeLeft:uint = _action.time + _action.duration * Numbers.HOUR - App.time;
+			_leftTimeText = Window.drawText(Locale.__e('flash:1393581955601') + '\n' + TimeConverter.timeToCuts(timeLeft),{
+				fontSize		:32,
+				color			:0xfff330,
+				borderColor		:0x224076,
+				borderSize		:3,
+				textAlign		:'center',
+				width:115
+			})
+			_leftTimeText.x = (_leftTimeBack.width - _leftTimeText.width) / 2;
+			_leftTimeText.y = (_leftTimeBack.height - _leftTimeText.height) / 2;
+			_leftTimeContainer.addChild(_leftTimeText)
+			App.self.setOnTimer(actionTimer)
+		}
+		
+		private function actionTimer():void 
+		{
+			var timeLeft:uint = _action.time + _action.duration * Numbers.HOUR - App.time;
+			if (timeLeft < 0)
+			{
+				close();
+				App.user.updateActions();
+				App.self.setOffTimer(actionTimer);
+				return;
+			}
+			_leftTimeText.text = Locale.__e('flash:1393581955601') + '\n' + TimeConverter.timeToCuts(timeLeft)
+		}*/
+		
 		private function build():void 
 		{
 			titleLabel.y += 28;

@@ -37,8 +37,12 @@ package units
 			{
 				var _units:Array = Map.findUnits([untrew]);
 				for each (var _unt:* in _units)
+				{
+					if (_unt.info.hasOwnProperty('lifetime') && _unt.info.lifetime && _unt.info.lifetime != '' && _unt.info.type == 'Walkgolden' && (_unt.started + _unt.info.lifetime < App.time))
+						continue;
 					if ((_unt.hasOwnProperty('hasProduct') && _unt.hasProduct) || (_unt.hasOwnProperty('tribute') && _unt.tribute))
 						unitsClick.push(_unt)
+				}
 			}
 			return unitsClick;
 		}

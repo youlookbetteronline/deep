@@ -377,7 +377,7 @@ package units
 		{
 			if (level > Numbers.countProps(info.levels))
 				level = Numbers.countProps(info.levels)
-			if (textures) {
+			/*if (textures) {
 				stopAnimation();
 			}
 			if (effect)
@@ -387,11 +387,11 @@ package units
 				}});
 				this.showGlowingOnce(0xfff000, 1);
 			}
-			else
+			else*/
 				Load.loading(Config.getSwf(info.type, info.levels[level].option.preview), onLoad);
 		}
 		
-		override public function onLoad(data:*):void 
+		/*override public function onLoad(data:*):void 
 		{
 			super.onLoad(data);
 			
@@ -401,7 +401,7 @@ package units
 				_ltween.kill();
 				_ltween = null
 			}
-		}
+		}*/
 		
 		override protected function onBuyAction(error:int, data:Object, params:Object):void 
 		{

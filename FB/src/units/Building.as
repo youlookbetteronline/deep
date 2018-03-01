@@ -30,6 +30,7 @@ package units
 	import ui.UnitIcon;
 	import ui.UserInterface;
 	import units.unitEvent.UnitEvent;
+	import utils.Locker;
 	import utils.UnitsHelper;
 	import wins.ApothecaryWindow;
 	import wins.BarterWindow;
@@ -1203,6 +1204,11 @@ package units
 		
 		override public function click():Boolean
 		{
+			if (this.sid == 3288 && this.level == 6)
+			{
+				Locker.availableUpdate();
+				return false;
+			}
 			if (pest && pest.alive)//Вредитель
 				return false;
 			hidePointing();
@@ -1333,6 +1339,12 @@ package units
 				{
 					if (hasUpgraded)
 					{
+						
+						if (this.sid == 3288 && this.level == 6)
+						{
+							Locker.availableUpdate();
+							return false;
+						}
 						var instanceNum:uint = instanceNumber();
 						
 						_constructWindow = new ConstructWindow( { // Bременно заменен истанс

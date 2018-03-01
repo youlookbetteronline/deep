@@ -40,7 +40,6 @@ package units
 	{
 		public static var SEAHORSE:int = 1592;
 		public var count:int = 0;
-		public var _level:int = 0;
 		public var cloudAnimal:AnimalCloud;
 		private var countRequireItems:int = 0;
 		public var time:uint = 0;
@@ -62,7 +61,7 @@ package units
 			sID = object.sid;
 			
 			if (object.hasOwnProperty('level'))
-				_level = object.level;
+				level = object.level;
 			if (started > App.time) 
 				producting = true;
 			super(object);
@@ -236,9 +235,9 @@ package units
 		private function changeLevelAnimal():void
 		{
 			var self:Animal = this;
-			if (info.hasOwnProperty('devel') && info.devel != null && _level != 0)
+			if (info.hasOwnProperty('devel') && info.devel != null && level != 0)
 			{
-				Load.loading(Config.getSwf(App.data.storage[sid].type, App.data.storage[sid].devel.req[_level].view), function(data:*):void {
+				Load.loading(Config.getSwf(App.data.storage[sid].type, App.data.storage[sid].devel.req[level].view), function(data:*):void {
 					self.textures = data;
 				});
 			}
@@ -249,13 +248,13 @@ package units
 				});
 			}
 			
-		   if (this.sid == 2077 && _level >= 1)
+		   if (this.sid == 2077 && level >= 1)
 				homeRadius = 50;
 		}
 		
 		private function changeAnimal(_hungry:Boolean = true):void
 		{
-			if (info.hasOwnProperty('devel') && info.devel != null && _level != 0)
+			if (info.hasOwnProperty('devel') && info.devel != null && level != 0)
 					changeLevelAnimal();
 			if (this.info.hasOwnProperty('hungryanim') && this.info.hungryanim != '')
 			{
@@ -1078,7 +1077,7 @@ package units
 						btmDataName = 'animalHungryBackingLight';
 					}
 				}
-				this.cloudAnimal = new AnimalCloud(callBack, this, sid, mode, {scaleIcon:scaleIcon, timeDelay:timeDelay, scaleBttn:scaleBttn, level:_level});
+				this.cloudAnimal = new AnimalCloud(callBack, this, sid, mode, {scaleIcon:scaleIcon, timeDelay:timeDelay, scaleBttn:scaleBttn, level:level});
 				this.cloudAnimal.create(btmDataName);
 				this.cloudAnimal.show();
 				
@@ -1133,8 +1132,8 @@ package units
 			var require:Object = App.data.storage[sid].require
 			if (fneed)
 				require = fneed;
-			else if (devel && _level != 0)
-				require = App.data.storage[sid].devel.req[_level].fneed
+			else if (devel && level != 0)
+				require = App.data.storage[sid].devel.req[level].fneed
 			if (!App.user.stock.takeAll(require))
 			{
 				for (var req:* in require)
@@ -1308,7 +1307,7 @@ package units
 			if (data.fneed)
 				fneed = data.fneed;
 			if (data.level)
-				_level = data.level;
+				level = data.level;
 			hasProduct = false;
 			started = 0;
 			var matSID:int = 0;
@@ -1317,7 +1316,7 @@ package units
 			
 			if (devel)
 			{
-				outs = info.devel.req[_level].out
+				outs = info.devel.req[level].out
 				changeLevelAnimal();
 			}
 			if(data.bonus){

@@ -199,7 +199,7 @@ package units
 		{
 			if (level > Numbers.countProps(info.levels))
 				level = Numbers.countProps(info.levels)
-			if (textures) {
+			/*if (textures) {
 				stopAnimation();
 			}
 			if (effect)
@@ -209,21 +209,21 @@ package units
 				}});
 				this.showGlowingOnce(0xfff000, 1);
 			}
-			else
+			else*/
 				Load.loading(Config.getSwf(info.type, info.levels[level].req.preview), onLoad);
 		}
 		
-		override public function onLoad(data:*):void 
-		{
-			super.onLoad(data);
+		//override public function onLoad(data:*):void 
+		//{
+			//super.onLoad(data);
 			
-			_ltween = TweenLite.to(this, 1, { alpha:1, scaleX:1, scaleY:1})
+			/*_ltween = TweenLite.to(this, 1, { alpha:1, scaleX:1, scaleY:1})
 			if (_ltween && _ltween.active)
 			{
 				_ltween.kill();
 				_ltween = null
-			}
-		}
+			}*/
+		//}
 		
 		private function mkickEvent(mID:int, typeMkick:String, mkickCallback:Function):void 
 		{

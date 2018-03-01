@@ -109,7 +109,7 @@ package
 	import wins.SimpleWindowRedux;
 	import wins.Window;
 
-	[SWF ( width = "900", height = "700", allowsFullScreen = true, backgroundColor = '#072d48') ]
+	[SWF ( width = "900", height = "700", allowsFullScreen = true, backgroundColor = '#042238') ]
 	
 	public class App extends Sprite 
 	{
@@ -206,11 +206,11 @@ package
 		 * Marcel Pijakowski:	FB: 1884987568449576
 		*/
 		//ФБшный ДИП
-		public static const ID:* = '120206848671085';//'30035157';// '774242479407105';
+		public static const ID:* = '1669818346372985';//'30035157';// '774242479407105';
 		public static const SERVER:* = 'FB';
 		public static const SOCIAL:* = 'FB';
 		public static var lang:String = 'en'; //de en es fr it nl pl pt tr ru
-		 
+		
 		public function App():void 
 		{
 			if (self)
@@ -325,7 +325,7 @@ package
 			
 			fader = new Sprite();
 				
-			fader.graphics.beginFill(0x072d48);
+			fader.graphics.beginFill(0x042238);
 			//fader.graphics.beginFill(0x031021);
 			fader.graphics.drawRect(0, 0, App.self.stage.stageWidth, App.self.stage.stageHeight);
 			fader.graphics.endFill();

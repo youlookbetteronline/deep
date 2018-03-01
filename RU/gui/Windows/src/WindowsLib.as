@@ -1993,6 +1993,30 @@ package
 		private var BackForNumber:Class;
 		public var backForNumber:BitmapData = new BackForNumber().bitmapData;
 		
+		[Embed(source="Graphics2/elements/TopIcon.png")]
+		private var TopIcon:Class;
+		public var topIcon:BitmapData = new TopIcon().bitmapData;
+		
+		[Embed(source="Graphics2/elements/FirstPlaceIcon.png")]
+		private var FirstPlaceIcon:Class;
+		public var firstPlaceIcon:BitmapData = new FirstPlaceIcon().bitmapData;
+		
+		[Embed(source="Graphics2/elements/SecondPlaceIcon.png")]
+		private var SecondPlaceIcon:Class;
+		public var secondPlaceIcon:BitmapData = new SecondPlaceIcon().bitmapData;
+		
+		[Embed(source="Graphics2/elements/ThirdPlaceIcon.png")]
+		private var ThirdPlaceIcon:Class;
+		public var thirdPlaceIcon:BitmapData = new ThirdPlaceIcon().bitmapData;
+		
+		[Embed(source="Graphics2/elements/CupIcon.png")]
+		private var CupIcon:Class;
+		public var cupIcon:BitmapData = new CupIcon().bitmapData;
+		
+		[Embed(source="Graphics2/elements/CupYellowIcon.png")]
+		private var CupYellowIcon:Class;
+		public var cupYellowIcon:BitmapData = new CupYellowIcon().bitmapData;
+		
 		public function Windows():void
 		{
 		}

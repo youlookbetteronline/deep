@@ -191,6 +191,7 @@ package
 		private var walkgift:Walkgift;
 		private var resource:Resource;
 		private var decor:Decor;
+		private var contest:Contest;
 		private var field:Field;
 		private var animal:Animal;
 		private var houseTechno:Wigwam;

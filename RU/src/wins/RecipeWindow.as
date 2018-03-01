@@ -514,7 +514,7 @@ package wins
 			bodyContainer.addChild(_desc);
 			
 			var _leftCount:int = formula.capacity;
-			if (settings.building.hasOwnProperty('craftsLimit') && settings.building.craftsLimit.hasOwnProperty(formula.ID))
+			if (settings.building && settings.building.hasOwnProperty('craftsLimit') && settings.building.craftsLimit.hasOwnProperty(formula.ID))
 				_leftCount = settings.building.craftsLimit[formula.ID];
 			
 			var _left:TextField = Window.drawText(Locale.__e('flash:1393581955601')+ ' ' + String(_leftCount), {

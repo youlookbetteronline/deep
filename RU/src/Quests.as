@@ -889,7 +889,7 @@ package
 									var obj:Object = App.data.storage[sID];
 									switch(missions[mID].event) {
 										case 'buy': 
-											if (['Building','Friendfloors','Craftfloors','Portal','Booster','Hippodrome','Bathyscaphe','University','Manufacture','Twigwam','Port', 'Pharmacy', 'Thappy', 'Field', 'Factory', 'Mining', 'Moneyhouse','Fatman', 'Golden', 'Storehouse', 'Fplant', 'Tradeshop','Hut','Tribute','Floors','Oracle', 'Mfloors', 'Happy', 'Barter', 'Ahappy', 'Table', 'Gamble'].indexOf(unit.type) != -1) {
+											if (['Building','Walkhero','Friendfloors','Craftfloors','Portal','Booster','Hippodrome','Bathyscaphe','University','Manufacture','Twigwam','Port', 'Pharmacy', 'Thappy', 'Field', 'Factory', 'Mining', 'Moneyhouse','Fatman', 'Golden', 'Storehouse', 'Fplant', 'Tradeshop','Hut','Tribute','Floors','Oracle', 'Mfloors', 'Happy', 'Barter', 'Ahappy', 'Table', 'Gamble'].indexOf(unit.type) != -1) {
 												if(scored[quest.id] == undefined){
 													scored[quest.id] = { };
 												}

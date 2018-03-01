@@ -277,7 +277,7 @@ package wins{
 				buyBttn.y = askBttn.y + askBttn.height + 2;
 				
 				
-				if (!App.user.quests.tutorial && (App.data.storage[sID].mtype != 6 || Config.admin)) 
+				if (!App.user.quests.tutorial && ((App.data.storage[sID].mtype != 6 && App.data.storage[sID].mtype != 8) || Config.admin)) 
 				{
 					addChild(buyBttn);
 				}

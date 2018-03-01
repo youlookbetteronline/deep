@@ -1340,8 +1340,8 @@ package units
 		
 		public function uninstall():void 
 		{
-			//if (_plane && _plane.parent)
-				//_plane.parent.removeChild(_plane);
+			if (_plane && _plane.parent)
+				_plane.parent.removeChild(_plane);
 			App.self.setOffEnterFrame(streaming);
 			App.self.setOffEnterFrame(moving);
 			if(App.user.quests.tutorial)

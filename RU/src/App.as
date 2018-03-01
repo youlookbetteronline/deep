@@ -101,7 +101,7 @@ package
 	import wins._6WBonusWindow;
 	import wins.ggame.GGameWindow;
 	//import starling.core.Starling;
-	[SWF ( width = "900", height = "700", allowsFullScreen = true, backgroundColor = '#031021') ]
+	[SWF ( width = "900", height = "700", allowsFullScreen = true, backgroundColor = '#042238') ]
 	
 	public class App extends Sprite 
 	{
@@ -201,7 +201,7 @@ package
 
 		public static const ID:* = '29060311';//'30035157';// '774242479407105';
 		public static const SERVER:* = 'DM';
-		public static const SOCIAL:* = 'VK';	
+		public static const SOCIAL:* = 'DM';	
 		public static var lang:String = 'ru'; //de en es fr it nl pl pt tr ru
 		
 		public static function get data():Object
@@ -325,7 +325,7 @@ package
 			
 			fader = new Sprite();
 				
-			fader.graphics.beginFill(0x082d48);
+			fader.graphics.beginFill(0x042238);
 			fader.graphics.drawRect(0, 0, App.self.stage.stageWidth, App.self.stage.stageHeight);
 			fader.graphics.endFill();
 			

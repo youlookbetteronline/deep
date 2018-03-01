@@ -74,7 +74,6 @@ package units
 			_model.throwCallback = throwEvent;
 			_model.renameCallback = renameAction;
 			_model.maxLengthName = 10;
-			//startLife();
 		}
 		
 		private function parseTips():Object{
@@ -148,24 +147,10 @@ package units
 			App.self.setOnTimer(work);
 		}
 		
-		private function startLife():void 
-		{
-			App.self.setOnTimer(life);
-		}
-		
 		private function work():void
 		{
 			if (App.time >= _model.crafted)
 				onProductionComplete();
-		}
-		
-		private function life():void
-		{
-			if (App.time >= _model.expire && _model.expire != 0)
-			{
-				App.self.setOffTimer(life);
-				removeUnit()
-			}
 		}
 		
 		private function onProductionComplete():void
@@ -304,7 +289,6 @@ package units
 			if (data.toThrow)
 				_model.toThrow = data.toThrow;
 			startWork();
-			//startLife();
 			goHome();
 		}
 		
@@ -316,7 +300,6 @@ package units
 			if (data.toThrow)
 				_model.toThrow = data.toThrow;
 			startWork();
-			//startLife();
 		}
 		
 		private function removeUnit():void

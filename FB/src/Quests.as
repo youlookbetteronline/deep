@@ -645,19 +645,19 @@ package
 			
 			for (var id:* in App.data.quests) {
 				
-				//if (id == 253)
-					//trace(1);
+				if (id == 1009)
+					trace(1);
 				
 				if (data[id] != undefined && data[id].finished == 0) {
 					
 					if(currentQID == 0){
 						currentQID = id;
-						for each(var miss:* in App.data.quests[id].missions) {
+						/*for each(var miss:* in App.data.quests[id].missions) {
 							if (!data[id][miss.ID]) {// == undefined
 								currentMID = miss.ID;
 								break;
 							}
-						}
+						}*/
 					}
 						
 					if (App.data.quests[id].tutorial) //включить туториал
@@ -868,7 +868,7 @@ package
 									var obj:Object = App.data.storage[sID];
 									switch(missions[mID].event) {
 										case 'buy': 
-											if (['Building','Friendfloors','Craftfloors','Booster','Portal','Hippodrome','Bathyscaphe','University','Manufacture','Twigwam','Port', 'Pharmacy', 'Thappy', 'Field', 'Factory', 'Mining', 'Moneyhouse','Fatman', 'Golden', 'Storehouse', 'Fplant', 'Tradeshop','Hut','Tribute','Floors','Oracle', 'Mfloors', 'Happy', 'Barter', 'Ahappy', 'Table', 'Gamble'].indexOf(unit.type) != -1) {
+											if (['Building','Walkhero','Friendfloors','Craftfloors','Booster','Portal','Hippodrome','Bathyscaphe','University','Manufacture','Twigwam','Port', 'Pharmacy', 'Thappy', 'Field', 'Factory', 'Mining', 'Moneyhouse','Fatman', 'Golden', 'Storehouse', 'Fplant', 'Tradeshop','Hut','Tribute','Floors','Oracle', 'Mfloors', 'Happy', 'Barter', 'Ahappy', 'Table', 'Gamble'].indexOf(unit.type) != -1) {
 												if(scored[quest.id] == undefined){
 													scored[quest.id] = { };
 												}
@@ -946,7 +946,7 @@ package
 											break;
 										case 'upgrade':
 										case 'reward':
-											if (['Building','Booster','Bathyscaphe','University','Portal','Manufacture','Hippodrome','Twigwam', 'Bridge', 'Pharmacy', 'Ctribute', 'Fair', 'Technological', 'Minigame', 'Port','Thappy', 'Field', 'Factory', 'Mining', 'Moneyhouse', 'Fatman','Golden', 'Storehouse','Tradeshop','Hut','Tribute','Floors','Zoner','Oracle','Mfloors', 'Happy', 'Ahappy', 'Barter', 'Tradeship'].indexOf(unit.type) != -1) {
+											if (['Building','Animal','Booster','Bathyscaphe','University','Portal','Manufacture','Hippodrome','Twigwam', 'Bridge', 'Pharmacy', 'Ctribute', 'Fair', 'Technological', 'Minigame', 'Port','Thappy', 'Field', 'Factory', 'Mining', 'Moneyhouse', 'Fatman','Golden', 'Storehouse','Tradeshop','Hut','Tribute','Floors','Zoner','Oracle','Mfloors', 'Happy', 'Ahappy', 'Barter', 'Tradeship'].indexOf(unit.type) != -1) {
 												if (unit['level'] >= missions[mID].need) {
 												if(scored[quest.id] == undefined){
 													scored[quest.id] = { };

@@ -3,6 +3,7 @@ package wins
 	import api.com.adobe.json.JSONDecoder;
 	import buttons.Button;
 	import buttons.ImageButton;
+	import buttons.ImagesButton;
 	import core.Load;
 	import core.Size;
 	import core.TimeConverter;

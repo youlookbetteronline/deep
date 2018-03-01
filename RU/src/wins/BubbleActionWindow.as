@@ -283,6 +283,8 @@ package wins
 		
 		private function drawReward():void
 		{
+			if (!needRewardPerTime)
+				return;
 			_rewardTitle = Window.drawText(_action.rewardpertime.text,{
 				fontSize		:28,
 				color			:0xfff330,
@@ -386,17 +388,20 @@ package wins
 			_description.x = (settings.width - _description.width) / 2;
 			bodyContainer.addChild(_description);
 			
-			_rewardTitle.x = (settings.width - _rewardTitle.width) / 2;
-			_rewardTitle.y = 335;
-			
-			_rewardContainer.x = (settings.width - _rewardContainer.width) / 2;
-			_rewardContainer.y = 370;
-			
-			_rewardDesc.x = (settings.width - _rewardDesc.width) / 2;
-			_rewardDesc.y = _rewardContainer.y + _rewardContainer.height + 5;
-			bodyContainer.addChild(_rewardTitle);
-			bodyContainer.addChild(_rewardContainer);
-			bodyContainer.addChild(_rewardDesc);
+			if (needRewardPerTime)
+			{
+				_rewardTitle.x = (settings.width - _rewardTitle.width) / 2;
+				_rewardTitle.y = 335;
+				
+				_rewardContainer.x = (settings.width - _rewardContainer.width) / 2;
+				_rewardContainer.y = 370;
+				
+				_rewardDesc.x = (settings.width - _rewardDesc.width) / 2;
+				_rewardDesc.y = _rewardContainer.y + _rewardContainer.height + 5;
+				bodyContainer.addChild(_rewardTitle);
+				bodyContainer.addChild(_rewardContainer);
+				bodyContainer.addChild(_rewardDesc);
+			}
 			
 			_bttn.x = (settings.width - _bttn.width) / 2;
 			_bttn.y = settings.height - 50;
@@ -412,7 +417,8 @@ package wins
 	
 		private function get needRewardPerTime():Boolean
 		{
-			if (_action.hasOwnProperty('rewardpertime') && _action.rewardpertime.hasOwnProperty('text') && _action.rewardpertime.text != '')
+			if (_action.hasOwnProperty('rewardpertime') && _action.rewardpertime.hasOwnProperty('text') && _action.rewardpertime.text != '' &&
+				_action.rewardpertime.hasOwnProperty('time') && _action.rewardpertime.time != '')
 				return true;
 			return false;
 		}

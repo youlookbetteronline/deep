@@ -1,6 +1,9 @@
 package core 
 {
+	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display.Shape;
+	import flash.display.Sprite;
 	import flash.geom.Matrix;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
@@ -113,6 +116,37 @@ package core
 			
             return bmp2;
         }
+		
+		public static function rectBorderBitmap(bitmap:Bitmap, width:int = 54, height:int = 54, radius:int = 20, color:uint = 0xffffff, thickness:int = 3):Bitmap
+		{
+			var _bitmap:Bitmap = new Bitmap();
+			var _sprite:Sprite = new Sprite();
+			var _mask:Shape = new Shape();
+			var shape:Shape = new Shape();
+			shape.graphics.beginFill(color);
+			shape.graphics.drawRoundRect(0, 0, width, height, radius, radius);
+			shape.graphics.endFill();
+			
+			_sprite.addChild(shape);
+			
+			Size.size(bitmap, width - thickness * 2, height - thickness * 2);
+			bitmap.smoothing = true;
+			bitmap.x = (_sprite.width - bitmap.width) / 2;
+			bitmap.y = (_sprite.height - bitmap.height) / 2;
+			_sprite.addChild(bitmap);
+			
+			_mask.graphics.beginFill(color);
+			_mask.graphics.drawRoundRect(0, 0, bitmap.width, bitmap.height, radius*.8, radius*.8);
+			_mask.graphics.endFill();
+			_mask.x = (_sprite.width - _mask.width) / 2;
+			_mask.y = (_sprite.height - _mask.height) / 2;
+			_sprite.addChild(_mask);
+			bitmap.mask = _mask;
+			
+			_bitmap.bitmapData = new BitmapData(width, height, true, 0)
+			_bitmap.bitmapData.draw(_sprite, new Matrix(1, 0, 0, 1, 0, 0));
+			return _bitmap;
+		}
 
 		
 	}

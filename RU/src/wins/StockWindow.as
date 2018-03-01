@@ -225,7 +225,7 @@ package wins
 				for (var i:* in sections[section].items) {
 					
 					var sid:int = sections[section].items[i].sid;
-					if (App.data.storage[sid].type == 'Collection' || App.data.storage[sid].type == 'Petfood')
+					if ((App.data.storage[sid].type == 'Collection' || App.data.storage[sid].type == 'Petfood') && collectionArray.indexOf(sid) == -1)
 						collectionArray.push(sid);
 					if (settings.find != null && settings.find.indexOf(sid) != -1 && section !='all') 
 					{
