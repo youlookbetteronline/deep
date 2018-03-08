@@ -45,7 +45,7 @@ package units
 		public var time:uint = 0;
 		public var sID:uint;
 		public var shadowBitmap:Bitmap = new Bitmap();
-		public var shady: int = 0;
+		//public var shady: int = 0;
 		private var rabbits:Array = [1441, 1442, 1443, 1444, 1445];
 		public static const HUNTER:uint = 1528;
 		public var depth_animal:int = 0;
@@ -1263,7 +1263,7 @@ package units
 				}, function(error:*, data:*, params:*):void {
 					
 					if (error) {
-						Errors.show(error, data);
+						//Errors.show(error, data);
 						return;
 					}
 					
@@ -1287,7 +1287,7 @@ package units
 				this.cloudAnimal.dispose();
 				this.cloudAnimal = null;
 			}
-			
+			clickable = false;
 			Post.send({
 				ctr:this.type,
 				act:'storage',
@@ -1300,8 +1300,9 @@ package units
 		
 		private function onStorageEvent(error:int, data:Object, params:Object):void 
 		{
+			clickable = true;
 			if (error) {
-				Errors.show(error, data);
+				//Errors.show(error, data);
 				return;
 			}
 			if (data.fneed)

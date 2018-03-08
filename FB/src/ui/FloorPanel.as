@@ -199,9 +199,15 @@ package ui
 		{
 			if (e.currentTarget.mode == Button.DISABLED)
 			{
-				Hints.text(Locale.__e('flash:1510137421605'), Hints.TEXT_RED, new Point(App.self.mouseX, App.self.mouseY));
+				if (_model.kicks < _target.info.levels[_model.floor].req.kicks)
+				{
+					Hints.text(Locale.__e('flash:1510137421605'), Hints.TEXT_RED, new Point(App.self.mouseX, App.self.mouseY));
+					return;
+				}
 				return;
+				
 			}
+			e.currentTarget.state = Button.DISABLED;
 			_model.growCallback();
 		}
 		

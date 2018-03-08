@@ -53,18 +53,17 @@ package units
 	{
 		public static const BUILD:String = 'build';
 		public static const BOOST:String = 'boost';
-		public static const ALWAYS_ANIMATED:Array = [183, 306, 500, 988, 1722, 1884, 1891, 1890, 1889, 1888, 2081, 2315, 2207, 2399, 2622, 2739, 2799, 2804, 3061, 3067, 3317];	// Постоянная анимация при окончании постройки
+		public static const ALWAYS_ANIMATED:Array = [183, 306, 500, 988, 1722, 1884, 1891, 1890, 1889, 1888, 2081, 2315, 2207, 2399, 2622, 2739, 2799, 2804, 2957, 3061, 3067, 3264, 3265, 3317, 3516];	// Постоянная анимация при окончании постройки
 		
 		public static const TRAVEL_COURTS:Array = [1679, 1685, 1686];	// Молянки для походной локи
 		public static const CHANK_ARRAY:Array = [1687]
 		
-		public static const SINOPTIC_HOUSE:int = 183;
 		public static const PET_CAGE_SID:int = 236;
 		public static const GIRL_IN_TRAP_SID:int = 282;
 		public static const CAPSULE:int = 500;
 		public static const APOTHECARY:int = 602;
 		public static const BARTER:int = 1078;
-		private static const PERMANENT_ANIMATED:Array = [1837, 2887, 3211, 3252, 3266, 3317]
+		private static const PERMANENT_ANIMATED:Array = [1837, 2887, 3211, 3252, 3266, 3317, 3397]
 		public var pest:Pest;
 		//public static pestAlive:Boolean = false;
 		
@@ -210,13 +209,15 @@ package units
 			{
 				needQuest = object.quest;
 			}
-			switch(sid){
-				case 1700:
-					needQuest = 414;
-				break;
-				case 1722:
-					needQuest = 431;
-				break;
+			
+			if (this.sid == 1700)
+			{
+				needQuest = 414;
+			}
+			
+			if (this.sid == 1722)
+			{
+				needQuest = 431;
 			}
 			
 			if (object.hasOwnProperty("slots")) 
@@ -279,7 +280,8 @@ package units
 				//rotateable = true;
 				//stockable = false;
 			/*}*/
-
+			if (this.sid == 2622)
+				stockable = true;
 		}
 		/*private function maxInstance():uint
 		{
@@ -812,7 +814,7 @@ package units
 		}
 		
 		override public function onLoad(data:*):void 
-		{			
+		{		
 			textures = data;
 			updateLevel();
 			
@@ -861,6 +863,7 @@ package units
 				Load.clearCache(Config.getSwf(bType, bView));
 				data = null;
 			}
+			
 			
 			calcDepth();
 				
@@ -1011,7 +1014,6 @@ package units
 			}
 			if ( levelData && levelData.bmp)
 				draw(levelData.bmp, levelData.dx, levelData.dy);
-			//draw(levelData.bmp, levelData.dx, levelData.dy);
 			if (level >= totalLevels) 
 				addGround();
 			
@@ -1204,11 +1206,11 @@ package units
 		
 		override public function click():Boolean
 		{
-			if (this.sid == 3288 && this.level == 6)
+			/*if (this.sid == 3288 && this.level == 6 && !Config.admin)
 			{
 				Locker.availableUpdate();
 				return false;
-			}
+			}*/
 			if (pest && pest.alive)//Вредитель
 				return false;
 			hidePointing();
@@ -1220,7 +1222,7 @@ package units
 				if (this.sid == 602)
 					node1 = App.map._aStarNodes[this.coords.x + this.cells -1][this.coords.z + this.rows - 1];
 				
-				if (node1.sector && !node1.sector.open)
+				if (!node1.sector.open)
 				{
 					new SimpleWindow( {
 						title:Locale.__e("flash:1474469531767"),
@@ -1234,17 +1236,9 @@ package units
 					return false;
 				}
 			}
+			
 			if (needQuest != 0 && App.user.mode == User.OWNER)
-			{				
-				if (!App.data.quests.hasOwnProperty(needQuest)){
-					new SimpleWindow({
-						title:Locale.__e("flash:1481879219779"),
-						label:SimpleWindow.ATTENTION,
-						text:Locale.__e('flash:1382952379805')
-					}).show();
-					return false;
-				}
-				
+			{
 				if (!App.user.quests.data.hasOwnProperty(needQuest))
 				{
 					new SimpleWindow( {
@@ -1328,10 +1322,6 @@ package units
 		{
 			if (_constructWindow != null)
 				return true;
-			//if (this.sid == 2739 && this.level >= 8/* && !Config.admin*/)
-			//{
-				//return false;
-			//}
 			
 			if ((level < totalLevels) || (level < totalLevels))
 			{
@@ -1339,12 +1329,19 @@ package units
 				{
 					if (hasUpgraded)
 					{
-						
-						if (this.sid == 3288 && this.level == 6)
+						/*if (this.sid == 3288 && this.level == 6 && !Config.admin)
 						{
 							Locker.availableUpdate();
 							return false;
-						}
+						}*/
+						/*if (this.sid == Unit.BATHYSCAPHE)
+						{
+							if (level == 8 && !Config.admin)
+							{
+								//Locker.availableUpdate();
+								return false;
+							}
+						}*/
 						var instanceNum:uint = instanceNumber();
 						
 						_constructWindow = new ConstructWindow( { // Bременно заменен истанс
@@ -1670,6 +1667,8 @@ package units
 		
 		public function isProduct():Boolean
 		{
+			if (level < totalLevels)
+				return false;
 			if (hasProduct)
 			{
 				if (App.user.quests.tutorial && App.user.quests.data.hasOwnProperty("135")) 
@@ -1943,27 +1942,6 @@ package units
 		{
 			if (sid == CAPSULE) return;
 			
-			if (this.sid == SINOPTIC_HOUSE && App.user.mode == User.OWNER)
-			{
-				if (!App.data.quests.hasOwnProperty(718)){
-					new SimpleWindow({
-						title:Locale.__e("flash:1481879219779"),
-						label:SimpleWindow.ATTENTION,
-						text:Locale.__e('flash:1382952379805')
-					}).show();
-					return;
-				}
-				
-				if (!App.user.quests.data.hasOwnProperty(718))
-				{
-					new SimpleWindow( {
-						title:Locale.__e("flash:1481879219779"),
-						label:SimpleWindow.ATTENTION,
-						text:Locale.__e('flash:1481878959561', App.data.quests[718].title)
-					}).show();
-					return;
-				}
-			}
 			if (TRAVEL_COURTS.indexOf(this.sid) != -1)
 			{
 				if (crafted > App.time) 
@@ -2085,7 +2063,6 @@ package units
 							if (App.data.crafting[crft].hasOwnProperty('rcount') && App.data.crafting[crft].rcount != "" && craftNeed == null)
 								Post.send(ssendObject, onCraftNeedAll);
 						}
-						
 						new ProductionWindow( {
 							title:			info.title,
 							crafting:		info.devel[1].craft,
@@ -2154,7 +2131,7 @@ package units
 			if (craftCounter == _arrCraft.length) 
 			{
 				//Hints.text(Locale.__e('flash:1474037570702'), Hints.TEXT_RED, new Point(App.self.mouseX, App.self.mouseY));//Нельзя!
-				//if (App.social != 'FB')
+				if (App.social != 'FB')
 					onSkinEvent(null);
 				return;
 			}
@@ -2347,6 +2324,7 @@ package units
 			
 			if (data.hasOwnProperty('craftsLimit'))
 				this.craftsLimit = data.craftsLimit;
+			
 			
 			if (data.hasOwnProperty('crafted')) {
 				this.crafted = data.crafted;
@@ -3356,7 +3334,9 @@ package units
 			
 			if (App.user.mode == User.OWNER) 
 			{
-				if (/*completed.length > 0*/crafted > 0 && crafted <= App.time && hasProduct && formula) {
+				if (this.sid == 2789 && level == 2)
+					clearIcon()
+				else if (/*completed.length > 0*/crafted > 0 && crafted <= App.time && hasProduct && formula) {
 					drawIcon(UnitIcon.BUILDING_REWARD, formula.out, 1, {
 						glow:		true,
 						iconScale: .64

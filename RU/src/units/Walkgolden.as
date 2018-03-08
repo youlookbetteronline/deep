@@ -42,15 +42,15 @@ package units
 		public var started:int = 0;
 		public var crafting:Boolean;
 		public var fID:int = 0;
-		public var shady:int = 0;
+		
 		public var _cloud:CloudsMenu;
 		public var _showCloud:Boolean;
 		public var capacity:int = 0;
 		public var walkable:Boolean;
 		public var hasProduct:Boolean;
-		public var shadowScale:Number = .75;
-		public var smartShadow:Bitmap = new Bitmap();
 		
+		public var smartShadow:Bitmap = new Bitmap();
+		public var shadowScale:Number = .75;
 		
 		protected var _helperLock:Boolean;
 		protected var _lock:Boolean;
@@ -864,8 +864,11 @@ package units
 				App.self.setOnTimer(work);
 			}
 			
-			Treasures.bonus(data.bonus, new Point(this.x, this.y));
-			SoundsManager.instance.playSFX('bonus');
+			if (data.bonus)
+			{
+				Treasures.bonus(data.bonus, new Point(this.x, this.y));
+				SoundsManager.instance.playSFX('bonus');
+			}
 			
 			tribute = false;
 			hasProduct = false;

@@ -53,8 +53,10 @@ package
 	import ui.UnitIcon;
 	import ui.UpPanel;
 	import units.Bubbles;
+	import utils.BonusHelper;
 	import utils.ObjectsContent;
 	import utils.Saver;
+	import utils.TopHelper;
 	import wins.AddResWindow;
 	import wins.CollectionMsgWindow;
 	import wins.FreebieWindow;
@@ -206,7 +208,7 @@ package
 		 * Marcel Pijakowski:	FB: 1884987568449576
 		*/
 		//ФБшный ДИП
-		public static const ID:* = '1669818346372985';//'30035157';// '774242479407105';
+		public static const ID:* = '973881489414432';//'30035157';// '774242479407105';
 		public static const SERVER:* = 'FB';
 		public static const SOCIAL:* = 'FB';
 		public static var lang:String = 'en'; //de en es fr it nl pl pt tr ru
@@ -1096,12 +1098,14 @@ package
 			//Rabbit.init();
 			SoundsManager.instance.loadSounds();
 			
+			
 			if (!App.user.quests.tutorial)
 			{
+				BonusHelper.checkLack();
 				
 				if(App.user.bonus == 0 && App.user.level > 3) 
 					new DayliBonusWindow().show();
-			
+				TopHelper.checkRewards();
 				Pigeon.checkNews();	
 				
 				App.user.quests.checkFreebie();

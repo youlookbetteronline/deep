@@ -192,7 +192,7 @@ package wins{
 				//giftBttn.y = 156;				
 				wishBttn = new ImageButton(Window.textures.wishlistBttn);
 				//if (App.data.storage[sID].type != 'Techno') {
-				if (!App.user.quests.tutorial && App.data.storage[sID].mtype != 6 && App.social != 'FB') 
+				if (!App.user.quests.tutorial && App.data.storage[sID].mtype != 6 && App.data.storage[sID].mtype != 8 && App.social != 'FB') 
 				{
 					addChild((wishBttn));
 					

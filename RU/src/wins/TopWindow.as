@@ -233,20 +233,6 @@ package wins
 					
 			}
 			
-			//var topID:int = TopHelper.getTopID(settings.info.sID);
-			//if(Numbers.countProps(App.user.data.user.top[TopHelper.getTopID(settings.info.sID)]) > 0)
-				//myPoints = Numbers.lastProp(App.user.data.user.top[TopHelper.getTopID(settings.info.sID)]).val.count;
-				
-			//var myPoints:int = Numbers.lastProp(App.user.data.user.top[TopHelper.getTopID(settings.info.sID)]).val.count;
-			/*for each(var _player:* in settings.content)
-			{
-				if (_player._id == App.user.id)
-				{
-					myPoints = _player.points;
-					break;
-				}
-			}*/
-			
 			var rateLabel:TextField = drawText(String(myPoints), {
 				//width:			200,
 				textAlign:		'left',

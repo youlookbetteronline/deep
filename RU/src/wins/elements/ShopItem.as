@@ -644,7 +644,9 @@ package wins.elements
 					case 'Friendfloors':
 					case 'Craftfloors':
 					case 'Postman':
+					case 'Plant':
 					case 'Manufacture':
+					case 'Contest':
 						drawFindBttn();	
 						return;
 						break;

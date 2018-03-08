@@ -626,6 +626,7 @@ package wins.elements
 					case 'Animal':
 					case 'Resource':
 					case 'Portal':
+					case 'Plant':
 					case 'GGame':
 					case 'Bathyscaphe':
 					case 'University':
@@ -633,6 +634,7 @@ package wins.elements
 					case 'Postman':
 					case 'Friendfloors':
 					case 'Manufacture':
+					case 'Contest':
 						drawFindBttn();	
 						return;
 						break;

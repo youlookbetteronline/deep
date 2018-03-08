@@ -108,7 +108,8 @@ package utils
 				
 				
 				// Пропустить если купили
-				
+				if (aID == '2588')
+					trace();
 				if (actionsArch.hasOwnProperty(aID) && actionsArch[aID] != null && App.data.actions.hasOwnProperty(aID) && App.data.actions[aID] != null && !App.data.actions[aID].more && actionsArch[aID].buy) {
 					delete actionsArch[aID].time;
 					delete actionsArch[aID].prime;
@@ -152,7 +153,7 @@ package utils
 						
 					}
 				}
-				if (aID == '2247')
+				if (aID == '2029')
 					trace();	
 				
 				if (action.hasOwnProperty('friendsless') && action.friendsless !="" && App.network.appFriends.length >= action.friendsless)

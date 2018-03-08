@@ -10,7 +10,7 @@ package
 	public class Config
 	{
 		public static var totalVersion:int;		
-		public static var versionObjects:int 		= 699  + totalVersion;		//Обьекты
+		public static var versionObjects:int 		= 700  + totalVersion;		//Обьекты
 		public static var versionInterface:int 		= 349  + totalVersion;		//Интерфейс
 		public static var versionImages:int 		= 1085 + totalVersion;		//Icons + Images
 		

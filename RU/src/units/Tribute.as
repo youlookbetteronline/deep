@@ -581,12 +581,12 @@ package units
 				App.self.setOnTimer(work);
 			}*/
 			
-			Treasures.bonus(data.treasure, new Point(this.x, this.y));
-			
-			if (info.sID == 3397)
-				SoundsManager.instance.playSFX('country');
-			else
+			if (data.bonus)
+			{
+				Treasures.bonus(data.bonus, new Point(this.x, this.y));
 				SoundsManager.instance.playSFX('bonus');
+			}
+			
 			
 			if (params != null) {
 				if (params['guest'] != undefined) {

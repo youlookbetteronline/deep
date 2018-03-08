@@ -892,6 +892,8 @@ internal class Mission extends Sprite {
 				tipDesc = Locale.__e('flash:1484134500629');
 				
 			}else{*/
+			if (mission.persicon)
+				url = Config.getImageIcon('quests/preview', App.data.personages[quest.character].preview)
 				loadIcon(url);
 				
 				tipTitle = App.data.storage[sID].title;
@@ -904,7 +906,15 @@ internal class Mission extends Sprite {
 						title:Locale.__e('flash:1478095847335')
 					};
 				}; 
-			}else{
+			}else if (mission.persicon)
+			{
+				iconCont.tip = function():Object {
+					return {
+						title:App.data.personages[quest.character].title
+					};
+				}; 
+			}
+			else{
 				iconCont.tip = function():Object {
 					return {
 						title:tipTitle,
@@ -972,6 +982,13 @@ internal class Mission extends Sprite {
 					trace("Level = " + obj.model.level);
 					trace("ID = " + obj.id);
 					have = obj.model.level;
+					break;
+				}
+				if (obj.type == 'Contest')
+				{
+					trace("Level = " + obj.model.floor);
+					trace("ID = " + obj.id);
+					have = obj.model.floor;
 					break;
 				}
 				if (obj.level && obj.sid == sID){

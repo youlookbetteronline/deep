@@ -6,8 +6,12 @@ package units
 	import core.Numbers;
 	import core.Post;
 	import core.TimeConverter;
+	import flash.display.Bitmap;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.filters.BitmapFilterQuality;
+	import flash.filters.BlurFilter;
+	import flash.filters.ColorMatrixFilter;
 	import flash.geom.Point;
 	import flash.utils.clearInterval;
 	import flash.utils.clearTimeout;
@@ -15,6 +19,7 @@ package units
 	import flash.utils.setTimeout;
 	import ui.AnimalCloud;
 	import ui.UnitIcon;
+	import ui.UserInterface;
 	import wins.NeedResWindow;
 	import wins.PurchaseWindow;
 	import wins.ShopWindow;
@@ -54,7 +59,7 @@ package units
 		public var thisTechnoWigwam:Wigwam;
 		
 		protected var timerIcon:int = 4;
-		
+		public var shadowScale:Number = .75;
 		private var target:*;
 		private var workerViewID:int;
 		private var intervalMove:int;
@@ -351,7 +356,7 @@ package units
 					}
 				}
 			}
-			if (info, type != 'Walkhero')
+			if (info, type != 'Walkhero' && type != 'Contest')
 			{
 				_info = App.data.storage[workerViewID];
 				Load.loading(Config.getSwf(_info.type, _info.view), onLoad);
@@ -380,6 +385,71 @@ package units
 					remove();
 					App.data.options.SlaveBoughtTime
 					App.self.setOffTimer(addTimerToDeath);
+				}
+			}
+		}
+		
+		override public function createShadow():void
+		{
+			if (!textures)
+				return;
+			if (shadow) 
+			{
+				removeChild(shadow);
+				shadow = null;
+			}
+			
+			if (textures){
+				textures.animation.shadow = {
+					x:0,
+					y:10,
+					alpha:0.59,
+					scaleX:1,
+					scaleY:1
+				};
+			}
+			if (sid == 1513)
+			{
+				textures.animation.shadow.scaleX = 3;
+				textures.animation.shadow.scaleY = 3;
+				textures.animation.shadow.x = -20;
+				textures.animation.shadow.y = -3;
+			}
+			info
+			shadow = new Bitmap(UserInterface.textures.shadow);
+			addChildAt(shadow, 0);
+			shadow.smoothing = true;
+			shadow.x = textures.animation.shadow.x - (shadow.width / 2);
+			shadow.y = textures.animation.shadow.y - (shadow.height / 2);
+			shadow.alpha = 0.3;
+			shadow.scaleX = textures.animation.shadow.scaleX * .7;
+			shadow.scaleY = textures.animation.shadow.scaleY * .7;
+			
+			if (App.data.storage[sid].base == 1)
+			{
+				//fly = true;
+				//var shadBitmap:BitmapData = textures.animation.animations.walk.frames[0][0].bmd.clone();
+				//var invertTransform:ColorTransform = new ColorTransform(0, 0, 0, 1, 0, 0, 0, 1);
+				//shadBitmap.colorTransform(shadBitmap.rect, invertTransform);
+				
+				var matrix:Array = new Array();
+				matrix = matrix.concat([0, 0, 0, 0, 0]); // red
+				matrix = matrix.concat([0, 0, 0, 0, 0]); // green
+				matrix = matrix.concat([0, 0, 0, 0, 0]); // blue
+				matrix = matrix.concat([0, 0, 0, 1, 0]); // alpha
+				var _filter:ColorMatrixFilter = new ColorMatrixFilter(matrix);
+				
+				//shadow.bitmapData = shadBitmap;
+				shadow.filters = [new BlurFilter(20, 20, BitmapFilterQuality.LOW), _filter];
+				shadow.scaleX = shadow.scaleY = shadowScale;
+				shadow.x = shadow.x - (shadow.width / 2);
+				shadow.y = shadow.y - (shadow.height / 2);
+				shady = shadow.y;
+				
+				if (textures)
+				{
+					ax = textures.animation.ax;
+					ay = textures.animation.ay - 100;// позиция битмапки персонажа над тенью
 				}
 			}
 		}

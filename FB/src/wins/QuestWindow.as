@@ -973,6 +973,13 @@ internal class Mission extends Sprite {
 					have = obj.model.level;
 					break;
 				}
+				if (obj.type == 'Contest')
+				{
+					trace("Level = " + obj.model.floor);
+					trace("ID = " + obj.id);
+					have = obj.model.floor;
+					break;
+				}
 				if (obj.level && obj.sid == sID){
 					trace("Level = " + obj.level);
 					trace("ID = " + obj.id);

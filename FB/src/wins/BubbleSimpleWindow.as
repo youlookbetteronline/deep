@@ -34,7 +34,7 @@ package wins
 			settings["hasButtons"]			= false;
 			settings["width"]				= 480;
 			drawDescription();
-			settings["height"] 				= 140 + _label.textHeight;
+			settings["height"] 				= 130 + _label.textHeight;
 			settings["leftBttnText"] 		= settings.leftBttnText || Locale.__e('flash:1382952380299');
 			settings["rightBttnText"] 		= settings.rightBttnText || Locale.__e('flash:1383041104026');
 			settings["confirmBttnText"] 	= settings.confirmBttnText || Locale.__e('flash:1382952380242');
@@ -159,13 +159,11 @@ package wins
 		
 		private function build():void 
 		{
-			titleLabel.y += 45;
-			
 			exit.y += 13;
 			exit.x -= 15;
 			
 			_label.x = (settings.width - _label.width) / 2;
-			_label.y = 50
+			_label.y = 30
 			
 			bodyContainer.addChild(_label);
 		}

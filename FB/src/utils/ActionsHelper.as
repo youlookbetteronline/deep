@@ -10,6 +10,7 @@ package utils
 	import wins.ActionWoodWindow;
 	import wins.BanksWindow;
 	import wins.BigsaleWindow;
+	import wins.BubbleActionWindow;
 	import wins.MaterialActionWindow;
 	import wins.PremiumActionWindow;
 	import wins.PromoWindow;
@@ -29,7 +30,8 @@ package utils
 	 */
 	public class ActionsHelper 
 	{
-		
+		public static const CURRENCY:int = 1;
+		public static const MATERIAL:int = 2;
 		public function ActionsHelper() 
 		{
 			
@@ -57,7 +59,6 @@ package utils
 			// Удалить куки несуществующих акций или акций которые уже не появятся. ОДИН РАЗ ПРИ ЗАПУСКЕ!
 			var arch:Object;
 			var pID:String;
-			
 			if(App.user.promoFirstParse) {
 				for (pID in actionsArch) {
 					if (pID == '1080') continue;
@@ -102,14 +103,10 @@ package utils
 			
 			for (var aID:String in App.data.actions) 
 			{
-				if (aID == '2410')
-					trace();
 				var action:Object = App.data.actions[aID];
 				var open:Boolean = false;
 				
-				if (aID == '1142') {
-					trace();
-				}
+				
 				// Пропустить если купили
 				
 				if (actionsArch.hasOwnProperty(aID) && actionsArch[aID] != null && App.data.actions.hasOwnProperty(aID) && App.data.actions[aID] != null && !App.data.actions[aID].more && actionsArch[aID].buy) {
@@ -143,9 +140,7 @@ package utils
 						}
 					}
 				}
-				if (aID == '1424')
-					trace()
-					
+				
 				var whileQuestComplete:Boolean = false;
 				if (action.hasOwnProperty('whilequest') && action.whilequest != '')
 				{
@@ -157,8 +152,10 @@ package utils
 						
 					}
 				}
+				if (aID == '2247')
+					trace();	
 				
-				if (action.hasOwnProperty('friendsless') && action.friendsless !="" && App.network.appFriends && App.network.appFriends.length >= action.friendsless)
+				if (action.hasOwnProperty('friendsless') && action.friendsless !="" && App.network.appFriends.length >= action.friendsless)
 					continue;
 				
 				if (alreadyOpened)
@@ -167,13 +164,13 @@ package utils
 					continue;
 				
 				if (action.type == 0) { // Обычные
+					
 					if (action.hasOwnProperty('paygroup'))
 					{
 						if (!checkPaygroup(action.paygroup))
 							continue;
-					}
-					//if (((action.unlock.level && level >= action.unlock.level) || (action.unlock.quest && quests.data.hasOwnProperty(action.unlock.quest) && quests.data[action.unlock.quest].finished == 0)) || (actionsArch.hasOwnProperty(aID) && actionsArch[aID] != null && actionsArch[aID].time + action.duration * 3600 > App.time)) {
-					if (!(actionsArch.hasOwnProperty(aID) && actionsArch[aID] != null && actionsArch[aID].buy == 1 && actionsArch[aID].time + action.duration * 3600 > App.time) &&
+					}//if (((action.unlock.level && level >= action.unlock.level) || (action.unlock.quest && quests.data.hasOwnProperty(action.unlock.quest) && quests.data[action.unlock.quest].finished == 0)) || (actionsArch.hasOwnProperty(aID) && actionsArch[aID] != null && actionsArch[aID].time + action.duration * 3600 > App.time)) {
+					if (!(actionsArch.hasOwnProperty(aID) && actionsArch[aID] != null && actionsArch[aID].buy == 1  && actionsArch[aID].time + action.duration * 3600 > App.time) &&
 					((action.unlock.level != '' && action.unlock.quest == '' && App.user.level >= action.unlock.level) ||
 					 (action.unlock.quest != '' && action.unlock.level == '' && App.user.quests.data.hasOwnProperty(action.unlock.quest)) ||
 					 (action.unlock.level != '' && action.unlock.quest != '' && App.user.level >= action.unlock.level && App.user.quests.data.hasOwnProperty(action.unlock.quest))))
@@ -471,6 +468,12 @@ package utils
 					break;
 			}
 			
+			if (action.bg && action.bg == 'ActionSandWindow')
+			{
+				new ActionSandWindow( { pID:pID } ).show();
+				return;
+			}
+			
 			if (action.bg && action.bg == 'MaterialActionWindow')
 			{
 				new MaterialActionWindow( { pID:pID } ).show();
@@ -480,12 +483,6 @@ package utils
 			if (action.bg && action.bg == 'TemporaryActionWindow')
 			{
 				new TemporaryActionWindow( { pID:pID } ).show();
-				return;
-			}
-			
-			if (action.bg && action.bg == 'ActionSandWindow')
-			{
-				new ActionSandWindow( { pID:pID } ).show();
 				return;
 			}
 			
@@ -510,6 +507,12 @@ package utils
 			if (action.bg && action.bg == 'SaleLimitWindow')
 			{
 				new SaleLimitWindow( { pID:pID } ).show();
+				return;
+			}
+			
+			if (action.bg && action.bg == 'BubbleActionWindow')
+			{
+				new BubbleActionWindow( { pID:pID } ).show();
 				return;
 			}
 			
@@ -611,7 +614,7 @@ package utils
 		
 		public static function viewUserAction(_aID:int):void
 		{
-			if (App.isSocial('SP') || App.isSocial('FB'))
+			if (App.isSocial('SP'))
 				return;
 			Post.send({
 				ctr		:'Uactions',
@@ -630,7 +633,9 @@ package utils
 		
 		public static function createUserActions(createNew:Boolean = false):void
 		{
-			if (App.isSocial('SP') || App.isSocial('FB'))
+			if (App.isSocial('SP', 'FB'))
+				return;
+			if (Capabilities.playerType == 'StandAlone')
 				return;
 			Post.send({
 				ctr		:'Uactions',
@@ -669,7 +674,6 @@ package utils
 				}
 			});
 		}
-		
 		private static function checkPaygroup(group:Array):Boolean 
 		{
 			var _checkPaygroup:Boolean = false
@@ -679,6 +683,13 @@ package utils
 					_checkPaygroup = true;
 			}
 			return _checkPaygroup
+		}
+		
+		public static function getActionType(aID:int):int{
+			if (App.data.actions[aID].hasOwnProperty('price') && App.data.actions[aID].price.hasOwnProperty(App.social))
+				return CURRENCY;
+			else 
+				return MATERIAL;
 		}
 		
 		public static function priceLable(price:Number):Object 
@@ -732,7 +743,6 @@ package utils
 			
 			return {text:text, price:price};
 		}	
-		
 	}
 
 }

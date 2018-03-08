@@ -2,6 +2,7 @@ package tree
 {
 	import com.flashdynamix.motion.extras.BitmapTiler;
 	import core.Numbers;
+	import core.Post;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.BlendMode;
@@ -275,6 +276,7 @@ package tree
 		}
 		public function onClick(e:MouseEvent = null):void
 		{
+			
 			if (App.treeManeger.mission && App.treeManeger.mission.parent)
 				App.self.removeChild(App.treeManeger.mission);
 				
@@ -301,7 +303,40 @@ package tree
 				//App.treeManeger.dialog.y = e.stageY - (App.treeManeger.dialog.height) / 2;// Node(_under.parent).y;
 				App.treeManeger.dialog.visible = true;
 			}
+			
+			if (App.complete)
+			{
+				if (App.userID && App.social)
+					completeEvent();
+			}
 		}
+		
+		private function completeEvent():void 
+		{
+			var scored:Object = {};
+			var mids:Object = {};
+			for (var i:int = 1; i <= Numbers.countProps(_quests[_id].missions); i++)
+			{
+				mids[i] = {1:1}
+			}
+			scored[_id] = mids;
+			
+			Post.send( {
+				ctr		:'quest',
+				act		:'score',
+				uID		:App.userID,
+				wID		:4,
+				score	:JSON.stringify(scored),
+				f		:1
+			},function(error:*, data:*, params:*):void {
+				if (error) {
+					return;
+				}
+				App.userPanel.onGoEvent(null);
+			});
+		
+		}
+		
 		public function clear ():void
 		{
 			//if (parent)

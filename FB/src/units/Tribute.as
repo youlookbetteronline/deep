@@ -581,7 +581,7 @@ package units
 				App.self.setOnTimer(work);
 			}*/
 			
-			Treasures.bonus(data.treasure, new Point(this.x, this.y));
+			Treasures.bonus(data.bonus, new Point(this.x, this.y));
 			SoundsManager.instance.playSFX('bonus');
 			
 			if (params != null) {

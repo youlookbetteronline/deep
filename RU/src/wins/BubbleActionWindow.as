@@ -94,7 +94,7 @@ package wins
 			
 			
 			var timeLeft:uint = _action.time + _action.duration * Numbers.HOUR - App.time;
-			_leftTimeText = Window.drawText(Locale.__e('flash:1393581955601') + '\n' + TimeConverter.timeToCuts(timeLeft),{
+			_leftTimeText = Window.drawText(Locale.__e('flash:1393581955601') + '\n' + TimeConverter.timeToDays(timeLeft),{
 				fontSize		:32,
 				color			:0xfff330,
 				borderColor		:0x224076,
@@ -118,7 +118,7 @@ package wins
 				App.self.setOffTimer(actionTimer);
 				return;
 			}
-			_leftTimeText.text = Locale.__e('flash:1393581955601') + '\n' + TimeConverter.timeToCuts(timeLeft)
+			_leftTimeText.text = Locale.__e('flash:1393581955601') + '\n' + TimeConverter.timeToDays(timeLeft)
 		}
 		
 		private function drawItem():void 
@@ -193,8 +193,8 @@ package wins
 			Size.size(_lifeTimerIcon, 30, 30);
 			_lifeTimerIcon.smoothing = true;
 			
-			var _bonusTimerText:TextField = Window.drawText(TimeConverter.timeToCuts(App.data.storage[_actionItem].time),{
-				fontSize		:26,
+			var _bonusTimerText:TextField = Window.drawText(TimeConverter.timeToDays(App.data.storage[_actionItem].time),{
+				fontSize		:24,
 				color			:0xffffff,
 				borderColor		:0x224076,
 				borderSize		:3,
@@ -202,8 +202,8 @@ package wins
 			})
 			_bonusTimerText.width = _bonusTimerText.textWidth + 5;
 			
-			var _lifeTimerText:TextField = Window.drawText(App.data.storage[_actionItem].lifetime?TimeConverter.timeToCuts(App.data.storage[_actionItem].lifetime):String('∞'),{
-				fontSize		:26,
+			var _lifeTimerText:TextField = Window.drawText(App.data.storage[_actionItem].lifetime?TimeConverter.timeToDays(App.data.storage[_actionItem].lifetime):String('∞'),{
+				fontSize		:24,
 				color			:0xffffff,
 				borderColor		:0x224076,
 				borderSize		:3,
@@ -213,7 +213,7 @@ package wins
 			var _lifeTimerInfinity:Bitmap = new Bitmap(Window.textures.infinity);
 			
 			var _bonusLabel:TextField = Window.drawText(Locale.__e('flash:1519295603909'),{
-				fontSize		:26,
+				fontSize		:24,
 				color			:0xfff330,
 				borderColor		:0x224076,
 				borderSize		:3,
@@ -222,7 +222,7 @@ package wins
 			_bonusLabel.width = _bonusLabel.textWidth + 5;
 			
 			var _lifeLabel:TextField = Window.drawText(Locale.__e('flash:1519295640115'),{
-				fontSize		:26,
+				fontSize		:24,
 				color			:0xfff330,
 				borderColor		:0x224076,
 				borderSize		:3,
@@ -391,10 +391,10 @@ package wins
 			if (needRewardPerTime)
 			{
 				_rewardTitle.x = (settings.width - _rewardTitle.width) / 2;
-				_rewardTitle.y = 335;
+				_rewardTitle.y = _description.y + _description.textHeight + 5;
 				
 				_rewardContainer.x = (settings.width - _rewardContainer.width) / 2;
-				_rewardContainer.y = 370;
+				_rewardContainer.y = _rewardTitle.y + _rewardTitle.height;
 				
 				_rewardDesc.x = (settings.width - _rewardDesc.width) / 2;
 				_rewardDesc.y = _rewardContainer.y + _rewardContainer.height + 5;

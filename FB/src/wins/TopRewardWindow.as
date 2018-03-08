@@ -85,8 +85,14 @@ package wins
 			
 		}
 		
+		override public function close(e:MouseEvent = null):void 
+		{
+			super.close(e);
+			App.user.stock.addAll(settings.reward);
+		}
 		
-		/*private function drawRibbon():void 
+		
+		override protected function drawRibbon():void 
 		{
 			var titleBackingBmap:Bitmap = backingShort(350, 'actionRibbonBg', true);
 			titleBackingBmap.x = (settings.width -titleBackingBmap.width) / 2;
@@ -96,7 +102,7 @@ package wins
 			titleLabel.y = titleBackingBmap.y + 16;
 			
 			bodyContainer.addChild(titleLabel);
-		}*/
+		}
 		
 		private function drawBttn():void
 		{			
@@ -119,16 +125,7 @@ package wins
 		
 		}
 		
-		private function okEvent(e:MouseEvent = null):void
-		{
-			var topID:int = TopHelper.getTopID(settings.target.sid);
-			var istanceTop:int = TopHelper.getTopInstance(TopHelper.getTopID(settings.target.sid)) - 1;
-			var bonusInfo:Object = App.user.data.user.top[topID][istanceTop];
-			if (App.user.data.user.top[topID][istanceTop].hasOwnProperty('tbonus'))
-				delete App.user.data.user.top[topID][istanceTop]['tbonus'];
-			if (App.user.data.user.top[topID][istanceTop].hasOwnProperty('abonus'))
-				delete App.user.data.user.top[topID][istanceTop]['abonus'];
-			
+		private function okEvent(e:MouseEvent = null):void{
 			close();
 		}
 		

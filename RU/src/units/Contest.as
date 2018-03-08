@@ -1,5 +1,6 @@
 package units 
 {
+	import core.Load;
 	import core.Numbers;
 	import core.Post;
 	import flash.geom.Point;
@@ -18,6 +19,7 @@ package units
 		{
 			super(object);
 			initModel(object);
+			load();
 			showIcon();
 			startWork();
 			tip = function():Object{
@@ -49,6 +51,25 @@ package units
 				title:		info.title,
 				text:		info.description
 			}
+			
+		}
+		
+		override public function load():void 
+		{
+			if (preloader) addChild(preloader);
+			var view:String = info.levels[_model.floor].req.preview;
+			Load.loading(Config.getSwf(info.type, view), onLoad);
+		}
+		
+		override public function onLoad(data:*):void 
+		{
+			textures = data;
+			getRestAnimations();
+			addAnimation();
+			createShadow();
+			
+			if (!open && formed) 
+				applyFilter();
 			
 		}
 		
@@ -94,16 +115,16 @@ package units
 			if (_model.tribute)
 			{
 				var _view:int = Stock.COINS;
-				if(info.hasOwnProperty('shake') && info.shake!="")
-					for (var shake:* in App.data.treasures[info.shake][info.shake].item)
-						if (Treasures.onlySystemMaterials(info.shake))
+				var infoshake:* = info.levels[_model.floor].bonus
+					for (var shake:* in App.data.treasures[infoshake][infoshake].item)
+						if (Treasures.onlySystemMaterials(infoshake))
 						{
-							if (App.data.treasures[info.shake][info.shake].probability[shake] == 100)
-								_view = App.data.treasures[info.shake][info.shake].item[shake]
+							if (App.data.treasures[infoshake][infoshake].probability[shake] == 100)
+								_view = App.data.treasures[infoshake][infoshake].item[shake]
 						}
-						else if (App.data.storage[App.data.treasures[info.shake][info.shake].item[shake]].mtype != 3 &&
-							App.data.treasures[info.shake][info.shake].probability[shake] == 100){	
-								_view = App.data.treasures[info.shake][info.shake].item[shake];
+						else if (App.data.storage[App.data.treasures[infoshake][infoshake].item[shake]].mtype != 3 &&
+							App.data.treasures[infoshake][infoshake].probability[shake] == 100){	
+								_view = App.data.treasures[infoshake][infoshake].item[shake];
 								break;
 						}		
 						
@@ -199,7 +220,17 @@ package units
 				App.user.stock.addAll(data.bonus)
 				SoundsManager.instance.playSFX('bonus');
 			}
+			changeLevel();
 			params.upgradeCallback();
+		}
+		
+		private function changeLevel():void 
+		{
+			var self:Contest = this;
+			var view:String = info.levels[_model.floor].req.preview;
+			Load.loading(Config.getSwf(info.type, view), function(data:*):void {
+				self.textures = data;
+			});
 		}
 		
 		override protected function onBuyAction(error:int, data:Object, params:Object):void 
@@ -211,6 +242,7 @@ package units
 			goHome();
 		}
 		
+		
 		override protected function onStockAction(error:int, data:Object, params:Object):void 
 		{
 			super.onStockAction(error, data, params);
@@ -219,6 +251,8 @@ package units
 			startWork();
 			goHome();
 		}
+		
+		public function get model():ContestModel {return _model;}
 	}
 
 }

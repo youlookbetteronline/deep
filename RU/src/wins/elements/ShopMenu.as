@@ -247,6 +247,9 @@ package wins.elements
 				case 3333: 
 					_arrSquence = [100, 4, 7, 14];
 					break;
+				case 3526: 
+					_arrSquence = [100, 4, 2, 7];
+					break;
 				default: 
 					_arrSquence = [100, 2, 13, 4, 15, 3, 7];
 					break;

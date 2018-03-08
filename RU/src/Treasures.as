@@ -471,6 +471,11 @@ package
 				case 'Walkgolden':
 					storageCount = Math.ceil(time / unit.time);
 					result = averageDropTreasure(unit.shake, storageCount)
+					break;
+				case 'Walkhero':
+					storageCount = Math.ceil(time / unit.time);
+					result = averageDropTreasure(unit.treasure, storageCount)
+					
 			}
 			return result;
 		}

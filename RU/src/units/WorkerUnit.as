@@ -16,6 +16,7 @@ package units
 		public static const FREE:int = 0;
 		public static const BUSY:int = 1;
 		public var _wigwam:Boolean = false;
+		public var shady:int = 0;
 		//public static const QUEUE:int = 2;
 		public var progressBar:ProgressBar;
 		public static var busy:uint = 0;

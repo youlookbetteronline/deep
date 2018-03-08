@@ -358,7 +358,7 @@ package units
 			}
 			if (sid == Decor.OCTOPUS_RUINS && App.user.mode == User.OWNER)
 			{
-				cantClick = true;
+				cantClick = false;
 				App.user.addTarget({target: this, near: true, callback: function():void 
 				{
 					removable = true;

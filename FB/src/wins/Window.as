@@ -7,6 +7,7 @@ package wins
 	import core.Size;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display.DisplayObject;
 	import flash.display.GradientType;
 	import flash.display.Graphics;
 	import flash.display.Shape;
@@ -2404,6 +2405,15 @@ package wins
 			}else {
 				dispatchEvent(new WindowEvent("onBeforeClose"));
 				dispose();
+			}
+		}
+		
+		public function disposeChilds(list:*):void 
+		{
+			for each(var item:DisplayObject in list){
+				if (item && item.parent)
+					item.parent.removeChild(item);
+				item = null;
 			}
 		}
 	}

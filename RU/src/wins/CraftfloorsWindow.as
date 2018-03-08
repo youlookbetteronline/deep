@@ -246,9 +246,12 @@ package wins
 		
 		private function onBoostEvent(e:MouseEvent):void 
 		{
+			if (e.currentTarget.mode == Button.DISABLED)
+				return;
+			e.currentTarget.state = Button.DISABLED;
 			if (!App.user.stock.check(3, int(e.currentTarget.countLabel.text)))
 			{
-				Window.closeAll();
+				close();
 				new BanksWindow( { section:e.currentTarget.settings.mode } ).show();
 				return;
 			}
@@ -861,10 +864,10 @@ internal class Slot extends LayerX
 	{
 		if (e.currentTarget.mode == Button.DISABLED)
 			return;
-		if (App.user.stock.check(_target.info.slots[_slotID].price))
+		e.currentTarget.state = Button.DISABLED;
+		if (!App.user.stock.checkAll(_target.info.slots[_slotID].price))
 		{
-			Window.closeAll();
-			new BanksWindow( { section:e.currentTarget.settings.mode } ).show();
+			e.currentTarget.state = Button.NORMAL;
 			return;
 		}
 		_model.unlockCallback(_slotID, _window.contentChange);

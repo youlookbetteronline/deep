@@ -385,6 +385,9 @@ internal class Component extends LayerX
 	
 	private function buyEvent(e:MouseEvent):void 
 	{
+		if (e.currentTarget.mode == Button.DISABLED)
+			return;
+		e.currentTarget.state = Button.DISABLED
 		var def:int = _count - App.user.stock.count(_sID);
 		e.currentTarget.state = Button.DISABLED;
 		App.user.stock.buy(_sID, def, onBuyEvent);

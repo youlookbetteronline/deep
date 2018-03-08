@@ -268,7 +268,8 @@ package
 			//}
 			
 			Log.alert('STATE User');
-			
+			if (!App.network.appFriends)
+				App.network.appFriends = [];
 			var send:Object = {
 				'ctr':'user',
 				'act':'state',

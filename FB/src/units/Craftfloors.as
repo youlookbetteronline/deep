@@ -264,7 +264,6 @@ package units
 		{
 			if (error)
 			{
-				Errors.show(error, data);
 				return;
 			}
 			//Window.closeAll()

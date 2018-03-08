@@ -9,6 +9,8 @@ package wins
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	import flash.text.TextField;
+	import utils.BonusHelper;
+	import utils.TopHelper;
 	/**
 	 * ...
 	 * @author ...
@@ -44,6 +46,9 @@ package wins
 			settings['fontBorderColor'] 	= 0x1f5167;
 			settings['fontBorderSize']		= 3;
 			settings['fontSize'] 			= 40;
+			settings["faderAsClose"]		= false;
+			settings["escExit"]				= false;
+			settings["hasExit"]				= false;
 			settings['title'] 				= Locale.__e('flash:1429693439093');
 			
 			return settings;
@@ -115,16 +120,19 @@ package wins
 		
 		private function onClick(e:MouseEvent):void 
 		{
-			close()
+			if (e.currentTarget.mode == Button.DISABLED)
+				return;
+			e.currentTarget.state = Button.DISABLED;
+			BonusHelper.getLack(lackCallback)
 		}
 		
-		override public function close(e:MouseEvent = null):void 
+		private function lackCallback(bonus:Object):void 
 		{
-			super.close(e);
-			App.user.stock.addAll(settings.bonus);
-			for (var _sid:* in settings.bonus) 
+			close();
+			App.user.stock.addAll(bonus);
+			for (var _sid:* in bonus) 
 			{
-				var item:BonusItem = new BonusItem(_sid, settings.bonus[_sid]);
+				var item:BonusItem = new BonusItem(_sid, bonus[_sid]);
 				var point:Point = new Point(App.self.mouseX, App.self.mouseY)
 				point.y += 80;
 				item.cashMove(point, App.self.windowContainer);
@@ -156,8 +164,6 @@ package wins
 		private function build():void 
 		{
 			titleLabel.y += 40;
-			exit.y += 10;
-			exit.x -= 15;
 			
 			_description.x = (settings.width - _description.width) / 2;
 			_description.y = 52;
@@ -216,6 +222,13 @@ internal class BubbleItem extends LayerX
 		drawCount();
 		
 		build();
+		
+		this.tip = function():Object{
+			return {
+				title	:_item.title,
+				text	:_item.description
+			}
+		}
 	}
 	
 	private function drawBackground():void 

@@ -214,6 +214,7 @@ package
 		private var table:Table;
 		private var wall:Wall;
 		private var bridge:Bridge;
+		private var contest:Contest;
 		private var box:Box;
 		private var photostand:Photostand;
 		private var firework:Firework;

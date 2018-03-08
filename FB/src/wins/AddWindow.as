@@ -276,7 +276,10 @@ package wins
 			new SimpleWindow( {
 				label:SimpleWindow.ATTENTION,
 				title:Locale.__e("flash:1382952379735"),
-				text:Locale.__e("flash:1382952379990")
+				text:Locale.__e("flash:1382952379990"),
+				confirm:function():void{
+					ActionsHelper.updateActions();
+				}
 			}).show();
 		}
 		

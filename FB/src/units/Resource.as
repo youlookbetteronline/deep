@@ -456,9 +456,10 @@ package units
 			if (!SystemPanel.animate && firstDraw) return;
 			
 			firstDraw = true;
-			
 			for each(var name:String in framesTypes) {
 				var frame:* 			= multipleAnime[name].frame;
+				if (!textures || !textures.animation || !textures.animation.animations)
+					continue
 				var cadr:uint 			= textures.animation.animations[name].chain[frame];
 				if (multipleAnime[name].cadr != cadr) {
 					multipleAnime[name].cadr = cadr;
@@ -524,6 +525,7 @@ package units
 				Load.clearCache(Config.getSwf(type, info.view));
 				data = null;
 			}
+			
 		}
 		
 		override public function moveAction():void
@@ -795,23 +797,6 @@ package units
 		{
 			if (App.user.mode == User.PUBLIC && !SocketActions.checkUserResource(this))
 				return false;
-			if (App.user.worldID == User.SYNOPTIK_MAP)
-			{
-				var tempPath:Vector.<AStarNodeVO>;
-				var placeNear:* = App.user.hero.findPlaceNearTarget(this, 5)
-				tempPath = App.user.hero.findPath(App.map._aStarNodes[App.user.hero.cell][App.user.hero.row], App.map._aStarNodes[placeNear.x][placeNear.z], App.map._astar);
-				if (tempPath == null)
-				{
-					new SimpleWindow( {
-						title:Locale.__e("flash:1474469531767"),
-						label:SimpleWindow.ATTENTION,
-						text:Locale.__e('flash:1506068356686'),
-						popup:true
-					}).show();
-					
-					return false;
-				}
-			}
 			if (SocketActions.lockAction)
 			{
 				SocketActions.lockStartMap();

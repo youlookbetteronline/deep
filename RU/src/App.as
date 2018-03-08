@@ -70,12 +70,14 @@ package
 	import units.Techno;
 	import units.Unit;
 	import units.WaitPlate;
+	import utils.BonusHelper;
 	import utils.ErrorManager;
 	import utils.InviteHelper;
 	import utils.LocaleHelper;
 	import utils.MapPresets;
 	import utils.ObjectsContent;
 	import utils.Saver;
+	import utils.TopHelper;
 	import utils.UnitsHelper;
 	import wins.AskWindow;
 	import wins.BanksWindow;
@@ -96,6 +98,7 @@ package
 	import wins.ReferalRewardWindow;
 	import wins.SalesWindow;
 	import wins.SimpleWindow;
+	import wins.TopResultWindow;
 	import wins.TravelWindow;
 	import wins.Window;
 	import wins._6WBonusWindow;
@@ -201,7 +204,7 @@ package
 
 		public static const ID:* = '29060311';//'30035157';// '774242479407105';
 		public static const SERVER:* = 'DM';
-		public static const SOCIAL:* = 'DM';	
+		public static const SOCIAL:* = 'VK';	
 		public static var lang:String = 'ru'; //de en es fr it nl pl pt tr ru
 		
 		public static function get data():Object
@@ -1097,10 +1100,11 @@ package
 			
 			if (!App.user.quests.tutorial)
 			{
+				BonusHelper.checkLack();
 				
 				if(App.user.bonus == 0 && App.user.level > 3) 
 					new DayliBonusWindow().show();
-			
+				TopHelper.checkRewards();
 				Pigeon.checkNews();	
 				
 				App.user.quests.checkFreebie();
@@ -1821,12 +1825,7 @@ package
 					}
 				}
 				trace(result);*/
-				/*new BonusLackWindow({
-					bonus:	{3393:2, 3326:4, 2:150, 3:15, 59:1}
-				}).show();*/
-				new BubbleActionWindow({
-					
-				}).show();
+				
 			}
 			
 			if (e.keyCode == Keyboard.L && e.ctrlKey) {

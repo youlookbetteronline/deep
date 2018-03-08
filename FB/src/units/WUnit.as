@@ -59,7 +59,8 @@ package units
 			super(object);
 			//walk = walkFunction;
 			//update = updateFunction;
-			//addEventListener(Event.REMOVED_FROM_STAGE, onRemoveFromStage);			
+			//addEventListener(Event.REMOVED_FROM_STAGE, onRemoveFromStage);		
+			
 		}
 		
 		/*public function onRemoveFromStage(e:Event):void 
@@ -326,7 +327,6 @@ package units
 		{
 			if (sid == 8 && value == 'wait')
 				value = 'stop_pause'
-			
 			if (_framesType != value)
 			{
 				frame = 0;
@@ -401,6 +401,8 @@ package units
 		//public var update:Function;
 		public function update(e:* = null):void
 		{
+			if (sid == 535)
+				trace();
 			if (_walk)
 			{
 				if (start.y < finish.y)
@@ -458,7 +460,7 @@ package units
 				_framesType = "rest";
 			}
 			if (!_framesType)
-				_framesType = "walk";
+				_framesType = 'walk';
 			var cadr:uint 	= anim[_framesType].chain[frame];
 			
 			if (anim[_framesType].frames[framesDirection] == undefined) 
@@ -500,13 +502,12 @@ package units
 					shadow.scaleY = bitmap.scaleY;
 				}*/
 			}
-			frame++; 
+			frame++;
 			if (frame >= anim[_framesType].chain.length) 
 			{
 				this.dispatchEvent(new Event(Event.COMPLETE));
 				frame = 0;
-				if(loopFunctionn != null)
-					loopFunctionn();
+				loopFunctionn();
 			}
 			
 			if (icon) iconSetPosition();			

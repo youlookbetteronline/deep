@@ -557,8 +557,11 @@ package units
 				capacity++;
 			}
 			
-			Treasures.bonus(data.bonus, new Point(this.x, this.y));
-			SoundsManager.instance.playSFX('bonus');
+			if (data.bonus)
+			{
+				Treasures.bonus(data.bonus, new Point(this.x, this.y));
+				SoundsManager.instance.playSFX('bonus');
+			}
 			
 			if (params != null) {
 				if (params['guest'] != undefined) {

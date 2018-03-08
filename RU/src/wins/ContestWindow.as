@@ -14,6 +14,7 @@ package wins
 	import flash.text.TextField;
 	import models.ContestModel;
 	import ui.Hints;
+	import units.Contest;
 	import utils.TopHelper;
 	/**
 	 * ...
@@ -39,11 +40,13 @@ package wins
 		private var _descriptionText:			TextField;
 		private var _timeStorageText:			TextField;
 		private var _topIcon:					ImageButton;
+		private var _target:					Contest;
 		
 		public function ContestWindow(settings:Object=null) 
 		{
 			_model = settings.model;
 			_info = settings.target.info
+			_target = settings.target;
 			settings = settingsInit(settings);
 			
 			super(settings);
@@ -56,7 +59,7 @@ package wins
 				settings = {};
 			}
 
-			settings["width"]				= 545;
+			settings["width"]				= 700;
 			settings["height"] 				= 470;
 			settings["hasPaginator"] 		= false;
 			settings["hasPaper"] 			= true;
@@ -74,15 +77,24 @@ package wins
 		}
 		
 		private function parseContent():Array{
-			var msimple:Object = _info.levels[_model.floor]['throw'].msimple[_model.toThrow.msimple]
-			var mcomplex:Object = _info.levels[_model.floor]['throw'].mcomplex[_model.toThrow.mcomplex]
-			var mdonate:Object = _info.levels[_model.floor]['throw'].mdonate[_model.toThrow.mdonate]
+			var msimple:Object = _info.levels[_model.floor]['throw'].msimple.items[_model.toThrow.msimple]
+			var mcomplex:Object = _info.levels[_model.floor]['throw'].mcomplex.items[_model.toThrow.mcomplex]
+			var mhard:Object = _info.levels[_model.floor]['throw'].mhard.items[_model.toThrow.mhard]
+			var mdonate:Object = _info.levels[_model.floor]['throw'].mdonate.items[_model.toThrow.mdonate]
 			
 			msimple.type = 'msimple';
+			msimple.order = _info.levels[_model.floor]['throw'].msimple.order;
 			mcomplex.type  = 'mcomplex';
+			mcomplex.order  = _info.levels[_model.floor]['throw'].mcomplex.order;
+			mhard.type  = 'mhard';
+			mhard.order  = _info.levels[_model.floor]['throw'].mhard.order;
 			mdonate.type  = 'mdonate';
+			mdonate.order  = _info.levels[_model.floor]['throw'].mdonate.order;
 			
-			return [msimple, mcomplex, mdonate];
+			var result:Array = [msimple, mcomplex, mdonate, mhard];
+			result.sortOn('order', Array.NUMERIC);
+			
+			return result;
 			
 		}	
 		
@@ -112,11 +124,11 @@ package wins
 		
 		private function drawProgress():void
 		{
-			_progressBackingMaterials = Window.backingShort(320, "backingBank");
+			_progressBackingMaterials = Window.backingShort(460, "backingBank");
 			
 			var barSettings:Object = {
 				typeLine:'sliderBank',
-				width:319,
+				width:459,
 				win:this.parent
 			};
 			
@@ -133,7 +145,7 @@ package wins
 				multiline:true,
 				wrap:true
 			});
-			_progressTextMaterials.width = 100;
+			_progressTextMaterials.width = 140;
 		}
 		
 		private function progress():void 
@@ -232,7 +244,14 @@ package wins
 			});
 			_bttnUpgrade.addEventListener(MouseEvent.CLICK, onUpgradeEvent);
 			
-			
+			_bttnUpgrade.tip = function():Object{
+				var treas:String = _target.info.levels[_model.floor].bonusupgrade;
+				var treasObject:* = App.data.storage[App.data.treasures[treas][treas].item[0]];
+				var canGive:String = Treasures.stringify(App.data.treasures[treasObject.treasure][treasObject.treasure]);
+				return{
+					title	:Locale.__e('flash:1520413537959', [treasObject.title, canGive])
+				}
+			}
 			if (_model.floor == _model.totalFloor)
 			{
 				_bttnStorage.x = (settings.width - _bttnStorage.width) / 2;
@@ -319,7 +338,12 @@ package wins
 		
 		private function infoEvent(e:MouseEvent):void 
 		{
-			
+			var hintWindow:ExpeditionHintWindow = new ExpeditionHintWindow( {
+				popup: true,
+				hintID:8,
+				height:540
+			});
+			hintWindow.show();	
 		}
 		
 		private function drawTopButton():void
@@ -365,8 +389,8 @@ package wins
 			_progressTextMaterials.x = _progressBackingMaterials.x + (_progressBackingMaterials.width - _progressTextMaterials.width) / 2;
 			_progressTextMaterials.y = _progressBackingMaterials.y + (_progressBackingMaterials.height - _progressTextMaterials.height) / 2 + 4;
 			
-			_topIcon.x = 5;
-			_topIcon.y = 50;
+			_topIcon.x = 0;
+			_topIcon.y = 30;
 
 			bodyContainer.addChild(_description);
 			bodyContainer.addChild(_itemsContainer);
@@ -540,7 +564,7 @@ internal class FoodItem extends LayerX
 	
 	private function drawPrice():void 
 	{	
-		_price = new PriceLabel({'3':_info.c});
+		_price = new PriceLabel(App.data.storage[_info.m].price);
 		if (_info.type != 'mdonate')
 			_price.visible = false;
 	}
@@ -594,7 +618,7 @@ internal class FoodItem extends LayerX
 			return;
 		if (_info.type == 'mdonate')
 		{
-			if (!App.user.stock.check(Stock.FANT, _info.c))
+			if (!App.user.stock.checkAll(App.data.storage[_info.m].price))
 				return;
 			else
 				_settings.throwCallback(_info.type, _settings.contentChange);
@@ -609,6 +633,8 @@ internal class FoodItem extends LayerX
 	
 	private function findMaterial(e:MouseEvent):void 
 	{
+		if (e.currentTarget.mode == Button.DISABLED)
+			return;
 		_settings.window.close();
 		ShopWindow.findMaterialSource(_info.m);
 	}

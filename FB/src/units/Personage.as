@@ -79,7 +79,7 @@ package units
 				preloader.x = loaderCoords[info.view].x;
 				preloader.y = loaderCoords[info.view].y;
 			}*/
-			if (info.type != 'Walkhero')
+			if (info.type != 'Walkhero' && info.type != 'Contest')
 				load();
 		}
 		
@@ -659,16 +659,27 @@ package units
 				shadow.parent.removeChild(shadow);
 				shadow = null;
 			}
-			
 			if (textures && textures.animation.hasOwnProperty('shadow')) {
 				shadow = new Bitmap(UserInterface.textures.shadow);
 				addChildAt(shadow, 0);
 				shadow.smoothing = true;
-				shadow.x = textures.animation.shadow.x - (shadow.width / 2);
-				shadow.y = textures.animation.shadow.y - (shadow.height / 2);
-				shadow.alpha = textures.animation.shadow.alpha;
-				shadow.scaleX = textures.animation.shadow.scaleX;
-				shadow.scaleY = textures.animation.shadow.scaleY;
+				if (textures.animation.shadow.alpha && textures.animation.shadow.scaleX && textures.animation.shadow.scaleY && textures.animation.shadow.x && textures.animation.shadow.y)
+				{
+					shadow.x = textures.animation.shadow.x - (shadow.width / 2);
+					shadow.y = textures.animation.shadow.y - (shadow.height / 2);
+					shadow.alpha = textures.animation.shadow.alpha;
+					shadow.scaleX = textures.animation.shadow.scaleX;
+					shadow.scaleY = textures.animation.shadow.scaleY;
+				}
+				else
+				{
+					shadow.x = 0;
+					shadow.y = 10;
+					shadow.alpha = 0.59;
+					shadow.scaleX = 1;
+					shadow.scaleY = 1;
+				}
+				
 			}
 		}
 		
@@ -714,10 +725,18 @@ package units
 				case IDENTIFIED: bitmap.filters = [new GlowFilter(0x88ffed,1, 8,8,10)]; break;
 				case DEFAULT: bitmap.filters = []; break;
 			}*/
-			switch(state) {
+			/*switch(state) {
 				case OCCUPIED: this.filters = [new GlowFilter(0xFF0000,1, 6,6,7)]; this.bitmap.filters = []; break;
 				case EMPTY: this.filters = [new GlowFilter(0x00FF00,1, 6,6,7)]; this.bitmap.filters = []; break;
 				case TOCHED: this.bitmap.filters = [new GlowFilter(0xFFFF00,1, 6,6,7)]; this.filters = []; break;
+				case HIGHLIGHTED: this.filters = [new GlowFilter(0x88ffed,0.6, 6,6,7)]; this.bitmap.filters = []; break;
+				case IDENTIFIED: this.filters = [new GlowFilter(0x88ffed,1, 8,8,10)]; this.bitmap.filters = []; break;
+				case DEFAULT: this.filters = []; this.bitmap.filters = []; break;
+			}*/
+			switch(state) {
+				case OCCUPIED: this.filters = [new GlowFilter(0xFF0000,1, 6,6,7)]; this.bitmap.filters = []; break;
+				case EMPTY: this.filters = [new GlowFilter(0x00FF00,1, 6,6,7)]; this.bitmap.filters = []; break;
+				case TOCHED: this.bitmap.filters = [new GlowFilter(glowingColor, 1, 6, 6, 7)]; this.filters = []; break;
 				case HIGHLIGHTED: this.filters = [new GlowFilter(0x88ffed,0.6, 6,6,7)]; this.bitmap.filters = []; break;
 				case IDENTIFIED: this.filters = [new GlowFilter(0x88ffed,1, 8,8,10)]; this.bitmap.filters = []; break;
 				case DEFAULT: this.filters = []; this.bitmap.filters = []; break;

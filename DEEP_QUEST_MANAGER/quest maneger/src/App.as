@@ -61,6 +61,7 @@ package
 		Security.allowDomain("*");
         Security.allowInsecureDomain("*");
 		public static var lang:String = 'ru';		// ru en fr es pl nl jp
+		public static var complete:Boolean = false;
 		
 		/* 
 		 * Николай	 		{DM: 159185922, OK:565449872326}
@@ -190,6 +191,7 @@ package
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 			stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+			stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 		}
 	
 		private function onResize(e:Event = null):void
@@ -446,9 +448,18 @@ package
 					}
 				}
 			}
+			if (e.keyCode == Keyboard.C) 
+			{
+				App.complete = true;
+			}
 			
 			if ( treeManeger )
 				treeManeger.onKeyDown(e);
+		}
+		
+		private function onKeyUp(e:KeyboardEvent):void 
+		{
+			App.complete = false;
 		}
 
 		private function onMouseUp(e:MouseEvent):void 

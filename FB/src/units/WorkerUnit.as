@@ -16,11 +16,12 @@ package units
 		public static const FREE:int = 0;
 		public static const BUSY:int = 1;
 		public var _wigwam:Boolean = false;
-		public var coordsCloud:Object = new Object();
+		public var shady:int = 0;
+		//public static const QUEUE:int = 2;
 		public var progressBar:ProgressBar;
 		public static var busy:uint = 0;
 		public var fly:Boolean = false;
-		
+		public var coordsCloud:Object = new Object();
 		public var rel:Object;
 		
 		public var movePoint:Point = new Point();
@@ -28,13 +29,13 @@ package units
 		public var ended:int = 0;
 		public var workEnded:int = 0;
 		//public var coordsCloud:Object = new Object();
-
+		
 		public function WorkerUnit(object:Object, view:String = '') {
 			
 			this.rel = object.rel;
 			
 			super(object, view);
-			
+			moveable = true;
 			movePoint.x = object.x;
 			movePoint.y = object.z;
 			
@@ -444,6 +445,25 @@ package units
 			}
 		}
 		
+		public function initCoordsCloud():void 
+		{				
+			if (cloudPositions.hasOwnProperty(App.data.storage[sid].view) ) 
+			{
+				coordsCloud.x = cloudPositions[App.data.storage[sid].view].x;
+				coordsCloud.y = cloudPositions[App.data.storage[sid].view].y;
+			}else{
+				if (App.data.storage[sid].hasOwnProperty('cloudoffset') && 
+				(App.data.storage[sid]['cloudoffset'].dx != 0 || App.data.storage[sid]['cloudoffset'].dy != 0))
+				{
+					coordsCloud.x = App.data.storage[sid]['cloudoffset'].dx;
+					coordsCloud.y = App.data.storage[sid]['cloudoffset'].dy;
+				}else{
+					coordsCloud.x = 0;
+					coordsCloud.y = -50;
+				}
+			}
+		}
+		
 		public function workerFree():void 
 		{
 			if (tm.currentTarget)
@@ -500,6 +520,7 @@ package units
 			var jobTime:Number = tm.currentTarget.target.info.jobtime;
 			if (!jobTime || jobTime <= 0) 
 				jobTime = 1;
+			//jobTime = 1;
 			if (progressBar == null) 
 			{
 				progressBar = new ProgressBar(jobTime, 110);
@@ -572,25 +593,6 @@ package units
 			}
 			
 			return false;
-		}
-		
-		public function initCoordsCloud():void 
-		{				
-			if (cloudPositions.hasOwnProperty(App.data.storage[sid].view) ) 
-			{
-				coordsCloud.x = cloudPositions[App.data.storage[sid].view].x;
-				coordsCloud.y = cloudPositions[App.data.storage[sid].view].y;
-			}else{
-				if (App.data.storage[sid].hasOwnProperty('cloudoffset') && 
-				(App.data.storage[sid]['cloudoffset'].dx != 0 || App.data.storage[sid]['cloudoffset'].dy != 0))
-				{
-					coordsCloud.x = App.data.storage[sid]['cloudoffset'].dx;
-					coordsCloud.y = App.data.storage[sid]['cloudoffset'].dy;
-				}else{
-					coordsCloud.x = 0;
-					coordsCloud.y = -50;
-				}
-			}
 		}
 	}
 }

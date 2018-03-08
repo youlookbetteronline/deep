@@ -2017,6 +2017,26 @@ package
 		private var CupYellowIcon:Class;
 		public var cupYellowIcon:BitmapData = new CupYellowIcon().bitmapData;
 		
+		[Embed(source="Graphics2/Backings/BackingYellowBL.png")]
+		private var BackingYellowBL:Class;
+		public var backingYellowBL:BitmapData = new BackingYellowBL().bitmapData;
+		
+		[Embed(source="Graphics2/Backings/BackingYellowBR.png")]
+		private var BackingYellowBR:Class;
+		public var backingYellowBR:BitmapData = new BackingYellowBR().bitmapData;
+		
+		[Embed(source="Graphics2/Backings/BackingYellowTR.png")]
+		private var BackingYellowTR:Class;
+		public var backingYellowTR:BitmapData = new BackingYellowTR().bitmapData;
+		
+		[Embed(source="Graphics2/Backings/BackingYellowTL.png")]
+		private var BackingYellowTL:Class;
+		public var backingYellowTL:BitmapData = new BackingYellowTL().bitmapData;
+		
+		[Embed(source="Graphics2/Backings/YellowSquareBacking.png")]
+		private var YellowSquareBacking:Class;
+		public var yellowSquareBacking:BitmapData = new YellowSquareBacking().bitmapData;
+		
 		public function Windows():void
 		{
 		}

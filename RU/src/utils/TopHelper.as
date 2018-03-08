@@ -2,7 +2,9 @@ package utils
 {
 	import core.Numbers;
 	import core.Post;
+	import wins.BubbleSimpleWindow;
 	import wins.TopBubbleWindow;
+	import wins.TopResultWindow;
 	import wins.TopWindow;
 	/**
 	 * ...
@@ -27,6 +29,8 @@ package utils
 			{
 				if (App.data.top[_t].target == targetSid)
 				{
+					if (!App.data.top[_t].expire || App.data.top[_t].expire.s > App.time || App.data.top[_t].expire.e < App.time)
+						continue;
 					return _t;
 					break;
 				}
@@ -53,6 +57,15 @@ package utils
 		{
 			TopHelper.targetSid = targetSid;
 			top = TopHelper.getTopID(targetSid);
+			if (!top)
+			{
+				new BubbleSimpleWindow({
+					popup	:true,
+					title	:Locale.__e('flash:1474469531767'),
+					label	:Locale.__e('flash:1520250885239')
+				}).show();
+				return;
+			}
 			expire = App.data.top[top].expire.e;
 			onTop100();
 		}
@@ -115,20 +128,7 @@ package utils
 			}
 			var top100DescText:String =  App.data.top[top].description;// Locale.__e('flash:1467807241824');
 			content = content.sortOn('points', Array.NUMERIC | Array.DESCENDING);
-			//getReward();
-			//new TopBubbleWindow({
-				//popup		:true,
-				//title		:info.title,
-				//expire		:expire, 
-				//content		:content,
-				//description	:top100DescText,
-				//max			:topNumber,
-				//info		:info,
-				//sid			:targetSid,
-				//top			:App.data.top[top]
-			//}).show();
-			//return;
-			new TopWindow( {
+			var windowSettings:Object = {
 				target		:null,
 				title		:info.title,
 				expire		:expire, 
@@ -139,9 +139,94 @@ package utils
 				sid			:targetSid,
 				top			:App.data.top[top],
 				popup		:true
-			}).show();
+			}
+			switch (App.data.top[top].window)
+			{
+				case 'TopBubbleWindow':
+					new TopBubbleWindow(windowSettings).show();
+					break
+				default:
+					new TopWindow(windowSettings).show();
+			}
+			//getReward();
+			
 			
 			//close();
+		}
+		
+		public static function checkRewards():void
+		{
+			for (var _top:* in App.user.top)
+			{
+				if (App.data.top[_top].checkreward) //TODO поле на старт
+				{
+					for (var _inst:* in App.user.top[_top])
+					{
+						var bonus:Object = {}
+						if (App.user.top[_top][_inst].hasOwnProperty('tbonus') && App.user.top[_top][_inst].tbonus)
+						{
+							for (var tb:* in App.user.top[_top][_inst].tbonus)
+								bonus[tb] = Numbers.firstProp(App.user.top[_top][_inst].tbonus[tb]).key * Numbers.firstProp(App.user.top[_top][_inst].tbonus[tb]).val
+							new TopResultWindow({
+								bonus		:bonus,
+								position	:App.user.top[_top][_inst].position,
+								topName		:App.data.top[_top].title,
+								type		:'tbonus',
+								iID			:_inst,
+								tID			:_top
+							}).show();
+							
+						}
+						else if (App.user.top[_top][_inst].hasOwnProperty('lbonus') && App.user.top[_top][_inst].lbonus)
+						{
+							for (var lb:* in App.user.top[_top][_inst].lbonus)
+								bonus[lb] = Numbers.firstProp(App.user.top[_top][_inst].lbonus[lb]).key * Numbers.firstProp(App.user.top[_top][_inst].lbonus[lb]).val
+							new TopResultWindow({
+								bonus		:bonus,
+								position	:App.user.top[_top][_inst].position,
+								topName		:App.data.top[_top].title,
+								type		:'lbonus',
+								iID			:App.user.top[_top][_inst],
+								tID			:_top
+							}).show();
+
+						}
+					}
+				}
+			}
+		}
+		
+		public static function getReward(tID:int, iID:int, type:String, callback:Function):void 
+		{
+			Post.send( {
+				ctr:	'top',
+				act:	type,
+				uID:	App.user.id,
+				tID:	tID,
+				iID:	iID
+			}, onRewardEvent, {
+				tID		:tID,
+				iID		:iID,
+				callback: callback
+			});
+		}
+		
+		private static function onRewardEvent(error:int, data:Object, params:Object):void 
+		{
+			if (error)
+			{
+				Errors.show(error, data);
+				return;
+			}
+			
+			if (data.hasOwnProperty('bonus'))
+			{
+				var bonus:Object = {}
+				for (var tb:* in data.bonus)
+					bonus[tb] = Numbers.firstProp(data.bonus[tb]).key * Numbers.firstProp(data.bonus[tb]).val
+				params.callback(bonus);
+			}
+			delete App.user.data.user.top[params.tID][params.iID]['tbonus'];
 		}
 		
 	}

@@ -369,9 +369,12 @@ package units
 				_model.upgradeParams = _model.level < _model.totalLevel ? info.levels[_model.level + 1] : null;
 				changeLevel();
 			}
-
-			Treasures.bonus(data.bonus, new Point(this.x, this.y));
-			SoundsManager.instance.playSFX('bonus');
+			if (data.bonus)
+			{
+				Treasures.bonus(data.bonus, new Point(this.x, this.y));
+				SoundsManager.instance.playSFX('bonus');
+			}
+			
 			if (data.died)
 			{
 				_model.freeze = true;

@@ -1,6 +1,8 @@
 package wins
 {
 	import buttons.ImageButton;
+	import core.Size;
+	import core.TimeConverter;
 	import flash.display.Bitmap;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
@@ -64,7 +66,7 @@ package wins
 		override public function drawBody():void
 		{
 			drawAskButton();
-			drawExpire();
+			drawLeftTime();
 			drawDescription();
 			contentChange();
 			build();
@@ -80,12 +82,32 @@ package wins
 					title:Locale.__e('flash:1382952380254')
 				}
 			}
+			
+			_askButton.x = 35;
+			_askButton.y = 0;
+			bodyContainer.addChild(_askButton);
 		}
 		
 		private function onAskEvent(e:MouseEvent):void 
 		{
 			close();
-			new HintWindow({
+			var tbonus:* = settings.top.tbonus;
+			var content:Array = []
+			for (var iterator:* in tbonus.d)
+			{
+				content.push({
+					placeFrom	: tbonus.s[iterator],
+					placeTo		: tbonus.e[iterator],
+					bonus		: tbonus.t[iterator]
+				})
+			}
+			new TopInfoWindow({
+				content:content,
+				callback:function():void{
+					TopHelper.showTopWindow(settings.sid);
+				}
+			}).show();
+			/*new HintWindow({
 				icons:[
 					'Craft1',
 					'Craft2',
@@ -100,12 +122,42 @@ package wins
 				callback:	function():void{
 					TopHelper.showTopWindow(settings.sid);
 				}
-			}).show();
+			}).show();*/
 		}
 		
-		private function drawExpire():void 
+		private function drawLeftTime():void 
 		{
+			_leftTimeBack = new Bitmap(Window.textures.popupBack)
+			Size.size(_leftTimeBack, 128, 120)
+			_leftTimeBack.smoothing = true;
+			_leftTimeContainer.addChild(_leftTimeBack);
 			
+			
+			var timeLeft:int = settings.top.expire.e - App.time;
+			_leftTimeText = Window.drawText(Locale.__e('flash:1393581955601') + '\n' + TimeConverter.timeToDays(timeLeft),{
+				fontSize		:32,
+				color			:0xfff330,
+				borderColor		:0x224076,
+				borderSize		:3,
+				textAlign		:'center',
+				width:115
+			})
+			_leftTimeText.x = (_leftTimeBack.width - _leftTimeText.width) / 2;
+			_leftTimeText.y = (_leftTimeBack.height - _leftTimeText.height) / 2;
+			_leftTimeContainer.addChild(_leftTimeText)
+			App.self.setOnTimer(expireTimer)
+		}
+		
+		private function expireTimer():void 
+		{
+			var timeLeft:int = settings.top.expire.e - App.time;
+			if (timeLeft < 0)
+			{
+				close();
+				App.self.setOffTimer(expireTimer);
+				return;
+			}
+			_leftTimeText.text = Locale.__e('flash:1393581955601') + '\n' + TimeConverter.timeToDays(timeLeft)
 		}
 		
 		override public function contentChange():void 
@@ -217,14 +269,14 @@ package wins
 			
 			titleLabel.y += 35;
 			
-			_askButton.x = 35;
-			_askButton.y = 0;
-			
 			_description.x = (settings.width - _description.width) / 2;
 			_description.y = 55;
 			
-			bodyContainer.addChild(_askButton);
 			bodyContainer.addChild(_description);
+			
+			_leftTimeContainer.x = 30;
+			_leftTimeContainer.y = -100;
+			bodyContainer.addChild(_leftTimeContainer);
 		}
 	
 	}

@@ -231,6 +231,18 @@ package wins
 						{ type:'Content/', icon:'stockIcon' }
 					];
 				break;
+				case 8://Топ контест
+					blocksArray = [
+						{ text: Locale.__e("flash:1519739823235") },
+						{ text: Locale.__e("flash:1519739966680") },
+						{ text: Locale.__e("flash:1519740011599") }
+					];
+					IconsArray = [
+						{ type:'Content/', icon:'TopIcon1' },
+						{ type:'Content/', icon:'TopIcon2' },
+						{ type:'Content/', icon:'TopIcon3' }
+					];
+				break;
 			}
 			var numberYPosition:Number = 110;
 			

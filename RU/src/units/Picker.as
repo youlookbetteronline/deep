@@ -1,5 +1,8 @@
 package units 
 {
+	import core.Numbers;
+	import core.Post;
+	import flash.geom.Point;
 	import ui.UnitIcon;
 	import wins.ShopWindow;
 	import wins.SimpleWindow;
@@ -11,6 +14,7 @@ package units
 	{
 		private var types:Array = new Array();
 		private var unitsClick:Array;
+		private var _content:Array;
 		public function Picker(object:Object) 
 		{
 			super(object);
@@ -52,6 +56,25 @@ package units
 			if (App.user.mode == User.GUEST) 
 				return false;
 			clearIcon();
+			{
+				Post.send({
+					ctr		:this.type,
+					act		:'storage',
+					uID		:App.user.id,
+					id		:this.id,
+					wID		:App.user.worldID,
+					sID		:this.sid
+				}, onStorageEvent)
+			}	
+			return true;
+		}
+		
+		/*override public function click():Boolean 
+		{
+			if (App.user.mode == User.GUEST) 
+				return false;
+
+			clearIcon();
 			if (initCount.length > 0)
 			{
 				for (var i:int = 0; i < initCount.length; i++)
@@ -73,6 +96,56 @@ package units
 				}).show();
 			}
 			return true;	
+		}*/
+		
+		private function onStorageEvent(error:int, data:Object, params:Object):void 
+		{
+			if (error)
+			{
+				Errors.show(error, data);
+				return;
+			}
+			if (Numbers.countProps(data) == 0)
+			{
+				new SimpleWindow( {
+					title:Locale.__e("flash:1474469531767"),
+					label:SimpleWindow.ATTENTION,
+					text:Locale.__e('flash:1501601080822'),
+					confirm:function():void {
+							new ShopWindow({find:[1222, 1526]}).show();
+						}
+				}).show();
+				return;
+			}
+			var _units:Array = new Array();
+			var _bonus:* = new Object();
+			for (var i:* in data)
+			{
+				for (var b:* in data[i].data.bonus)
+				{
+					if (!_bonus.hasOwnProperty(b))
+					{
+						_bonus[b] = {}
+						_bonus[b][Numbers.firstProp(data[i].data.bonus[b]).key * Numbers.firstProp(data[i].data.bonus[b]).val] = 1;
+					}
+					else
+					{
+						var rescount:int = 0;
+						rescount = Numbers.firstProp(_bonus[b]).key + Numbers.firstProp(data[i].data.bonus[b]).key * Numbers.firstProp(data[i].data.bonus[b]).val
+						_bonus[b] = {}
+						_bonus[b][rescount] = 1;
+					}
+				}
+				var unt:Unit = Map.findUnit(data[i].sID, data[i].id)
+				delete data[i].data.bonus
+				if (unt.hasOwnProperty('onStorageEvent'))
+					unt['onStorageEvent'].call(null, 0, data[i].data, null)
+				
+			}
+			Treasures.bonus(_bonus, new Point(this.x, this.y));
+			SoundsManager.instance.playSFX('bonus');
+			trace();
+			
 		}
 		
 		private function redrawIcon(e:*):void 

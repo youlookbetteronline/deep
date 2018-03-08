@@ -11,6 +11,7 @@ package wins
 	import flash.display.Sprite;
 	import flash.geom.Rectangle;
 	import ui.SalesIcon;
+	import utils.ActionsHelper;
 
 	public class AddWindow extends Window 
 	{
@@ -294,7 +295,10 @@ package wins
 			new SimpleWindow( {
 				label:SimpleWindow.ATTENTION,
 				title:Locale.__e("flash:1382952379735"),
-				text:Locale.__e("flash:1382952379990")
+				text:Locale.__e("flash:1382952379990"),
+				confirm:function():void{
+					ActionsHelper.updateActions();
+				}
 			}).show();
 		}
 		

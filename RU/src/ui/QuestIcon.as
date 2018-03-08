@@ -421,20 +421,27 @@ package ui
 				var have:String; 
 				for each(var obj:* in unitsSe)
 				{
-						if (obj.type == 'Walkhero')
-						{
-							trace("Level = " + obj.model.level);
-							trace("ID = " + obj.id);
-							have = obj.model.level + 1;
-							break;
-						}
-						else
-							have = obj.level + 1;
+					if (obj.type == 'Walkhero')
+					{
+						trace("Level = " + obj.model.level);
+						trace("ID = " + obj.id);
+						have = obj.model.level + 1;
+						break;
+					}
+					else if (obj.type == 'Contest')
+					{
+						trace("Level = " + obj.model.floor);
+						trace("ID = " + obj.id);
+						have = obj.model.floor;
+						break;
+					}
+					else
+						have = obj.level;
 				}
 				if (have == null)
 					have = '0';
 				else
-					have = String(int(have) - 1);
+					have = String(int(have));
 				text = have + '/' + String(questData.missions[missionNum].need);
 			}
 			else if ((questData.missions[missionNum].event == "grow") && (qID == 548 || qID == 556 || qID == 748 || qID == 950 || qID == 951 || qID == 952)) 

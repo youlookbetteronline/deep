@@ -42,15 +42,15 @@ package units
 		public var started:int = 0;
 		public var crafting:Boolean;
 		public var fID:int = 0;
-		public var shady:int = 0;
+		
 		public var _cloud:CloudsMenu;
 		public var _showCloud:Boolean;
 		public var capacity:int = 0;
 		public var walkable:Boolean;
 		public var hasProduct:Boolean;
-		public var shadowScale:Number = .75;
+		
 		public var smartShadow:Bitmap = new Bitmap();
-		//public var coordsCloud:Object = new Object();
+		public var shadowScale:Number = .75;
 		
 		protected var _helperLock:Boolean;
 		protected var _lock:Boolean;
@@ -120,7 +120,7 @@ package units
 		}
 		
 		override public function set touch(touch:Boolean):void{
-			if (App.user.mode == User.GUEST)
+			if (App.user.mode == User.GUEST && this.info.type == 'Walkgolden')
 				return;
 			
 			super.touch = touch;
@@ -755,24 +755,7 @@ package units
 			showIcon();
 		}
 		
-		override public function initCoordsCloud():void 
-		{				
-			if (cloudPositions.hasOwnProperty(App.data.storage[sid].view) ) 
-			{
-				coordsCloud.x = cloudPositions[App.data.storage[sid].view].x;
-				coordsCloud.y = cloudPositions[App.data.storage[sid].view].y;
-			}else{
-				if (App.data.storage[sid].hasOwnProperty('cloudoffset') && 
-				(App.data.storage[sid]['cloudoffset'].dx != 0 || App.data.storage[sid]['cloudoffset'].dy != 0))
-				{
-					coordsCloud.x = App.data.storage[sid]['cloudoffset'].dx;
-					coordsCloud.y = App.data.storage[sid]['cloudoffset'].dy;
-				}else{
-					coordsCloud.x = 0;
-					coordsCloud.y = -50;
-				}
-			}
-		}
+		
 		
 		public function showIcon():void
 		{
@@ -851,11 +834,6 @@ package units
 		{
 			if (App.user.mode == User.OWNER) {
 				var act:String = 'storage';
-				
-				if (App.isSocial('AI', 'YB', 'MX'))
-				{
-					act = 'storage2'
-				}
 				
 				Post.send({
 					ctr:this.type,

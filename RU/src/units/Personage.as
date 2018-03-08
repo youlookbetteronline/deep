@@ -79,7 +79,7 @@ package units
 				preloader.x = loaderCoords[info.view].x;
 				preloader.y = loaderCoords[info.view].y;
 			}*/
-			if (info.type != 'Walkhero')
+			if (info.type != 'Walkhero' && info.type != 'Contest')
 				load();
 		}
 		
@@ -659,16 +659,27 @@ package units
 				shadow.parent.removeChild(shadow);
 				shadow = null;
 			}
-			
 			if (textures && textures.animation.hasOwnProperty('shadow')) {
 				shadow = new Bitmap(UserInterface.textures.shadow);
 				addChildAt(shadow, 0);
 				shadow.smoothing = true;
-				shadow.x = textures.animation.shadow.x - (shadow.width / 2);
-				shadow.y = textures.animation.shadow.y - (shadow.height / 2);
-				shadow.alpha = textures.animation.shadow.alpha;
-				shadow.scaleX = textures.animation.shadow.scaleX;
-				shadow.scaleY = textures.animation.shadow.scaleY;
+				if (textures.animation.shadow.alpha && textures.animation.shadow.scaleX && textures.animation.shadow.scaleY && textures.animation.shadow.x && textures.animation.shadow.y)
+				{
+					shadow.x = textures.animation.shadow.x - (shadow.width / 2);
+					shadow.y = textures.animation.shadow.y - (shadow.height / 2);
+					shadow.alpha = textures.animation.shadow.alpha;
+					shadow.scaleX = textures.animation.shadow.scaleX;
+					shadow.scaleY = textures.animation.shadow.scaleY;
+				}
+				else
+				{
+					shadow.x = 0;
+					shadow.y = 10;
+					shadow.alpha = 0.59;
+					shadow.scaleX = 1;
+					shadow.scaleY = 1;
+				}
+				
 			}
 		}
 		

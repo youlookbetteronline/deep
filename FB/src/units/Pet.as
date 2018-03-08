@@ -54,7 +54,7 @@ package units {
 		private var specialCount:int;
 		private var _finished:int;
 		private var depth_animal:int;
-		private var shady:int;
+		//private var shady:int;
 		private var hideTimeout:uint = 1;
 		private var shadowBitmap:Bitmap;
 		//private var coordsCloud:Object = new Object();

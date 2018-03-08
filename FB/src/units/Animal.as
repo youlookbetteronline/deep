@@ -45,7 +45,7 @@ package units
 		public var time:uint = 0;
 		public var sID:uint;
 		public var shadowBitmap:Bitmap = new Bitmap();
-		public var shady: int = 0;
+		//public var shady: int = 0;
 		private var rabbits:Array = [1441, 1442, 1443, 1444, 1445];
 		public static const HUNTER:uint = 1528;
 		public var depth_animal:int = 0;
@@ -1263,7 +1263,7 @@ package units
 				}, function(error:*, data:*, params:*):void {
 					
 					if (error) {
-						Errors.show(error, data);
+						//Errors.show(error, data);
 						return;
 					}
 					
@@ -1287,7 +1287,7 @@ package units
 				this.cloudAnimal.dispose();
 				this.cloudAnimal = null;
 			}
-			
+			clickable = false;
 			Post.send({
 				ctr:this.type,
 				act:'storage',
@@ -1300,8 +1300,9 @@ package units
 		
 		private function onStorageEvent(error:int, data:Object, params:Object):void 
 		{
+			clickable = true;
 			if (error) {
-				Errors.show(error, data);
+				//Errors.show(error, data);
 				return;
 			}
 			if (data.fneed)
@@ -1312,11 +1313,9 @@ package units
 			started = 0;
 			var matSID:int = 0;
 			//var place:Boolean = false;
-			var outs:Object = Treasures.convert(info.outs)
 			
 			if (devel)
 			{
-				outs = info.devel.req[level].out
 				changeLevelAnimal();
 			}
 			if(data.bonus){
@@ -1332,14 +1331,12 @@ package units
 					}
 				}*/
 				Treasures.bonus(data.bonus, new Point(this.x, this.y - depth_animal));
-				if (data.out)
-					Treasures.bonus(data.out, new Point(this.x, this.y - depth_animal));
-				//hungry();
-			}else {
-				Treasures.bonus(outs, new Point(this.x, this.y - depth_animal));
 				//hungry();
 			}
-			
+			if (data.out){
+				Treasures.bonus(data.out, new Point(this.x, this.y - depth_animal));
+				//hungry();
+			}
 			onGoHomeComplete();
 			hungry();
 			//click();
@@ -1367,6 +1364,7 @@ package units
 			
 				
 			lock = false;
+			
 		}
 		
 		private var startHungryCloud:int;
