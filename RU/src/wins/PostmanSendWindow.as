@@ -130,7 +130,7 @@ package wins
 			_giftsContainer.tip = function():Object{
 				return{
 					title	:App.data.storage[_model.mtake.sid].title,
-					text	:'В наличии: ' + String(App.user.stock.count(_model.mtake.sid)) + ' шт.'
+					text	:Locale.__e('flash:1521105052667') + String(App.user.stock.count(_model.mtake.sid)) + Locale.__e('flash:flash:1382952379974')
 				}
 			}
 			

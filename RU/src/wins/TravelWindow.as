@@ -760,7 +760,9 @@ package wins
 			while (items.length > 0)
 			{
 				var item:TravelItem = items.shift();
+				item.hidePointing();
 				item.dispose();
+				item = null;
 			}
 			
 		}

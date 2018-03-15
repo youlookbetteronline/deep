@@ -886,6 +886,8 @@ package
 								
 								if (unit.sid == sID)
 								{
+									if (!unit.formed)
+										continue;
 									var obj:Object = App.data.storage[sID];
 									switch(missions[mID].event) {
 										case 'buy': 

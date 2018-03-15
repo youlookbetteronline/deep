@@ -46,6 +46,7 @@ package units
 			_model.lifetime = params.lifetime || 0;
 			_model.mkickCallback = mkickEvent;
 			_model.fkickCallback = fkickEvent;
+			_model.fakefkickCallback = fakefkickEvent;
 			_model.growCallback = growEvent;
 			_model.totalFloor = Numbers.countProps(info.levels);
 			_model.friends = params.friends || {};
@@ -198,7 +199,7 @@ package units
 		{
 			if (level > Numbers.countProps(info.levels))
 				level = Numbers.countProps(info.levels)
-			if (textures) {
+			/*if (textures) {
 				stopAnimation();
 			}
 			if (effect)
@@ -208,21 +209,21 @@ package units
 				}});
 				this.showGlowingOnce(0xfff000, 1);
 			}
-			else
+			else*/
 				Load.loading(Config.getSwf(info.type, info.levels[level].req.preview), onLoad);
 		}
 		
-		override public function onLoad(data:*):void 
-		{
-			super.onLoad(data);
+		//override public function onLoad(data:*):void 
+		//{
+			//super.onLoad(data);
 			
-			_ltween = TweenLite.to(this, 1, { alpha:1, scaleX:1, scaleY:1})
+			/*_ltween = TweenLite.to(this, 1, { alpha:1, scaleX:1, scaleY:1})
 			if (_ltween && _ltween.active)
 			{
 				_ltween.kill();
 				_ltween = null
-			}
-		}
+			}*/
+		//}
 		
 		private function mkickEvent(mID:int, typeMkick:String, mkickCallback:Function):void 
 		{
@@ -278,6 +279,34 @@ package units
 			App.user.stock.takeAll(data.__take);
 			_model.window.contentChange();
 			Treasures.bonus(data.bonus, new Point(this.x, this.y));
+			params.callback();
+		}
+		
+		private function fakefkickEvent(ffID:int, callbackFunc:Function):void 
+		{
+			Post.send({
+				ctr		:this.type,
+				act		:'fakefkick',
+				uID		:App.user.id,
+				id		:this.id,
+				wID		:App.user.worldID,
+				sID		:this.sid,
+				ffID	:ffID
+			}, onFakefkickEvent, {
+				callback: callbackFunc
+			});
+		}
+		
+		private function onFakefkickEvent(error:int, data:Object, params:Object):void 
+		{
+			if (error)
+			{
+				Errors.show(error, data);
+				return;
+			}
+			_model.friends = data.friends  
+			App.user.stock.takeAll(data.__take);
+			_model.window.contentChange();
 			params.callback();
 		}
 		
@@ -402,7 +431,6 @@ package units
 		
 		private function showIcon():void
 		{	
-			
 			if (!World.zoneIsOpen(App.map._aStarNodes[this.coords.x][this.coords.z].z))
 				return;
 			clearIcon()
@@ -450,6 +478,12 @@ package units
 					glow:		true
 				}, 0, coordsCloud.x, coordsCloud.y);
 			}
+		}
+		
+		override public function applyFilter(colour:uint = 0xeff200):void 
+		{
+			super.applyFilter(colour);
+			//startAnimation();
 		}
 		
 		public function get model():FriendfloorsModel 

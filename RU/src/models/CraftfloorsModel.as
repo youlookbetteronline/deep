@@ -23,6 +23,7 @@ package models
 		private var _storageCallback :Function;
 		private var _unlockCallback :Function;
 		private var _boostCallback :Function;
+		private var _cancelCallback :Function;
 		private var _craftingSlot :int;
 		private var _finishedSlots :Array;
 		private var _toThrow:Object;
@@ -215,6 +216,16 @@ package models
 		public function set crafts(value:Array):void 
 		{
 			_crafts = value;
+		}
+		
+		public function get cancelCallback():Function 
+		{
+			return _cancelCallback;
+		}
+		
+		public function set cancelCallback(value:Function):void 
+		{
+			_cancelCallback = value;
 		}
 		
 	}

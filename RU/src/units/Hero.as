@@ -308,8 +308,8 @@ package units
 			addAnimation();
 			App.map.allSorting();
 			//drawAntiFog();
-		}/*
-		
+		}
+		/*
 		override public function set x(value:Number):void 
 		{
 			super.x = value;
@@ -338,7 +338,7 @@ package units
 			circle.x = point.x;
 			circle.y = point.y;
 			circle.cacheAsBitmap = true;
-			App.map.mFog.alpha = .8
+			App.map.mFog.alpha = .93;
 			circle.blendMode = BlendMode.ERASE;
 		}
 		

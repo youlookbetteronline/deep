@@ -473,6 +473,7 @@ package
 					result = averageDropTreasure(unit.shake, storageCount)
 					break;
 				case 'Walkhero':
+				case 'Tribute':
 					storageCount = Math.ceil(time / unit.time);
 					result = averageDropTreasure(unit.treasure, storageCount)
 					

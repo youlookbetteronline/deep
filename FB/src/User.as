@@ -119,6 +119,7 @@ package
 		public static var checkBoxState:int = 1;
 		
 		public static var openExpJson:Object;
+		public var buyActions:Object = {};
 		
 		public var auction:Auction;
 		public var openedRadarMaps:Array = [];

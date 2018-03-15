@@ -77,7 +77,7 @@ package units
 			else if (_model.crafted > App.time && info.lifetime)
 			{
 				var lastTime:int = _model.expired - App.time;
-				if (String(info.downgrade) != "")
+				if (info.downgrade)
 				{
 					if (lastTime > 0)
 					{
@@ -94,7 +94,7 @@ package units
 					{
 						return{
 							title:		info.title,
-							text:		info.description + '\n' + Locale.__e('flash:1510741250260') + '\n' + Locale.__e("flash:1382952379839") + '\n',
+							text:		info.description + '\n' + '\n' + Locale.__e('flash:1510741250260') + ' ' + Locale.__e("flash:1382952379839") + '\n',
 							timerText:	TimeConverter.timeToDays(_model.crafted - App.time),
 							timer:		true
 						}
@@ -117,7 +117,7 @@ package units
 					{
 						return{
 							title:		info.title,
-							text:		info.description + '\n' + Locale.__e('flash:1510741250260') + ' ' + Locale.__e("flash:1382952379839") + '\n',
+							text:		info.description + '\n' + '\n' + Locale.__e('flash:1510741250260') + ' ' + Locale.__e("flash:1382952379839") + '\n',
 							timerText:	TimeConverter.timeToDays(_model.crafted - App.time),
 							timer:		true
 						}
@@ -369,9 +369,12 @@ package units
 				_model.upgradeParams = _model.level < _model.totalLevel ? info.levels[_model.level + 1] : null;
 				changeLevel();
 			}
-
-			Treasures.bonus(data.bonus, new Point(this.x, this.y));
-			SoundsManager.instance.playSFX('bonus');
+			if (data.bonus)
+			{
+				Treasures.bonus(data.bonus, new Point(this.x, this.y));
+				SoundsManager.instance.playSFX('bonus');
+			}
+			
 			if (data.died)
 			{
 				_model.freeze = true;
@@ -389,12 +392,11 @@ package units
 		}
 		
 		override protected function onBuyAction(error:int, data:Object, params:Object):void 
-		{info
+		{
 			super.onBuyAction(error, data, params);
 			_model.level = data.level;
 			if (data.expired)
 				_model.expired = data.expired;
-			App.user.stock.takeAll(data.__take)
 			changeLevel();
 			showIcon();
 		}
@@ -405,7 +407,6 @@ package units
 			_model.level = data.level;
 			if (data.expired)
 				_model.expired = data.expired;
-			App.user.stock.takeAll(data.__take)
 			changeLevel();
 			showIcon();
 		}
@@ -437,18 +438,18 @@ package units
 			}
 			
 			var _view:int = 2192;
-				if(info.hasOwnProperty('treasure') && info.treasure!="")
-					for (var shake:* in App.data.treasures[info.treasure][info.treasure].item)
-						if (Treasures.onlySystemMaterials(info.treasure))
-						{
-							if (App.data.treasures[info.treasure][info.treasure].probability[shake] == 100)
-								_view = App.data.treasures[info.treasure][info.treasure].item[shake]
-						}
-						else if (App.data.storage[App.data.treasures[info.treasure][info.treasure].item[shake]].mtype != 3 &&
-							App.data.treasures[info.treasure][info.treasure].probability[shake] == 100){	
-								_view = App.data.treasures[info.treasure][info.treasure].item[shake];
-								break;
-						}
+			if(info.hasOwnProperty('treasure') && info.treasure!="")
+				for (var shake:* in App.data.treasures[info.treasure][info.treasure].item)
+					if (Treasures.onlySystemMaterials(info.treasure))
+					{
+						if (App.data.treasures[info.treasure][info.treasure].probability[shake] == 100)
+							_view = App.data.treasures[info.treasure][info.treasure].item[shake]
+					}
+					else if (App.data.storage[App.data.treasures[info.treasure][info.treasure].item[shake]].mtype != 3 &&
+						App.data.treasures[info.treasure][info.treasure].probability[shake] == 100){	
+							_view = App.data.treasures[info.treasure][info.treasure].item[shake];
+							break;
+					}
 						
 			if (_model.level < _model.totalLevel)
 			{

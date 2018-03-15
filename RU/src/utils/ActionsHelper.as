@@ -42,6 +42,7 @@ package utils
 		public static function updateActions():void
 		{
 			var actionsArch:Object = App.user.storageRead('actions', { } );
+			App.user.buyActions = App.user.storageRead('buyActions', { } );
 			//storageStore('actions', { }, true );
 			//return;
 			//if (id == '84003280') actionsArch = { };
@@ -108,9 +109,18 @@ package utils
 				
 				
 				// Пропустить если купили
-				if (aID == '2588')
+				if (aID == '1665')
 					trace();
 				if (actionsArch.hasOwnProperty(aID) && actionsArch[aID] != null && App.data.actions.hasOwnProperty(aID) && App.data.actions[aID] != null && !App.data.actions[aID].more && actionsArch[aID].buy) {
+					delete actionsArch[aID].time;
+					delete actionsArch[aID].prime;
+					continue;
+				}
+				
+				if (actionsArch.hasOwnProperty(aID) && actionsArch[aID] != null && App.data.actions.hasOwnProperty(aID) &&
+				App.data.actions[aID] != null && App.data.actions[aID].more && App.data.actions[aID].countsell &&
+				App.user.buyActions.hasOwnProperty(aID) && App.user.buyActions[aID] >= App.data.actions[aID].countsell)
+				{
 					delete actionsArch[aID].time;
 					delete actionsArch[aID].prime;
 					continue;

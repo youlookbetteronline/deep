@@ -111,16 +111,22 @@ package wins
 		
 		private function onLeftClick(e:MouseEvent):void 
 		{
+			if (e.currentTarget.mode == Button.DISABLED)
+				return;
+			e.currentTarget.state = Button.DISABLED;
 			if (settings.leftBttnEvent)
-				settings.leftBttnEvent
+				settings.leftBttnEvent()
 			else
 				close();
 		}
 		
 		private function onRightEvent(e:MouseEvent):void 
 		{
+			if (e.currentTarget.mode == Button.DISABLED)
+				return;
+			e.currentTarget.state = Button.DISABLED;
 			if (settings.rightBttnEvent)
-				settings.rightBttnEvent
+				settings.rightBttnEvent()
 			else
 				close();
 				

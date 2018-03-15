@@ -921,7 +921,7 @@ package units
 							if (fld2.hasOwnProperty('plant') && fld2.plant && fld2.plant.hasOwnProperty('sid') && fld2.plant.sid == ShopWindow.currentBuyObject.sid)
 								_countPlant++
 						}
-						if (_countPlant > App.data.storage[ShopWindow.currentBuyObject.sid].gcount)
+						if (_countPlant - 1 > App.data.storage[ShopWindow.currentBuyObject.sid].gcount)
 						{
 							new SimpleWindow( {
 								title:Locale.__e("flash:1474469531767"),

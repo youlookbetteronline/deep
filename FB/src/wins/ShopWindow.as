@@ -1008,11 +1008,23 @@ package wins
 			
 			for (var s:* in App.data.storage)
 			{
-				if ((App.data.storage[s].order && App.data.storage[s].order == 0) || s == 0)
+				if ((App.data.storage[s].order && App.data.storage[s].order == 0) || s == 0 || (App.data.storage[s].hasOwnProperty('stopfind') && App.data.storage[s].stopfind == 1))
 					continue;
 				
 				if (App.data.storage[s].type == 'Plant') 
 				{
+					if (App.data.storage[s].hasOwnProperty('treasure') && App.data.storage[s].treasure)
+					{
+						for each(var pl_tresh:* in App.data.treasures[App.data.storage[s].treasure][App.data.storage[s].treasure].item)
+						{
+							if (pl_tresh == int(sid))
+							{
+								finded.push(s);
+								findPlant = true;
+								break;
+							}
+						}
+					}
 					for (var sids:* in App.data.storage[s].outs)
 					{
 						if (int(sid) == sids)
@@ -1388,18 +1400,29 @@ package wins
 				
 				if (App.data.storage[s].type == 'Walkhero')
 				{
-					for each(var levl:* in App.data.storage[s].levels)
+					var wh:* = App.data.storage[s]
+					
+					for each (var whlvl:* in wh.levels)
 					{
-						for each(var trhero:* in App.data.treasures[levl.bonus][levl.bonus].item)
+						for each(var whlvl_tresh:* in App.data.treasures[whlvl.bonus][whlvl.bonus].item)
 						{
-							if (trhero == int(sid))
+							if (whlvl_tresh == int(sid))
 							{
 								finded.push(s);
+								break;
 							}
 						}
 					}
+					for each(var wh_tresh:* in App.data.treasures[App.data.storage[s].treasure][App.data.storage[s].treasure].item)
+					{
+						if (wh_tresh == int(sid))
+						{
+							finded.push(s);
+							break;
+						}
+					}
 				}
-				
+								
 				if (App.data.storage[s].type == 'Building') 
 				{
 					if (s == 1257)

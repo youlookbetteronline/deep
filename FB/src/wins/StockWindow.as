@@ -1359,7 +1359,7 @@ internal class StockItem extends Sprite {
 			closeBttn.y = 10;
 		}
 		
-		if (['Walkhero', 'Happy','Photostand','GGame','Beast','Banker','Picker','Thappy','Building','Hippodrome','Booster','Barter','Plant','Changeable','Farm','Gardener', 'Mfield', 'Fatman','Helper', 'Tribute','Decor'/*'Golden'*/,'Animal','Ganimal','Resource','Table','Collector','Bridge','Firework', 'Techno', 'Box', 'Moneyhouse', 'Field', 'Floors','Resource','Tree','Gamble','Port','Tent','Walkgolden','Zoner','Oracle', 'Changeable', 'Mfloors', 'Boss', 'Booker', 'Technological', 'Ahappy', 'Mhelper', 'Table', 'Pharmacy', 'Ctribute'].indexOf(item.type) != -1){
+		if (['Walkhero', 'Happy','Photostand','Friendfloors','GGame','Beast','Banker','Picker','Thappy','Building','Hippodrome','Booster','Barter','Plant','Changeable','Farm','Gardener', 'Mfield', 'Fatman','Helper', 'Tribute','Decor'/*'Golden'*/,'Animal','Ganimal','Resource','Table','Collector','Bridge','Firework', 'Techno', 'Box', 'Moneyhouse', 'Field', 'Floors','Resource','Tree','Gamble','Port','Tent','Walkgolden','Zoner','Oracle', 'Changeable', 'Mfloors', 'Boss', 'Booker', 'Technological', 'Ahappy', 'Mhelper', 'Table', 'Pharmacy', 'Ctribute'].indexOf(item.type) != -1){
 			giftBttn.visible = false;
 			wishlistBttn.visible = false;
 			//priceBttn.visible = false;

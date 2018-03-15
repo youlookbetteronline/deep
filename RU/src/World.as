@@ -44,6 +44,7 @@ package
 		
 		public var data:Object;
 		public var zones:Array = [];
+		public var currentOpenZones:Object = new Object();
 		public var faders:Object = new Object();
 		public var zoneUnits:Object = { };
 		public var checkClicks:Number = 0;
@@ -54,11 +55,15 @@ package
 		public function World(data:Object)
 		{
 			zones = new Array();
-			
+			currentOpenZones = new Array();
 			this.data = data;
 			for each(var zone:* in data.zones) 
 			{
 				zones.push(zone);
+			}
+			for each(var czone:* in data.currentOpenZones) 
+			{
+				currentOpenZones.push(czone);
 			}
 			buildingStorage = null;
 			buildingStorage = {};
@@ -134,39 +139,6 @@ package
 					return;
 				}
 			}
-			//}else{
-				/*if (App.user.worldID == User.LAND_2 && zoneID != 949 && zoneID != 950 && zoneID != 951) 
-				{
-					new SimpleWindow( {
-						title:Locale.__e("flash:1474469531767"),
-						label:SimpleWindow.ATTENTION,
-						text:Locale.__e('flash:1481899130563')
-					}).show();
-					return;
-				}
-			}*/
-			
-			/*if (zoneID == 1305 && !Config.admin)
-			{
-				new SimpleWindow( {
-				title:Locale.__e("flash:1474469531767"),
-				label:SimpleWindow.ATTENTION,
-				text:Locale.__e('flash:1481899130563')
-				}).show();
-				return;
-			}*/
-			
-			/*if (zoneID == 1447 && !Config.admin)
-			{
-				new SimpleWindow( {
-				title:Locale.__e("flash:1474469531767"),
-				label:SimpleWindow.ATTENTION,
-				text:Locale.__e('flash:1481899130563')
-				}).show();
-				return;
-			}*/
-			
-			
 			
 			new OpenZoneWindow({
 				sID:zoneID,
@@ -429,6 +401,9 @@ package
 				return;
 			}
 			
+			if (data.currentOpenZones)
+				currentOpenZones = data.currentOpenZones
+			
 			bonusCoords = new Point(App.map.mouseX, App.map.mouseY);
 			
 			if (App.data.storage[params.sID].hasOwnProperty("price"))
@@ -438,6 +413,9 @@ package
 			
 			if (data.hasOwnProperty("bonus")) Treasures.bonus(data.bonus, bonusCoords);
 			if (data.hasOwnProperty("reward")) Treasures.bonus(data.reward, bonusCoords);
+			
+			if (currentOpenZones.hasOwnProperty(sID))
+				return;
 			
 			onOpenComplete(sID);
 			bonusCoords = null;

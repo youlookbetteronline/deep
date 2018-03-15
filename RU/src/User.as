@@ -118,6 +118,8 @@ package
 		public static var sectorsLocations:Array 	= [1627, 1733, 2001, 2633, 2698, 2740, 2975, 3148];
 		public static var checkBoxState:int = 1;
 		
+		public var buyActions:Object = {};
+		
 		public static var openExpJson:Object;
 		
 		public var auction:Auction;
@@ -474,13 +476,16 @@ package
 		
 		private function onLoadData(error:int, data:Object, params:Object):void {
 			if (error) return;
-			
+
 			this.data = data;
 			if(App.user.data.user.modefriends)
 				fmode = App.user.data.user.modefriends;
 			if (App.social == 'FS' && this.data.user.sex == 'w')
 				this.data.user.sex = 'f';
 			App.self.dispatchEvent(new AppEvent(AppEvent.ON_USERDATA_COMPLETE));
+			
+			
+			
 			if (App.isSocial('AM'))
 			{
 				if (ExternalInterface.available)

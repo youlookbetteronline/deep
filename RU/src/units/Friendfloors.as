@@ -244,7 +244,7 @@ package units
 		{
 			if (error)
 			{
-				Errors.show(error, data);
+				//Errors.show(error, data);
 				return;
 			}
 			_model.kicks = data.kicks  

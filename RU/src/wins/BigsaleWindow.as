@@ -547,10 +547,11 @@ internal class BigsaleItem extends LayerX {
 			bitmap.y = background.y - background.height/2 + (background.height - bitmap.height)/ 2;
 
 			titleItem = Window.drawText(String(App.data.storage[item.sID].title), {
-				color:0xffffff,
-				autoSize:'left',
-				borderColor:0x6e411e,
-				fontSize:28
+				color		:0xffffff,
+				autoSize	:'left',
+				borderColor	:0x6e411e,
+				fontSize	:28,
+				width		:150
 			});
 			sprite.addChild(titleItem);
 			titleItem.x = background.x - titleItem.textWidth / 2;

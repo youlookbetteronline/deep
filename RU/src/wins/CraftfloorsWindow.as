@@ -647,6 +647,7 @@ package wins
 	}
 }
 import buttons.Button;
+import buttons.ImagesButton;
 import buttons.MoneyButton;
 import core.Load;
 import core.Numbers;
@@ -664,6 +665,7 @@ import units.Craftfloors;
 import wins.CraftfloorsWindow;
 import wins.BanksWindow;
 import wins.FormulaWindow;
+import wins.BubbleSimpleWindow;
 import wins.Window;
 import wins.ProgressBar;
 
@@ -682,6 +684,7 @@ internal class Slot extends LayerX
 	private var _title:TextField;
 	private var _mode:int;
 	private var _bttn:Button;
+	private var _cancelButton:ImagesButton;
 	
 	public function Slot(number:int, window:CraftfloorsWindow)
 	{
@@ -694,6 +697,7 @@ internal class Slot extends LayerX
 		drawItem();
 		drawTitle();
 		drawButton();
+		drawCancel();
 		
 		tip = function():Object{return parseTips();}
 	}
@@ -850,6 +854,43 @@ internal class Slot extends LayerX
 		_bttn.x = (_backing.width - _bttn.width) / 2;
 		_bttn.y = _backing.height - _bttn.height / 2 - 10;
 		addChild(_bttn)
+	}
+	
+	private function drawCancel():void 
+	{
+		if (!(mode == CraftfloorsModel.INQUEUE || mode == CraftfloorsModel.INPROGRESS))
+			return;
+		_cancelButton = new ImagesButton(Window.textures.cancelRedButton);
+		_cancelButton.x = _backing.width - _cancelButton.width;
+		_cancelButton.y = _backing.height - _cancelButton.height;
+		addChild(_cancelButton);
+		_cancelButton.addEventListener(MouseEvent.CLICK, onCancelEvent);
+		_cancelButton.tip = function():Object{
+			return {
+				title: Locale.__e('flash:1520942165133')
+			}
+		}
+	}
+	
+	private function onCancelEvent(e:MouseEvent):void 
+	{
+		if (_cancelButton.mode == Button.DISABLED)
+			return;
+		
+		var win:BubbleSimpleWindow = new BubbleSimpleWindow({
+			popup			:true,
+			title			:Locale.__e('flash:1474469531767'),
+			label			:Locale.__e('flash:1520946812612'),
+			dialog			:true,
+			leftBttnEvent	:function():void{
+				_model.cancelCallback(_slotID, _window.contentChange);
+			},
+			rightBttnEvent	:function():void{
+				win.close();
+			}
+		})
+		win.show();
+		
 	}
 	
 	private function onStorageEvent(e:MouseEvent):void 

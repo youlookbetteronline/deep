@@ -114,6 +114,16 @@ package utils
 					delete actionsArch[aID].prime;
 					continue;
 				}
+				
+				if (actionsArch.hasOwnProperty(aID) && actionsArch[aID] != null && App.data.actions.hasOwnProperty(aID) &&
+				App.data.actions[aID] != null && App.data.actions[aID].more && App.data.actions[aID].countsell &&
+				App.user.buyActions.hasOwnProperty(aID) && App.user.buyActions[aID] >= App.data.actions[aID].countsell)
+				{
+					delete actionsArch[aID].time;
+					delete actionsArch[aID].prime;
+					continue;
+				}
+				
 				// Нет в социальной сети
 				if (!action.mprice && (!action.price || !action.price.hasOwnProperty(App.social))) continue;
 				
@@ -152,7 +162,7 @@ package utils
 						
 					}
 				}
-				if (aID == '2247')
+				if (aID == '2599')
 					trace();	
 				
 				if (action.hasOwnProperty('friendsless') && action.friendsless !="" && App.network.appFriends.length >= action.friendsless)

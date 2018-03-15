@@ -79,7 +79,7 @@ package wins
 		
 		private function drawTexts():void 
 		{
-			_descriptionText = Window.drawText(Locale.__e('flash:1397573560652') + ': ' + _model.floor + '/' + _model.totalFloor, {
+			_descriptionText = Window.drawText(Locale.__e('flash:1397573560652') + ': ' + _model.floor + '/' + (_model.totalFloor + 1), {
 				fontSize		:44,
 				color			:0xffffff,
 				borderColor		:0x7e3e13,
@@ -196,7 +196,6 @@ package wins
 			}
 			
 		}
-			
 		
 		private function drawFriendSprite():void
 		{
@@ -204,7 +203,6 @@ package wins
 			Size.size(_friendBttn, 90, 90)
 			_friendBttn.bitmap.smoothing = true;
 			_friendBttn.addEventListener(MouseEvent.CLICK, addFriends)
-			
 		}
 		
 		private function addFriends(e:MouseEvent):void 
@@ -214,7 +212,16 @@ package wins
 				Hints.text(Locale.__e('flash:1510137461363'), Hints.TEXT_RED, new Point(App.self.mouseX, App.self.mouseY));
 				return;
 			}
-			
+			var friendData:Array = getFriends();
+			if (friendData.length == 0 || !friendData)
+			{
+				new AddFriendWindow({
+					model:	_model,
+					target:	settings.target,
+					popup:	true
+				}).show();
+			return;
+			}
 			new FriendsListWindow({
 				popup:		true,
 				target:		settings.target,
@@ -235,9 +242,6 @@ package wins
 			}
 			return friends;
 		}
-		
-		
-		
 		
 		private function progress():void 
 		{	
@@ -541,6 +545,7 @@ internal class KickItem extends LayerX
 	{
 		if (e.currentTarget.mode == Button.DISABLED)
 			return;
+		e.currentTarget.state = Button.DISABLED;
 		if (_info.type == 'mdonate')
 		{
 			if (!App.user.stock.checkAll(App.data.storage[_info.m].price))

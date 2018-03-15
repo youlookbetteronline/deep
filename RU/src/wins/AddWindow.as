@@ -146,7 +146,11 @@ package wins
 		private var buyBttn:*;
 		public function buyEvent(e:MouseEvent):void
 		{
-			
+			if (App.user.buyActions.hasOwnProperty(action.id))
+				App.user.buyActions[action.id] = App.user.buyActions[action.id] + 1;
+			else
+				App.user.buyActions[action.id] = 1;
+			App.user.storageStore('buyActions', App.user.buyActions);
 			if (e.currentTarget.mode == Button.DISABLED) return;
 			buyBttn = e.currentTarget as Button;
 			
@@ -195,7 +199,7 @@ package wins
 						//close();
 					//}
 					break;
-				case 'SP':
+				/*case 'SP':
 					if(App.user.stock.take(Stock.FANT, action.price[App.social])){
 						Post.send({
 							ctr:'Promo',
@@ -210,7 +214,7 @@ package wins
 					}else {
 						close();
 					}
-					break;
+					break;*/
 				default:
 					var object:Object;
 					
@@ -298,7 +302,10 @@ package wins
 				text:Locale.__e("flash:1382952379990"),
 				confirm:function():void{
 					ActionsHelper.updateActions();
-				}
+					App.ui.salesPanel.createPromoPanel();
+				},
+				faderAsClose:false,
+				escExit:false
 			}).show();
 		}
 		

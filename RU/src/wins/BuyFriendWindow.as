@@ -209,7 +209,8 @@ internal class Fakefriend extends LayerX
 	{
 		if (!App.user.stock.checkAll(_item.price))
 		{
-			Locker.notEnoughOnStock(Numbers.firstProp(_item.price).key, false);
+			if (Numbers.firstProp(_item.price).key != 2 && Numbers.firstProp(_item.price).key != 3)
+				Locker.notEnoughOnStock(Numbers.firstProp(_item.price).key, false);
 			return;
 		}
 		_model.fakefkickCallback(_item.sID, function():void{

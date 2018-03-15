@@ -209,9 +209,9 @@ package
 		*/
 		//ФБшный ДИП
 		public static const ID:* = '973881489414432';//'30035157';// '774242479407105';
-		public static const SERVER:* = 'FB';
+		public static const SERVER:* = 'FBD';
 		public static const SOCIAL:* = 'FB';
-		public static var lang:String = 'en'; //de en es fr it nl pl pt tr ru
+		public static var lang:String = 'ru'; //de en es fr it nl pl pt tr ru
 		
 		public function App():void 
 		{

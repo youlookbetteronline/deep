@@ -6,6 +6,7 @@ package units
 	import ui.UnitIcon;
 	import wins.ShopWindow;
 	import wins.SimpleWindow;
+	import wins.Window;
 	/**
 	 * ...
 	 * @author ...
@@ -107,6 +108,7 @@ package units
 			}
 			if (Numbers.countProps(data) == 0)
 			{
+				Window.closeAll();
 				new SimpleWindow( {
 					title:Locale.__e("flash:1474469531767"),
 					label:SimpleWindow.ATTENTION,

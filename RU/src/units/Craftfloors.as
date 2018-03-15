@@ -31,6 +31,7 @@ package units
 				return parseTips();
 			}
 			multiple = false
+			stockable = false
 		}
 		
 		
@@ -49,6 +50,7 @@ package units
 			_model.openSlots = getOpenSlots;
 			_model.growCallback = growEvent;
 			_model.storageCallback = storageEvent;
+			_model.cancelCallback = cancelEvent;
 			_model.craftingCallback = craftingEvent;
 			_model.unlockCallback = unlockEvent;
 			_model.boostCallback = boostEvent;
@@ -271,6 +273,35 @@ package units
 			_model.slots = Numbers.objectToArray(data.slots);
 			updateSlots();
 			params.craftCallback()
+		}
+		
+		private function cancelEvent(slotID:int, cancelCallback:Function):void 
+		{
+			Post.send({
+				ctr		:this.type,
+				act		:'cancel',
+				uID		:App.user.id,
+				id		:this.id,
+				wID		:App.user.worldID,
+				sID		:this.sid,
+				slotID	:slotID
+			}, onCancelEvent, {
+				cancelCallback:cancelCallback
+			});
+		}
+		
+		private function onCancelEvent(error:int, data:Object, params:Object):void 
+		{
+			if (error)
+			{
+				return;
+			}
+			Window.closeAll()
+			Treasures.bonus(data.bonus, new Point(this.x, this.y));
+			SoundsManager.instance.playSFX('bonus');
+			_model.slots = Numbers.objectToArray(data.slots);
+			updateSlots();
+			params.cancelCallback()
 		}
 		
 		private function storageEvent(slotID:int, storageCallback:Function):void 

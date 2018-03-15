@@ -13,7 +13,7 @@ package
 		public static var totalVersion:int;		
 		public static var versionObjects:int 		= 702  + totalVersion;		//Обьекты
 		public static var versionInterface:int 		= 351  + totalVersion;		//Интерфейс
-		public static var versionImages:int 		= 1087 + totalVersion;		//Icons + Images
+		public static var versionImages:int 		= 1092 + totalVersion;		//Icons + Images
 		
 		public static var _mainIP:Array;
 		public static var _resIP:*;
@@ -119,12 +119,12 @@ package
 					break;		
 			}
 			
-			_resIP 	= resIP  != null ? resIP  : ['dp-vk-static.islandsville.com'];
+			//_resIP 	= resIP  != null ? resIP  : ['dp-vk-static.islandsville.com'];
 			//_resIP 	= resIP  != null ? resIP  : ['dp-mm-static.islandsville.com'];
 			//_resIP 	= resIP  != null ? resIP  : ['dp-ok-static.islandsville.com'];
 			//_resIP 	= resIP  != null ? resIP  : ['dp-fs-static.islandsville.com'];
 			//_resIP 	= resIP  != null ? resIP  : ['dp-fs-static.islandsville.com'];
-			//_resIP 	= resIP  != null ? resIP  : ['deep.islandsville.com'];
+			_resIP 	= resIP  != null ? resIP  : ['deep.islandsville.com'];
 			//_resIP 	= resIP  != null ? resIP  : ['deep.office.ad'];
 			//_resIP 	= resIP  != null ? resIP  : ['dp-mx-static.islandsville.com'];
 			//_resIP 	= resIP  != null ? resIP  : ['dp-fb-static.islandsville.com'];

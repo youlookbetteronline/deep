@@ -991,7 +991,7 @@ internal class Mission extends Sprite {
 					have = obj.model.floor;
 					break;
 				}
-				if (obj.level && obj.sid == sID){
+				if (obj.hasOwnProperty('level') && obj.level && obj.sid == sID){
 					trace("Level = " + obj.level);
 					trace("ID = " + obj.id);
 					have = obj.level;

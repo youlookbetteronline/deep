@@ -595,7 +595,7 @@ package
 			mIcon = new Sprite();
 			
 			var fogshape:Shape = new Shape();
-			fogshape.graphics.beginFill(0x6d97ac, 1)
+			fogshape.graphics.beginFill(0x76a4b9, 1)
 			fogshape.graphics.drawRect(0, 0, App.self.width, App.self.height);
 			fogshape.graphics.endFill();
 			mFog.addChild(fogshape);

@@ -561,7 +561,7 @@ package units
 				{
 					
 					if (error) {
-						Errors.show(error, data);
+						//Errors.show(error, data);
 						//App.map.removeUnit(plant);
 						plant = null;
 						ordered = false;
@@ -919,7 +919,7 @@ package units
 							if (fld2.hasOwnProperty('plant') && fld2.plant && fld2.plant.hasOwnProperty('sid') && fld2.plant.sid == ShopWindow.currentBuyObject.sid)
 								_countPlant++
 						}
-						if (_countPlant > App.data.storage[ShopWindow.currentBuyObject.sid].gcount)
+						if (_countPlant - 1 > App.data.storage[ShopWindow.currentBuyObject.sid].gcount)
 						{
 							new SimpleWindow( {
 								title:Locale.__e("flash:1474469531767"),
@@ -1194,7 +1194,7 @@ package units
 					Field.planting.splice(Field.planting.indexOf(self), 1);
 				
 				if (error) {
-					Errors.show(error, data);
+					//Errors.show(error, data);
 					plant = null;
 					ordered = false;
 					return;

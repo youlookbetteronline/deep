@@ -1621,6 +1621,10 @@ package
 		private var CloseBttnWood:Class;
 		public var closeBttnWood:BitmapData = new CloseBttnWood().bitmapData;
 	
+		[Embed(source="Graphics2/Buttons/CancelRedButton.png")]
+		private var CancelRedButton:Class;
+		public var cancelRedButton:BitmapData = new CancelRedButton().bitmapData;
+	
 		[Embed(source="Graphics2/Backings/WoodShelf.png")]
 		private var WoodShelf:Class;
 		public var woodShelf:BitmapData = new WoodShelf().bitmapData;

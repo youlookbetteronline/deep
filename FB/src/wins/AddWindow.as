@@ -9,6 +9,7 @@ package wins
 	import flash.display.Sprite;
 	import flash.geom.Rectangle;
 	import ui.SalesIcon;
+	import utils.ActionsHelper;
 
 	public class AddWindow extends Window 
 	{

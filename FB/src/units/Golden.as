@@ -1,11 +1,13 @@
 package units 
 {
 	import astar.AStarNodeVO;
+	import core.IsoConvert;
 	import core.Load;
 	import core.MD5;
 	import core.Post;
 	import core.TimeConverter;
 	import flash.display.Bitmap;
+	import flash.display.Shape;
 	import flash.filters.GlowFilter;
 	import flash.geom.Point;
 	import flash.system.System;
@@ -22,6 +24,7 @@ package units
 	public class Golden extends Tribute
 	{
 		private var died:Boolean = false;
+		public var capacity:int = 0;
 		public function Golden(object:Object) 
 		{
 			crafted = object.crafted || 0;
@@ -31,7 +34,10 @@ package units
 			started = object['started'];// = App.time + 0;
 			if (object.hasOwnProperty('died'))
 				died = Boolean(object.died);
+			if (object.capacity)
+				capacity = object.capacity;
 			crafting = true;
+			info.config
 			totalLevels = level;
 			stockable = true;
 			if(this.info && this.info.config){
@@ -54,6 +60,45 @@ package units
 			mouseEnabled = true;
 			mouseChildren = true;
 			tip = tips;
+			/*if (this.sid == 2951)
+				drawAvailableArea();*/
+			
+		}
+		
+		private function drawAvailableArea():void 
+		{
+			var point1:Point = new Point(70, 90);
+			var point2:Point = new Point(90, 110);
+			_availableZone = new Shape();
+			App.map.focusedOnPoint(new Point((point1.x + point2.x) / 2,  (point1.y + point2.y) / 2));
+			_availableZone.graphics.beginFill(0x2ef229, .3);//0x21f86d
+			
+			var isoPoint:Object = IsoConvert.isoToScreen(point1.x, point1.y, true);
+			_availableZone.graphics.moveTo(isoPoint.x, isoPoint.y);
+			
+			isoPoint = IsoConvert.isoToScreen(point1.x, point2.y, true);
+			_availableZone.graphics.lineTo(isoPoint.x, isoPoint.y);
+			
+			isoPoint = IsoConvert.isoToScreen(point2.x, point2.y, true);
+			_availableZone.graphics.lineTo(isoPoint.x, isoPoint.y);
+			
+			isoPoint = IsoConvert.isoToScreen(point2.x, point1.y, true);
+			_availableZone.graphics.lineTo(isoPoint.x, isoPoint.y);
+			
+			isoPoint = IsoConvert.isoToScreen(point1.x, point1.y, true);
+			_availableZone.graphics.lineTo(isoPoint.x, isoPoint.y);
+			_availableZone.graphics.endFill();
+			
+			App.map.mField.addChildAt(_availableZone,0);
+		}
+		
+		private function clearAvailableZone():void 
+		{
+			if (_availableZone)
+			{
+				_availableZone.parent.removeChild(_availableZone)
+				_availableZone = null
+			}
 		}
 		
 		override protected function tips():Object
@@ -112,6 +157,20 @@ package units
 						}
 						
 					}
+					else if (info.capacity != 0 && capacity < info.capacity)
+					{
+						return {
+							title:info.title,
+							text: Locale.__e('flash:1491831964108', [info.capacity - capacity])
+						};
+					}
+					else if (died)
+					{
+						return {
+							title:info.title,
+							text: Locale.__e("flash:1491817499163")//Декор иссяк
+						};
+					}
 					else{
 						return {
 							title:info.title,
@@ -155,6 +214,8 @@ package units
 			
 			beginCraft(0, crafted);
 			beginAnimation();
+			
+			//clearAvailableZone();
 		}
 		
 		override public function flip():void
@@ -223,6 +284,10 @@ package units
 			
 			return false;
 		}
+		override public function placing(x:uint, y:uint, z:uint):void
+		{
+			super.placing(x, y, z);
+		}
 		
 		override public function calcState(node:AStarNodeVO):int
 		{
@@ -280,6 +345,15 @@ package units
 						}
 					}
 				}
+			}
+			if (this.sid == 2951)
+			{	
+				var point1:Point = new Point(70, 90);
+				var point2:Point= new Point(90 - this.info.area.w, 110 - this.info.area.h);
+				if ((coords.x > point1.x && coords.z > point1.y) && (coords.x < point2.x && coords.z < point2.y))
+					return EMPTY;
+				else
+					return OCCUPIED;
 			}
 			return EMPTY;
 		}
@@ -362,12 +436,6 @@ package units
 			}
 		}
 		
-		override public function set touch(touch:Boolean):void 
-		{
-			
-			super.touch = touch;
-		}
-		
 		
 		//
 		override public function isProduct():Boolean
@@ -392,6 +460,8 @@ package units
 			{
 				if (info.speedup == "")
 					return false;
+				if (info.stopboost)
+					return true;
 				if (sid == 1133 || sid == 1832)
 				{
 					var imageName:String = '';
@@ -404,6 +474,8 @@ package units
 					{
 						imageName = 'Painting1';
 					}
+					
+					
 					
 					new EaselSpeedWindow( {
 						title			:info.title,
@@ -480,8 +552,16 @@ package units
 					onDie();
 			}
 			
-			Treasures.bonus(data.bonus, new Point(this.x, this.y));
-			SoundsManager.instance.playSFX('bonus');
+			if (info.hasOwnProperty('capacity') && info.capacity > 0)
+			{
+				capacity++;
+			}
+			
+			if (data.bonus)
+			{
+				Treasures.bonus(data.bonus, new Point(this.x, this.y));
+				SoundsManager.instance.playSFX('bonus');
+			}
 			
 			if (params != null) {
 				if (params['guest'] != undefined) {
@@ -564,8 +644,8 @@ package units
 			initAnimation();
 			beginAnimation();
 		}
-		
-		/*override public function get bmp():Bitmap 
+		/*
+		override public function get bmp():Bitmap 
 		{
 			if (bitmap.bitmapData && bitmap.bitmapData.getPixel(bitmap.mouseX, bitmap.mouseY) != 0)
 				return bitmap;
@@ -649,6 +729,7 @@ package units
 		}
 		
 		private var unit:Unit;
+		private var _availableZone:Shape;
 		public var decorCoords:Object;
 		override public function onLoad(data:*):void 
 		{
@@ -684,6 +765,11 @@ package units
 					setCloudPosition(0, -50);
 					break;
 			}
+		}
+		override public function uninstall():void 
+		{
+			super.uninstall();
+				//clearAvailableZone();
 		}
 	}
 }

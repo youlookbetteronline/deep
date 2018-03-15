@@ -1114,7 +1114,6 @@ package
 				
 				//checkOnGiftsBox();
 			}
-			
 			/*var octopusSID:uint = 500000;
 			var info:Object = { type:'Tutorial', view:'octopus_ruins' };
 			App.data.storage[octopusSID] = info;
