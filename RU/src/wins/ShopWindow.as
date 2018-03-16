@@ -208,7 +208,7 @@ package wins
 				{
 					for (var __sid:* in _itemsData[_sect])
 					{
-						if (__sid == 3215)
+						if (__sid == 2622)
 							trace();
 						if (__sid != 's' && _itemsData[_sect][__sid] != 0 && App.data.storage[__sid] != null && App.data.storage[__sid].type != 'Material' && App.data.storage[__sid].type != 'Lamp') 
 						{
@@ -358,10 +358,7 @@ package wins
 						//trace();
 					/*if (item['sid'] == 1777 || item['sid'] == 3215)
 						item.visible = 1*/
-					if (item['sid'] == 2622)
-						continue;
-					if (item['sid'] == 3215)
-						trace();
+
 					if (ShopWindow.sarcofitons.indexOf(int(item.sid)) != -1)
 					{
 						continue;

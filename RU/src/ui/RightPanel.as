@@ -139,7 +139,7 @@ package ui
 			//
 			freebieBttn.y = -110;
 			freebieBttn.x = -15;
-			if (Capabilities.playerType != 'StandAlone')
+			//if (Capabilities.playerType != 'StandAlone')
 				addChild(freebieBttn);
 		//
 			////rectangle.y -= 100;

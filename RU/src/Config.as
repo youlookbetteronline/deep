@@ -11,9 +11,9 @@ package
 	{
 		//public static var FVResourcesVersion:int;
 		public static var totalVersion:int;		
-		public static var versionObjects:int 		= 702  + totalVersion;		//Обьекты
-		public static var versionInterface:int 		= 351  + totalVersion;		//Интерфейс
-		public static var versionImages:int 		= 1092 + totalVersion;		//Icons + Images
+		public static var versionObjects:int 		= 703  + totalVersion;		//Обьекты
+		public static var versionInterface:int 		= 352  + totalVersion;		//Интерфейс
+		public static var versionImages:int 		= 1093 + totalVersion;		//Icons + Images
 		
 		public static var _mainIP:Array;
 		public static var _resIP:*;

@@ -181,12 +181,14 @@ package utils
 						{
 							for (var lb:* in App.user.top[_top][_inst].lbonus)
 								bonus[lb] = Numbers.firstProp(App.user.top[_top][_inst].lbonus[lb]).key * Numbers.firstProp(App.user.top[_top][_inst].lbonus[lb]).val
+							if (!bonus || Numbers.countProps(bonus) == 0)
+								return;
 							new TopResultWindow({
 								bonus		:bonus,
 								position	:App.user.top[_top][_inst].position,
 								topName		:App.data.top[_top].title,
 								type		:'lbonus',
-								iID			:App.user.top[_top][_inst],
+								iID			:_inst,
 								tID			:_top
 							}).show();
 

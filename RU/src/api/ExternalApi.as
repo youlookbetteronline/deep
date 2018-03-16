@@ -648,7 +648,7 @@ package api
 							var ldr:MultipartURLLoader = new MultipartURLLoader();
 							ldr.addEventListener(Event.COMPLETE, function(e:Event):void 
 							{
-								
+								Log.alert(e.currentTarget.loader);
 								var response:Object = JSON.parse(e.currentTarget.loader.data);
 								if (ExternalInterface.available)
 								{
@@ -658,19 +658,21 @@ package api
 										addPostCallback(callback);
 									}
 									
-									
+									Cc.error('RESPONSEEEEEEEEE' + JSON.stringify(response));
 									ExternalInterface.call("wallPost", {owner_id:owner_id, message:message, hasCallback:hasCallback}, response);	
 								}
 							});
 							
-							Log.alert('url '+App.network);
-							Log.alert('pngStream '+App.network.wallServer);
-							Log.alert('ExternalInterface 2 '+App.network.wallServer.upload_url);
+							Log.alert('url '+JSON.stringify(App.network));
+							Log.alert('pngStream '+JSON.stringify(App.network.wallServer));
+							Log.alert('ExternalInterface 2 '+JSON.stringify(App.network.wallServer.upload_url));
 					
 															
 							ldr.addVariable('url', App.network.wallServer.upload_url);
 							ldr.addFile(pngStream, "image.png", "file", 'image/png');
-							ldr.load('http://deep.islandsville.com/iframe/upload.php');
+							
+							Cc.error('RESPONSEEEEEEEEE' + JSON.stringify(ldr));
+							ldr.load('https://dp-vk1.islandsville.com/iframe/upload.php');
 							
 						}
 					break;
