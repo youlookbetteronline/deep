@@ -229,10 +229,8 @@ package wins
 						collectionArray.push(sid);
 					if (settings.find != null && settings.find.indexOf(sid) != -1 && section !='all') 
 					{
-						//paginator.page = i / paginator.onPageCount;
-						//paginator.update();
 						history.section = section;
-						history.page = (int(i) - collectionArray.length) / settings.itemsOnPage;
+						history.page = int((i - collectionArray.length) / settings.itemsOnPage);
 						
 						settings.section = history.section;
 						settings.page = history.page;

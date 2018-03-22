@@ -58,75 +58,9 @@ package ui
 		
 		public function Tips() 
 		{			
-			/*textLabel = Window.drawText("", {
-				color:fonttColor,
-				borderColor:bordertColor,
-				multiline:true,
-				fontSize:fontSize,
-				textLeading:-5
-			});
 			
-			textLabel.wordWrap = true;
-			
-			titleLabel = Window.drawText("", {
-				color:fonttColor,
-				borderColor:bordertColor,
-				multiline:true,
-				fontSize:fontSize+6
-			}); 
-			
-			descLabel = Window.drawText("", {
-				color:fonttColor,
-				borderColor:bordertColor,
-				multiline:true,
-				fontSize:fontSize+2
-			}); 
-			
-			additionalDesc = Window.drawText("", {
-				color:fonttColor,
-				borderColor:bordertColor,
-				multiline:true,
-				fontSize:fontSize,
-				textLeading:-5
-			});
-			
-			orDesc = Window.drawText("", {
-				color:fonttColor,
-				borderColor:bordertColor,
-				multiline:true,
-				fontSize:fontSize,
-				textLeading:-5
-			});
-			
-			countLabel = Window.drawText("", {
-				color:fonttColor,
-				borderColor:bordertColor,
-				multiline:true,
-				fontSize:fontSize+3
-			}); */
 		}
 		
-		/*public function init():void {
-			
-			textLabel = Window.drawText("", {
-				color:0xffffff,
-				borderColor:0x0a4069,
-				multiline:true,
-				border:false,
-				fontSize:fontSize,
-				textLeading:-5
-			});
-			
-			textLabel.wordWrap = true;
-			
-			titleLabel = Window.drawText("", {
-				color:0xffffff,
-				borderColor:0x0a4069,
-				multiline:true,
-				border:false,
-				fontSize:fontSize+2
-			}); 
-		}*/
 		
 		private function dispose():void {
 			timer.stop();
@@ -269,14 +203,6 @@ package ui
 				textLeading:-5
 			});
 			
-			/*orDesc = Window.drawText("", {
-				color:fonttColor,
-				borderColor:bordertColor,
-				multiline:true,
-				fontSize:fontSize,
-				textLeading:-5
-			});*/
-			
 			countLabel = Window.drawText("", {
 				color:fonttColor,
 				borderColor:bordertColor,
@@ -311,11 +237,9 @@ package ui
 			var desc:String = '';
 			var timerText:String = '';
 			var timerText2:String = '';
-			//var ordesc:String = '';
 			var count1:String = '';
 			var count2:String = '';
 			var addDesc:String = '';
-			//var itemList:Array = [];
 			if (target['tip'] is Function) {
 				var tip:Object = target['tip']();
 				title =  tip.title || "";			//	Верхняя надпись
@@ -323,7 +247,6 @@ package ui
 				desc = tip.desc || "";				//	Нижняя надпись
 				timerText = tip.timerText || "";
 				timerText2 = tip.timerText2 || "";
-				//ordesc = tip.ordesc || "";
 				count1 = tip.count1 || "";
 				count2 = tip.count2 || "";
 				icon = tip.icon || null;
@@ -346,9 +269,6 @@ package ui
 			{
 				var textWidth:int = int(w);
 				var lineCount:int = Math.round((text.length * fontSize) / textWidth);
-				//if (lineCount < sizes['width']) {
-					//break;
-				//}
 			}
 			
 			if (title == text)
@@ -362,7 +282,6 @@ package ui
 			textLabel.width = textWidth;
 			
 			givesLabel.text = givesDesc;
-			//givesLabel.border = true;
 			givesLabel.width = textWidth -20;
 			
 			givesLabel.autoSize = TextFieldAutoSize.LEFT;
@@ -392,9 +311,7 @@ package ui
 			{
 				titleOnly = false;
 			}
-			
-			//orDesc.text = ordesc;
-			//orDesc.autoSize = TextFieldAutoSize.LEFT;
+
 			blick1 = new Bitmap(Window.textures.blickUpLeft);
 			blick2 = new Bitmap(Window.textures.blickUpRight);
 			blick3 = new Bitmap(Window.textures.blickDownLeft);
@@ -419,17 +336,13 @@ package ui
 			}
 			
 			addChild(textLabel);
-			//addChild(textLabel);
-			//if (gives != []) {
 			addChild(givesLabel);
-			//}
-			
+
 			if (additionalDesc.text != "") {
 				addChild(additionalDesc);
 			}
 			if (itemList) {
 				var newHt:int = 0;
-				//drawItems(itemList);
 				drawItemsIntoDescription(itemList);
 			}
 			if (icon)
@@ -439,12 +352,12 @@ package ui
 			{
 				if (icon) 
 				{
-					iconW = 40;//icon.width /** iconScale*/;
-					iconH = 40;//icon.height;
+					iconW = 40;
+					iconH = 40;
 				}
 				if (icon2)
 				{
-					iconW2 = 40*iconScale2 + 20;//icon2.width /** iconScale*/ +20;
+					iconW2 = 40*iconScale2 + 20;
 				}else
 				{
 					iconW2 = 0;
@@ -478,25 +391,9 @@ package ui
 				addChild(timerLabel);
 			}
 			if (icon) {
-				//if (icon) {
-					//iconW = 40*iconScale;//icon.width /** iconScale*/;
-					//iconH = 40;//icon.height;
-				//}
-				//if (icon2){
-					//iconW2 = 40*iconScale2 + 20;//icon2.width /** iconScale*/ +20;
-				//}else{
-					//iconW2 = 0;
-				//}
-				//if (icon && icon2) {
 				descLabel.x = textLabel.x;
 				givesLabel.x = textLabel.x;
 				
-				
-				//}else{
-				//descLabel.x = (bgimg.width - descLabel.width)/2 - 10;
-				//}
-				
-				//descLabel.x -= iconW / 2;
 				addChild(icon);
 				icon.filters = [new GlowFilter(0xffffff, .7, 5, 5, 2)];
 				descLabel.y += iconH / 2.4; 
@@ -521,9 +418,8 @@ package ui
 				}
 				
 			}else {
-				iconW = 0;//icon.width /** iconScale*/;
-				iconH = 0;//icon.height;
-				//countLabel.x = padding;
+				iconW = 0;
+				iconH = 0;
 				if (count1)
 					addChild(countLabel);
 				descLabel.x = textLabel.x;
@@ -550,7 +446,6 @@ package ui
 			App.self.tipsContainer.addChild(this);
 		}
 		
-		//	Формирование строки Description
 		private function get givesDesc():String
 		{
 			if (gives.length == 0)
@@ -558,24 +453,6 @@ package ui
 			
 			var _sids:Array = gives;
 			var _desc:String = Locale.__e('flash:1402650165308') + " ";
-			//for (var _out:* in info.outs)
-			//{
-				//obj[_out] = App.data.storage[_out].title;
-				//queue.push(_out);
-			//}
-			
-			
-			//for each(var _out2:* in App.data.treasures[info.treasure]['kick'].item)
-			//{
-				//if (_out2 == Stock.EXP) continue;
-				//obj[_out2] = App.data.storage[_out2].title;
-				//if(queue.indexOf(App.data.storage[_out2].title) == -1)
-					//queue.push(App.data.storage[_out2].title);
-			//}
-			
-			//for (var i:int = 0; i < queue.length; i++)
-				//_desc += ' ' + queue[i] + ', ';
-				
 			for each(var _out3:* in _sids)
 			{
 				
@@ -606,13 +483,7 @@ package ui
 				else
 					bgimg1 = Window.backing(maxWidth + padding * 2 + 40, maxHeight + padding + 26, 50, 'tipUp');
 			}
-			/*if(blick1 != null){
-				blick1 = null;
-				blick2 = null;
-				blick3 = null;
-			}*/
-			
-			
+
 			bgimg.bitmapData = bgimg1.bitmapData;
 			
 			blick1.x = 13;
@@ -684,11 +555,6 @@ package ui
 				timerLabel2.autoSize = TextFieldAutoSize.LEFT;
 			}
 			
-			
-			/*fitInWidth(textLabel, 200);
-			fitInWidth(titleLabel, 200);
-			fitInWidth(descLabel, 200);*/
-			
 
 			if (tip.timer != null && tip.timer == false) {
 				App.self.setOffTimer(rewrite);
@@ -708,10 +574,6 @@ package ui
 			if (App.self.stage.stageHeight - App.self.stage.mouseY < height +20) {
 				y -= height + 22;
 			}
-			/*
-			if (App.self.stage.mouseY < height + 20) {
-				y = App.self.stage.mouseY - 45;
-			}*/
 		}
 		
 	}

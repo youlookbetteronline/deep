@@ -28,7 +28,7 @@ package utils
 		
 		private var settings:Object;
 		private var _open:Boolean = false;
-		public var defResources:Object = {};
+		public var defResources:Object = new Object();
 		public var resources:Vector.<Resource>;
 		public var neighbors:Vector.<Sector> = new Vector.<Sector>();
 		public var coords:Object;
@@ -48,6 +48,8 @@ package utils
 			id = _settings.zone.id;
 			resources = _settings.resources;
 			coords = _settings.zone;
+			if (this.id == 708)
+				trace();
 			checkMode();
 			switch(App.user.worldID){
 				case User.VILLAGE_MAP:
@@ -98,6 +100,8 @@ package utils
 			//if(val == true)
 				//trace('open sector with id: ' + this.id);
 			_open = val;
+			if (this.id == 743)
+				trace();
 		}
 		
 		public function get open():Boolean
@@ -137,35 +141,54 @@ package utils
 		}
 		
 		private var _sectorsToOpen:Array = [];
+		private var send:Boolean;
 		public function openNeibors(send:Boolean = false):void
 		{
-			if (canOpenNeibors)
+			this.send = send;
+			if (Map.ready)
+				onOpenNeibors();
+			else
+				App.self.addEventListener(AppEvent.ON_MAP_COMPLETE, onOpenNeibors);
+			
+		}
+		
+		private function onOpenNeibors():void 
+		{
+			App.self.removeEventListener(AppEvent.ON_MAP_COMPLETE, onOpenNeibors);
+			try 
 			{
-				_sectorsToOpen = [];
-				for each(var _sector:Sector in neighbors)
+				if (canOpenNeibors)
 				{
-					if (App.user.mode == User.OWNER && _sector.id == 718 && App.user.worldID == User.TRAVEL_LOCATION)
-						openBridgeSectors();
-					if (App.user.mode == User.OWNER && (_sector.id == 744 /*|| _sector.id == 708 ||_sector.id == 745 || _sector.id == 709 || _sector.id == 707*/) && App.user.worldID == 3148)
-						openBridgeSectors();
-					_sector.open = true;
-					if (App.user.mode == User.PUBLIC)
+					_sectorsToOpen = [];
+					for each(var _sector:Sector in neighbors)
 					{
-						if (App.owner && App.data.storage[App.owner.worldID].maptype == World.PUBLIC)
+						if (App.user.mode == User.OWNER && _sector.id == 718 && App.user.worldID == User.TRAVEL_LOCATION)
+							openBridgeSectors();
+						if (App.user.mode == User.OWNER && (_sector.id == 744 /*|| _sector.id == 708 ||_sector.id == 745 || _sector.id == 709 || _sector.id == 707*/) && App.user.worldID == 3148)
+							openBridgeSectors();
+						_sector.open = true;
+						if (App.user.mode == User.PUBLIC)
 						{
-							//if(App.owner){
-							//var _ss:Object = {}
-							//_ss[_sector.id] = 1;
-							_sectorsToOpen.push(_sector.id);
+							if (App.owner && App.data.storage[App.owner.worldID].maptype == World.PUBLIC)
+							{
+								//if(App.owner){
+								//var _ss:Object = {}
+								//_ss[_sector.id] = 1;
+								_sectorsToOpen.push(_sector.id);
+							}
 						}
+						
+						if(App.user.mode == User.PUBLIC || (App.user.mode == User.OWNER && App.user.worldID != User.FARM_LOCATION))
+							_sector.checkFog();
 					}
-					
-					if(App.user.mode == User.PUBLIC || (App.user.mode == User.OWNER && App.user.worldID != User.FARM_LOCATION))
-						_sector.checkFog();
+					if (send && App.user.mode == User.PUBLIC && _sectorsToOpen.length > 0)
+						SectorsHelper.sendOpened(_sectorsToOpen);
 				}
-				if (send && App.user.mode == User.PUBLIC && _sectorsToOpen.length > 0)
-					SectorsHelper.sendOpened(_sectorsToOpen);
+			}catch (err:Error)
+			{
+				trace('WARNING');
 			}
+			
 		}
 		
 		
@@ -200,6 +223,7 @@ package utils
 						_sector.openNeibors();
 					}
 				}
+				
 			}
 		}
 		
@@ -226,12 +250,20 @@ package utils
 		public function get canOpenNeibors():Boolean
 		{
 			var i:int = 0;
+
 			for each(var _res:* in resources)
 			{
-				if (defResources.hasOwnProperty(_res.id) && defResources[_res.id].sid == _res.sid)
-					i++;
+				if (_res.id == 1515)
+					continue;
+				if (defResources && defResources.hasOwnProperty(_res.id))
+				{
+					if (defResources[_res.id].sid == _res.sid)
+						i++;
+				}
+					
 			}
-			
+			/*if (Numbers.countProps(defResources) != i)
+				trace();*/
 			return Numbers.countProps(defResources) != i;
 		}
 		

@@ -766,7 +766,8 @@ package units
 					}
 					if (plant.info.hasOwnProperty('require') && plant.info.require != null)
 					{
-						if (!App.user.stock.takeAll(plant.info.require))
+						if (App.user.stock.count(Numbers.firstProp(plant.info.require).key) < Numbers.firstProp(plant.info.require).val)
+						//if (!App.user.stock.takeAll(plant.info.require))
 						{
 							var needParams:Object = {
 								title:Locale.__e("flash:1435241453649"),
@@ -1065,7 +1066,8 @@ package units
 				}
 				return;
 			}
-			
+			if(data.__take)
+				App.user.stock.takeAll(data.__take)
 			if (data.hasOwnProperty("bonus")) Treasures.bonus(/*Treasures.convert(*/data.bonus/*)*/, new Point(this.x, this.y),null,true);
 			
 			if (state == TOCHED) touch = false;
@@ -1163,6 +1165,7 @@ package units
 			if (!App.user.stock.checkAll(price)) {
 			//	openEnergyWindow();
 				stopPlanting();
+				App.user.onStopEvent();
 				return;
 			}else if (!App.user.stock.checkAll(item.price)) 
 			{

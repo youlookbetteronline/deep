@@ -1,6 +1,7 @@
 package models 
 {
 	import core.Numbers;
+	import units.Booster;
 	import units.Craftfloors;
 	/**
 	 * ...
@@ -24,10 +25,12 @@ package models
 		private var _unlockCallback :Function;
 		private var _boostCallback :Function;
 		private var _cancelCallback :Function;
+		private var _refreshCallback :Function;
 		private var _craftingSlot :int;
 		private var _finishedSlots :Array;
 		private var _toThrow:Object;
 		private var _craftOnPage:int;
+		private var _booster:Booster;
 		
 		public static const FINISH:int = 1;
 		public static const INPROGRESS:int = 2;
@@ -223,9 +226,46 @@ package models
 			return _cancelCallback;
 		}
 		
+		public function get booster():Booster 
+		{
+			var bID:int;
+			var bArray:Array = [];
+			for (var unt:* in App.data.storage)
+			{
+				if (App.data.storage[unt].type == 'Booster' && App.data.storage[unt].target && App.data.storage[unt].target.hasOwnProperty(_target.sid))
+				{
+					bArray = Map.findUnits([unt]);
+					if (bArray.length > 0)
+					{
+						var __booster:Booster = bArray[0];
+						if (__booster.level == __booster.totalLevels)
+							_booster = __booster;
+					}
+					break;
+				}
+					
+			}
+			return _booster;
+		}
+		
+		public function set booster(value:Booster):void 
+		{
+			_booster = value;
+		}
+		
 		public function set cancelCallback(value:Function):void 
 		{
 			_cancelCallback = value;
+		}
+		
+		public function get refreshCallback():Function 
+		{
+			return _refreshCallback;
+		}
+		
+		public function set refreshCallback(value:Function):void 
+		{
+			_refreshCallback = value;
 		}
 		
 	}

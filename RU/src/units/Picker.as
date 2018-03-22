@@ -147,7 +147,6 @@ package units
 			Treasures.bonus(_bonus, new Point(this.x, this.y));
 			SoundsManager.instance.playSFX('bonus');
 			trace();
-			
 		}
 		
 		private function redrawIcon(e:*):void 
@@ -178,13 +177,10 @@ package units
 				coordsCloud.x = 0;
 				coordsCloud.y = -50;
 			}
-				
-			//if (initCount.length > 0) 
-			//{
+			
 				drawIcon(UnitIcon.REWARD, 2192, 1, {
 					glow:		true
 				}, 0, coordsCloud.x, coordsCloud.y);
-			//}
 		}
 	}
 

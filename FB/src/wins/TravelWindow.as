@@ -604,8 +604,11 @@ package wins
 					item.startGlowing();
 					if (loadded || item.bitmap.bitmapData)
 					{
-						
+						item.hidePointing();
 						item.showPointing("top", -item.width / 2, -20, item.parent);
+						setTimeout(function():void{
+							item.hidePointing();
+						},2000);
 						focusOnItem(item, true);
 					}
 				}
@@ -859,6 +862,7 @@ import com.greensock.TweenLite;
 import com.greensock.TweenMax;
 import com.greensock.easing.Bounce;
 import com.greensock.easing.Cubic;
+import core.Size;
 import flash.display.Bitmap;
 import flash.display.Shape;
 import flash.display.Sprite;
@@ -1208,6 +1212,7 @@ import wins.TravelRequireWindow;
 import wins.TravelPayWindow;
 import wins.SimpleWindow;
 import wins.BathyscaphePayWindow;
+import wins.BubbleSimpleWindow;
 
 internal class TravelItem extends WorldItem {
 	
@@ -1284,6 +1289,13 @@ internal class TravelItem extends WorldItem {
 			drawTemp();
 		}
 		
+		if (App.data.storage[sID].hasOwnProperty('start') && App.time < App.data.storage[sID].start[App.social])
+		{
+			drawLockStart();
+			finalTime = App.data.storage[sID].start[App.social];
+			drawTemp();
+		}
+		
 		if (App.data.storage[sID].hasOwnProperty('available'))
 		{
 			//var serverDate:Date = new Date();
@@ -1304,6 +1316,17 @@ internal class TravelItem extends WorldItem {
 		}
 		
 	}
+	
+	private function drawLockStart():void 
+	{
+		var lockBitmap:Bitmap = new Bitmap(Window.textures.lockedSlot);
+		Size.size(lockBitmap, 45, 45);
+		lockBitmap.smoothing = true;
+		lockBitmap.x = -30;
+		lockBitmap.y = -35;
+		addChild(lockBitmap);
+	}
+	
 	public var block:Boolean = false;
 	
 	public function startPlacePointing():void
@@ -1319,6 +1342,20 @@ internal class TravelItem extends WorldItem {
 	
 	override public function onClick(e:MouseEvent = null):void 
 	{
+		if (App.data.storage[sID].hasOwnProperty('start') && App.time < App.data.storage[sID].start[App.social])
+		{
+			new BubbleSimpleWindow({
+				popup	:true,
+				title	:Locale.__e('flash:1474469531767'),
+				label	:Locale.__e('flash:1406275629192'),
+				timer	:{
+					enabled	: true,
+					text	: Locale.__e('flash:1521557338809'),
+					finish	: App.data.storage[sID].start[App.social]
+				}
+			}).show();
+			return;
+		}
 		if (App.data.storage[sID].hasOwnProperty('reqquest') &&
 		App.data.storage[sID]['reqquest'] != "" &&
 		!App.user.quests.data.hasOwnProperty(App.data.storage[sID]['reqquest']))

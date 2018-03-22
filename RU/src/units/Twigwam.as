@@ -10,6 +10,7 @@ package units
 	import wins.SimpleWindow;
 	import wins.TechnoEquipWindow;
 	import wins.TechnoSpeedWindow;
+	import wins.Window;
 	/**
 	 * ...
 	 * @author 
@@ -404,14 +405,18 @@ package units
 		{
 			if (hasProduct)
 			{
-				new SimpleWindow( {
-					title:Locale.__e("flash:1474469531767"),
-					label:SimpleWindow.ATTENTION,
-					text:Locale.__e('flash:1475757458469',  App.data.storage[this.animal].title),
-					confirm:function():void {
-						unitToMove.lightUnit({focus:true}, 10);
-					}
-				}).show();
+				if (!Window.hasType(SimpleWindow))
+				{
+					new SimpleWindow( {
+						title:Locale.__e("flash:1474469531767"),
+						label:SimpleWindow.ATTENTION,
+						text:Locale.__e('flash:1475757458469',  App.data.storage[this.animal].title),
+						confirm:function():void {
+							unitToMove.lightUnit({focus:true}, 10);
+						}
+					}).show();
+				}
+				
 				unitToMove.showIcon();
 				return true; 
 			}

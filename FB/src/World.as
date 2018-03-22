@@ -24,6 +24,7 @@ package
 	import wins.RoomFader;
 	import wins.SimpleWindow;
 	import wins.Window;
+	import wins.ZoneTimeWindow;
 	import wins.elements.ShopMenu;
 	
 	/**
@@ -44,6 +45,7 @@ package
 		
 		public var data:Object;
 		public var zones:Array = [];
+		public var currentOpenZones:Object = new Object();
 		public var faders:Object = new Object();
 		public var zoneUnits:Object = { };
 		public var checkClicks:Number = 0;
@@ -54,12 +56,15 @@ package
 		public function World(data:Object)
 		{
 			zones = new Array();
-			
+			currentOpenZones = new Array();
 			this.data = data;
 			for each(var zone:* in data.zones) 
 			{
 				zones.push(zone);
 			}
+			if (data.currentOpenZones)
+				currentOpenZones = data.currentOpenZones;
+
 			buildingStorage = null;
 			buildingStorage = {};
 		}
@@ -134,39 +139,6 @@ package
 					return;
 				}
 			}
-			//}else{
-				/*if (App.user.worldID == User.LAND_2 && zoneID != 949 && zoneID != 950 && zoneID != 951) 
-				{
-					new SimpleWindow( {
-						title:Locale.__e("flash:1474469531767"),
-						label:SimpleWindow.ATTENTION,
-						text:Locale.__e('flash:1481899130563')
-					}).show();
-					return;
-				}
-			}*/
-			
-			/*if (zoneID == 1305 && !Config.admin)
-			{
-				new SimpleWindow( {
-				title:Locale.__e("flash:1474469531767"),
-				label:SimpleWindow.ATTENTION,
-				text:Locale.__e('flash:1481899130563')
-				}).show();
-				return;
-			}*/
-			
-			/*if (zoneID == 1447 && !Config.admin)
-			{
-				new SimpleWindow( {
-				title:Locale.__e("flash:1474469531767"),
-				label:SimpleWindow.ATTENTION,
-				text:Locale.__e('flash:1481899130563')
-				}).show();
-				return;
-			}*/
-			
-			
 			
 			new OpenZoneWindow({
 				sID:zoneID,
@@ -320,6 +292,13 @@ package
 					}
 				}
 				if (openWindow && App.user.mode == User.OWNER){
+					if (currentOpenZones.hasOwnProperty(node.z))
+					{
+						new ZoneTimeWindow({
+							zID:	node.z
+						}).show();
+						return false;
+					}
 					showOpenZoneWindow(node.z);
 				}
 				
@@ -370,6 +349,70 @@ package
 				zID:sID,
 				buy:int(buy)
 			}, onOpenZone, {sID:sID, require:require});
+		}
+		
+		public function boostZone(zID:int, callback:Function):void 
+		{
+			Post.send({
+				ctr:'world',
+				act:'boost',
+				uID:App.user.id,
+				wID:App.user.worldID,
+				zID:zID
+			}, onBoostZone, {
+				callback: callback
+			});
+		}
+		
+		private function onBoostZone(error:*, data:*, params:*):void 
+		{
+			if (error)
+				return;
+			App.user.stock.takeAll(data.__take);
+			currentOpenZones = data.currentOpenZones;
+			params.callback();
+		}
+		
+		public function currentOpen(zID:int):void 
+		{
+			Post.send({
+				ctr:'world',
+				act:'zone',
+				uID:App.user.id,
+				wID:App.user.worldID,
+				zID:zID
+			}, onCurrentOpen, {
+				zID:zID
+			});
+		}
+		
+		private function onCurrentOpen(error:*, data:*, params:*):void 
+		{
+			if (error)
+				return;
+				
+			var zID:int = params.zID;
+			
+			if (data.currentOpenZones)
+				currentOpenZones = data.currentOpenZones
+			
+			bonusCoords = new Point(App.map.mouseX, App.map.mouseY);
+			if (data.hasOwnProperty("bonus")) Treasures.bonus(data.bonus, bonusCoords);
+			if (data.hasOwnProperty("reward")) Treasures.bonus(data.reward, bonusCoords);
+			
+			if (currentOpenZones.hasOwnProperty(zID))
+				return;
+			
+			onOpenComplete(zID);
+			bonusCoords = null;
+			
+			removeFakes(zID);
+			
+			//Делаем push в _6e
+			if (App.social == 'FB') {
+				ExternalApi.og('investigate','area');
+			}
+			Fog.openZone(zID);
 		}
 		
 		public function onOpenExpeditionZone(error:*, data:*, params:*):void 
@@ -429,6 +472,9 @@ package
 				return;
 			}
 			
+			if (data.currentOpenZones)
+				currentOpenZones = data.currentOpenZones
+			
 			bonusCoords = new Point(App.map.mouseX, App.map.mouseY);
 			
 			if (App.data.storage[params.sID].hasOwnProperty("price"))
@@ -438,6 +484,14 @@ package
 			
 			if (data.hasOwnProperty("bonus")) Treasures.bonus(data.bonus, bonusCoords);
 			if (data.hasOwnProperty("reward")) Treasures.bonus(data.reward, bonusCoords);
+			
+			if (currentOpenZones.hasOwnProperty(sID))
+			{
+				new ZoneTimeWindow({
+					zID: sID
+				}).show()
+				return;
+			}
 			
 			onOpenComplete(sID);
 			bonusCoords = null;
@@ -860,6 +914,11 @@ package
 		}
 		
 		public static function canBuyOnThisMap(sid:*, exceptionSections:Array = null):Boolean {
+			if (sid == 2622 && (App.user.worldID == User.HOME_WORLD || App.user.worldID == User.HOLIDAY_LOCATION))
+			{
+				return true;
+				
+			}
 			var info:Object = App.data.storage[App.map.id];
 			
 			if (info) {

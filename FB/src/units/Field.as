@@ -180,7 +180,7 @@ package units
 				default:
 					return 76
 					break;
-			}			
+			}		
 		}
 		
 		public static var fieldTouch:Field;
@@ -277,7 +277,7 @@ package units
 		private var uninstallTimeout:uint;
 		override public function buyAction(setts:*= null):void 
 		{
-			if (App.data.storage[ShopWindow.currentBuyObject.sid].hasOwnProperty('gcount') && App.data.storage[ShopWindow.currentBuyObject.sid].gcount != '')
+			if (App.data.storage[ShopWindow.currentBuyObject.sid].hasOwnProperty('gcount') && App.data.storage[ShopWindow.currentBuyObject.sid].gcount != '' /*&& App.data.storage[ShopWindow.currentBuyObject.sid].gcount > 0*/)
 			{
 				var _fields:Array = Map.findFieldUnits([76, 2198]);
 				var _countPlant:int = 0;
@@ -477,7 +477,6 @@ package units
 				return;
 			}
 			
-			
 			_touch = touch;
 			var unit:Field;
 			if (touch) 
@@ -562,7 +561,7 @@ package units
 				{
 					
 					if (error) {
-						Errors.show(error, data);
+						//Errors.show(error, data);
 						//App.map.removeUnit(plant);
 						plant = null;
 						ordered = false;
@@ -767,7 +766,8 @@ package units
 					}
 					if (plant.info.hasOwnProperty('require') && plant.info.require != null)
 					{
-						if (!App.user.stock.takeAll(plant.info.require))
+						if (App.user.stock.count(Numbers.firstProp(plant.info.require).key) < Numbers.firstProp(plant.info.require).val)
+						//if (!App.user.stock.takeAll(plant.info.require))
 						{
 							var needParams:Object = {
 								title:Locale.__e("flash:1435241453649"),
@@ -911,7 +911,6 @@ package units
 			{ 
 				if (ShopWindow.currentBuyObject && ShopWindow.currentBuyObject.type == "Plant")
 				{
-					
 					if (ShopWindow.currentBuyObject.sid != null && App.data.storage[ShopWindow.currentBuyObject.sid].hasOwnProperty('gcount') && App.data.storage[ShopWindow.currentBuyObject.sid].gcount != '')
 					{
 						var _fields:Array = Map.findFieldUnits([76, 2198]);
@@ -933,7 +932,6 @@ package units
 							return false;
 						}
 					}
-					
 					// Добавляем растение
 					pID = ShopWindow.currentBuyObject.sid;
 					
@@ -1068,7 +1066,8 @@ package units
 				}
 				return;
 			}
-			
+			if(data.__take)
+				App.user.stock.takeAll(data.__take)
 			if (data.hasOwnProperty("bonus")) Treasures.bonus(/*Treasures.convert(*/data.bonus/*)*/, new Point(this.x, this.y),null,true);
 			
 			if (state == TOCHED) touch = false;
@@ -1166,6 +1165,7 @@ package units
 			if (!App.user.stock.checkAll(price)) {
 			//	openEnergyWindow();
 				stopPlanting();
+				App.user.onStopEvent();
 				return;
 			}else if (!App.user.stock.checkAll(item.price)) 
 			{
@@ -1197,7 +1197,7 @@ package units
 					Field.planting.splice(Field.planting.indexOf(self), 1);
 				
 				if (error) {
-					Errors.show(error, data);
+					//Errors.show(error, data);
 					plant = null;
 					ordered = false;
 					return;

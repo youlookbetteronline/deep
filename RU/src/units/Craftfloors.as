@@ -54,6 +54,7 @@ package units
 			_model.craftingCallback = craftingEvent;
 			_model.unlockCallback = unlockEvent;
 			_model.boostCallback = boostEvent;
+			_model.refreshCallback = refreshEvent;
 		}
 		
 		
@@ -228,7 +229,7 @@ package units
 		{
 			if (error)
 			{
-				Errors.show(error, data);
+				//Errors.show(error, data);
 				return;
 			}
 			showIcon()
@@ -249,7 +250,7 @@ package units
 		
 		private function craftingEvent(fID:int, craftCallback:Function):void 
 		{
-			Post.send({
+			var sendObj:Object = {
 				ctr		:this.type,
 				act		:'crafting',
 				uID		:App.user.id,
@@ -257,7 +258,13 @@ package units
 				wID		:App.user.worldID,
 				sID		:this.sid,
 				fID		:fID
-			}, onCraftingEvent, {
+			}
+			if (_model.booster)
+			{
+				sendObj['bSID'] = _model.booster.sid;
+				sendObj['bID'] = _model.booster.id;
+			}
+			Post.send(sendObj, onCraftingEvent, {
 				craftCallback:craftCallback
 			});
 		}
@@ -391,15 +398,39 @@ package units
 			showIcon();
 		}
 		
-		override public function click():Boolean 
+		private function refreshEvent():void 
 		{
-			if (App.user.mode == User.GUEST) 
-				return true;
+			Post.send({
+				ctr		:this.type,
+				act		:'refreshcrafts',
+				uID		:App.user.id,
+				id		:this.id,
+				wID		:App.user.worldID,
+				sID		:this.sid
+			}, onRefreshEvent);
+		}
+		
+		private function onRefreshEvent(error:int, data:Object, params:Object):void 
+		{
+			if (error)
+			{
+				Errors.show(error, data);
+				return;
+			}
+			if (data.crafts)
+				_model.craftList = Numbers.objectToArray(data.crafts);
 			new CraftfloorsWindow({
 				target:	this,
 				model:	_model,
 				find:	helpTarget
 			}).show();
+		}
+		
+		override public function click():Boolean 
+		{
+			if (App.user.mode == User.GUEST) 
+				return true;
+			refreshEvent();
 			return true;
 		}
 		

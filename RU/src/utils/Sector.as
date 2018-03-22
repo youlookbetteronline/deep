@@ -155,33 +155,40 @@ package utils
 		private function onOpenNeibors():void 
 		{
 			App.self.removeEventListener(AppEvent.ON_MAP_COMPLETE, onOpenNeibors);
-			if (canOpenNeibors)
+			try 
 			{
-				_sectorsToOpen = [];
-				for each(var _sector:Sector in neighbors)
+				if (canOpenNeibors)
 				{
-					if (App.user.mode == User.OWNER && _sector.id == 718 && App.user.worldID == User.TRAVEL_LOCATION)
-						openBridgeSectors();
-					if (App.user.mode == User.OWNER && (_sector.id == 744 /*|| _sector.id == 708 ||_sector.id == 745 || _sector.id == 709 || _sector.id == 707*/) && App.user.worldID == 3148)
-						openBridgeSectors();
-					_sector.open = true;
-					if (App.user.mode == User.PUBLIC)
+					_sectorsToOpen = [];
+					for each(var _sector:Sector in neighbors)
 					{
-						if (App.owner && App.data.storage[App.owner.worldID].maptype == World.PUBLIC)
+						if (App.user.mode == User.OWNER && _sector.id == 718 && App.user.worldID == User.TRAVEL_LOCATION)
+							openBridgeSectors();
+						if (App.user.mode == User.OWNER && (_sector.id == 744 /*|| _sector.id == 708 ||_sector.id == 745 || _sector.id == 709 || _sector.id == 707*/) && App.user.worldID == 3148)
+							openBridgeSectors();
+						_sector.open = true;
+						if (App.user.mode == User.PUBLIC)
 						{
-							//if(App.owner){
-							//var _ss:Object = {}
-							//_ss[_sector.id] = 1;
-							_sectorsToOpen.push(_sector.id);
+							if (App.owner && App.data.storage[App.owner.worldID].maptype == World.PUBLIC)
+							{
+								//if(App.owner){
+								//var _ss:Object = {}
+								//_ss[_sector.id] = 1;
+								_sectorsToOpen.push(_sector.id);
+							}
 						}
+						
+						if(App.user.mode == User.PUBLIC || (App.user.mode == User.OWNER && App.user.worldID != User.FARM_LOCATION))
+							_sector.checkFog();
 					}
-					
-					if(App.user.mode == User.PUBLIC || (App.user.mode == User.OWNER && App.user.worldID != User.FARM_LOCATION))
-						_sector.checkFog();
+					if (send && App.user.mode == User.PUBLIC && _sectorsToOpen.length > 0)
+						SectorsHelper.sendOpened(_sectorsToOpen);
 				}
-				if (send && App.user.mode == User.PUBLIC && _sectorsToOpen.length > 0)
-					SectorsHelper.sendOpened(_sectorsToOpen);
+			}catch (err:Error)
+			{
+				trace('WARNING');
 			}
+			
 		}
 		
 		
@@ -243,11 +250,12 @@ package utils
 		public function get canOpenNeibors():Boolean
 		{
 			var i:int = 0;
-			if (id == 708)
-				trace();
+
 			for each(var _res:* in resources)
 			{
-				if (defResources.hasOwnProperty(_res.id))
+				if (_res.id == 1515)
+					continue;
+				if (defResources && defResources.hasOwnProperty(_res.id))
 				{
 					if (defResources[_res.id].sid == _res.sid)
 						i++;

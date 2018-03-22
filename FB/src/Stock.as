@@ -326,7 +326,8 @@ package
 						break;
 						
 					default:
-						new BanksWindow().show();
+						if (!Window.hasType(BanksWindow))
+							new BanksWindow().show();
 						break;
 				}
 			} else if(sID == FANTASY) {
@@ -741,6 +742,12 @@ package
 			}
 				
 				Post.send(settings, onBuyEvent, params);
+		}
+		
+		public function buyAll(items:Object):void
+		{
+			for (var itm:* in items)
+				buy(itm, items[itm]);
 		}
 		
 		/**

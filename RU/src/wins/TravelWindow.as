@@ -615,6 +615,7 @@ package wins
 					item.startGlowing();
 					if (loadded || item.bitmap.bitmapData)
 					{
+						item.hidePointing();
 						item.showPointing("top", -item.width / 2, -20, item.parent);
 						setTimeout(function():void{
 							item.hidePointing();
@@ -1355,6 +1356,7 @@ import wins.TravelRequireWindow;
 import wins.TravelPayWindow;
 import wins.BathyscaphePayWindow;
 import wins.SimpleWindow;
+import wins.BubbleSimpleWindow;
 
 internal class TravelItem extends WorldItem {
 	
@@ -1431,12 +1433,12 @@ internal class TravelItem extends WorldItem {
 			drawTemp();
 		}
 		
-		/*if (App.data.storage[sID].hasOwnProperty('start') && App.time < App.data.storage[sID].start[App.social])
+		if (App.data.storage[sID].hasOwnProperty('start') && App.time < App.data.storage[sID].start[App.social])
 		{
 			drawLockStart();
 			finalTime = App.data.storage[sID].start[App.social];
 			drawTemp();
-		}*/
+		}
 		
 		if (App.data.storage[sID].hasOwnProperty('available'))
 		{
@@ -1479,24 +1481,20 @@ internal class TravelItem extends WorldItem {
 	
 	override public function onClick(e:MouseEvent = null):void 
 	{
-		//if (sID == 2001)
-			//return;
-		/*if (App.data.storage[sID].hasOwnProperty('start') && App.time < App.data.storage[sID].start[App.social])
+		if (App.data.storage[sID].hasOwnProperty('start') && App.time < App.data.storage[sID].start[App.social])
 		{
-			var dateOffset:int = 0;	
-			var date:Date = new Date();
-			date.setTime((App.data.storage[sID].start[App.social] + date.timezoneOffset * 60 + 3600 * 12 + dateOffset * 86400) * 1000);
-			var day:int = date.getDate() ;
-			var month:int = date.getMonth() + 1 ;
-			var year:int = date.getFullYear();
-			new SimpleWindow( {
-				title:Locale.__e("flash:1474469531767"),
-				label:SimpleWindow.ATTENTION,
-				text:Locale.__e('flash:1512141658405') + ' ' + App.data.calendar[month].title + ', '+ String(day),
-				popup:true
+			new BubbleSimpleWindow({
+				popup	:true,
+				title	:Locale.__e('flash:1474469531767'),
+				label	:Locale.__e('flash:1406275629192'),
+				timer	:{
+					enabled	: true,
+					text	: Locale.__e('flash:1521557338809'),
+					finish	: App.data.storage[sID].start[App.social]
+				}
 			}).show();
 			return;
-		}*/
+		}
 		if (App.data.storage[sID].hasOwnProperty('reqquest') &&
 		App.data.storage[sID]['reqquest'] != "" &&
 		!App.user.quests.data.hasOwnProperty(App.data.storage[sID]['reqquest']))

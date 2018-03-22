@@ -1922,6 +1922,24 @@ package wins.elements
 		
 		private function onBuyEvent(e:MouseEvent):void 
 		{
+			if (item.hasOwnProperty('reqquest') && item.reqquest)
+			{
+				if (!App.user.data.quests.hasOwnProperty(item.reqquest))
+				{
+					new SimpleWindow( {
+						title			:Locale.__e("flash:1474469531767"),
+						label			:SimpleWindow.ATTENTION,
+						text			:Locale.__e("flash:1521624674173",[item.title, App.data.quests[item.reqquest].title]) + '\n' + Locale.__e('flash:1507967972859'),
+						faderAsClose	:false,
+						popup			:true,
+						dialog			:true,
+						confirm			:function():void{
+							utils.Finder.questInUser(item.reqquest, true);
+						}
+					}).show();
+					return;
+				}
+			}
 			if (price) 
 			{
 				if (!App.user.stock.checkAll(price)) 

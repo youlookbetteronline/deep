@@ -165,7 +165,7 @@ package units
 				level = object.level;
 
 			super(object);
-			multiple = true;
+			multiple = false;
 			moveable = true;
 			stockable = true;
 			

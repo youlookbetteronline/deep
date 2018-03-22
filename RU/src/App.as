@@ -203,7 +203,7 @@ package
 		*/
 
 		public static const ID:* = '29060311';//'30035157';// '774242479407105';
-		public static const SERVER:* = 'DM';
+		public static const SERVER:* = 'VK';
 		public static const SOCIAL:* = 'VK';	
 		public static var lang:String = 'ru'; //de en es fr it nl pl pt tr ru
 		
@@ -216,7 +216,6 @@ package
 			//trace('data seted');
 			_data = _value;
 		}
-		
 		public function App():void 
 		{
 			if (self)
@@ -1875,7 +1874,7 @@ package
 					App.user.auction.closeAuctionWindow();
 					App.user.auction.openAuctionWindow();
 				}
-			}	
+			}
 			
 			if (e.keyCode == Keyboard.M && e.ctrlKey) 
 			{

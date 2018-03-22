@@ -87,6 +87,7 @@ package tree
 			}
 			if (e.ctrlKey)
 				showFirst();
+			
 		}
 		public function clearWindow():void
 		{

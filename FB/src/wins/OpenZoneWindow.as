@@ -3,6 +3,8 @@ package wins
 	import buttons.Button;
 	import buttons.MoneyButton;
 	import buttons.SimpleButton;
+	import core.Size;
+	import core.TimeConverter;
 	import flash.display.Bitmap;
 	import flash.display.Shape;
 	import flash.display.Sprite;
@@ -58,13 +60,55 @@ package wins
 		
 		override public function drawBody():void 
 		{
-			
 			drawRibbon();
 			drawBttn();
 			contentChange();
 			drawDescription();	
 			onUpdateOutMaterial();
+			drawTimeLabel();
 			build();
+		}
+		
+		private function drawTimeLabel():void 
+		{
+			if (App.data.storage[settings.sID].hasOwnProperty('openingtime') && App.data.storage[settings.sID].openingtime.hasOwnProperty('time') && 
+			App.data.storage[settings.sID].openingtime.time != '')
+			{
+				var _timeContainer:Sprite = new Sprite;
+				var _timeBack:Bitmap = new Bitmap(Window.textures.popupBackYellow);
+				_timeContainer.addChild(_timeBack);
+				var _timeTitle:TextField = Window.drawText(Locale.__e('flash:1521536843693'),{
+					color:			0xffdf34,
+					borderColor:	0x451c00,
+					fontSize:		24,
+					textAlign:		'center',
+					width:			_timeBack.width
+				})
+				_timeTitle.x = (_timeBack.width - _timeTitle.width) / 2;
+				_timeTitle.y = 15;
+				_timeContainer.addChild(_timeTitle);
+				var _timeText:TextField = Window.drawText(TimeConverter.timeToDays(App.data.storage[settings.sID].openingtime.time),{
+					color:			0xffdf34,
+					borderColor:	0x451c00,
+					fontSize:		26,
+					textAlign:		'right',
+					width:			90
+				})
+				_timeText.x = _timeBack.width - _timeText.width - 30;
+				_timeText.y = _timeTitle.y + _timeTitle.textHeight + 5;
+				_timeContainer.addChild(_timeText);
+				var timeIcon:Bitmap = new Bitmap(Window.textures.timerDark);
+				Size.size(timeIcon, 29, 29);
+				timeIcon.smoothing = true;
+				timeIcon.x = _timeText.x - timeIcon.width + 5;
+				timeIcon.y = _timeText.y + (_timeText.height - _timeText.height) / 2;
+				_timeContainer.addChild(timeIcon);
+				
+				_timeContainer.x = - 40;
+				_timeContainer.y = - 80;
+				bodyContainer.addChild(_timeContainer);
+			}
+			
 		}
 		
 		private function build():void 
@@ -75,7 +119,7 @@ package wins
 			
 			contentContainer.x = (settings.width - contentContainer.width) / 2;
 			//contentContainer.y = _whiteShape.y + (_whiteShape.height - _items[0].HEIGHT) / 2;
-			contentContainer.y = 120;
+			contentContainer.y = 150;
 		}
 		
 		override public function drawBackground():void
@@ -149,7 +193,7 @@ package wins
 			if (App.user.quests.tutorial)
 			{
 				_applyBttn.showGlowing();
-				_applyBttn.showPointing('bottom', 150, 55, _applyBttn.parent, '', null, false, true);
+				_applyBttn.showPointing('bottom', 0, 55, _applyBttn.parent, '', null, false, true);
 			}
 			
 			

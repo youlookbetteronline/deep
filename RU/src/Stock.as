@@ -326,7 +326,8 @@ package
 						break;
 						
 					default:
-						new BanksWindow().show();
+						if (!Window.hasType(BanksWindow))
+							new BanksWindow().show();
 						break;
 				}
 			} else if(sID == FANTASY) {

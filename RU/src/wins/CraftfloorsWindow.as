@@ -604,6 +604,7 @@ package wins
 						targetGlowing(target)
 					})				
 				}
+				settings.target.helpTarget = 0;
 			}
 			else
 			{
@@ -685,6 +686,7 @@ internal class Slot extends LayerX
 	private var _mode:int;
 	private var _bttn:Button;
 	private var _cancelButton:ImagesButton;
+	private var _craftTime:int = 0;
 	
 	public function Slot(number:int, window:CraftfloorsWindow)
 	{
@@ -698,8 +700,13 @@ internal class Slot extends LayerX
 		drawTitle();
 		drawButton();
 		drawCancel();
-		
-		tip = function():Object{return parseTips();}
+		if (_model.slots[_slotID].hasOwnProperty('fID'))
+		{
+			_craftTime = App.data.crafting[_model.slots[_slotID].fID].time
+			if (_model.booster)
+				_craftTime = int(_craftTime * (100-_model.booster.boostPercent) / 100)
+		}
+		tip = function():Object{return parseTips(); }
 	}
 	
 	private function parseTips():Object 
@@ -722,7 +729,7 @@ internal class Slot extends LayerX
 				return{
 					title:		App.data.storage[App.data.crafting[_model.slots[_slotID].fID].out].title,
 					text:		Locale.__e('flash:1516898812608'),
-					timerText: 	TimeConverter.timeToStr(_model.slots[_slotID].crafted - App.time - App.data.crafting[_model.slots[_slotID].fID].time),
+					timerText: 	TimeConverter.timeToStr(_model.slots[_slotID].crafted - App.time - _craftTime),
 					timer:		true
 				}
 				break;

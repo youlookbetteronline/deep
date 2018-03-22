@@ -118,6 +118,8 @@ package wins
 		{
 			for (var section:* in shop)
 			{
+				if (section == 0)
+					continue;
 				for (var i:* in shop[section].data)
 				{
 					var sid:int = shop[section].data[i].sid;
@@ -1741,7 +1743,7 @@ package wins
 									return true;
 								}
 								else
-									new ShopWindow( { find:[finded[0]] } ).show();			
+									new ShopWindow( { find:finded } ).show();			
 							}
 						}
 					linked = true;	

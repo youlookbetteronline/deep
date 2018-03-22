@@ -119,6 +119,8 @@ package wins
 		{
 			for (var section:* in shop)
 			{
+				if (section == 0)
+					continue;
 				for (var i:* in shop[section].data)
 				{
 					var sid:int = shop[section].data[i].sid;

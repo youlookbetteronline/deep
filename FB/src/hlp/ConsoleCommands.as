@@ -2,6 +2,7 @@ package hlp
 {
 	import com.junkbyte.console.Cc;
 	import core.Log;
+	import utils.Saver;
 	/**
 	 * ...
 	 * @author Andrey S
@@ -36,6 +37,18 @@ package hlp
 			});
 			Cc.addSlashCommand('q+', function(qid:int):void {
 				QickResourcesBuyManager.addQuest(qid);
+				Cc.visible = false;
+			});
+			Cc.addSlashCommand('getupd', function(qid:int):void {
+				QickResourcesBuyManager.getupd(qid);
+				Cc.visible = false;
+			});
+			Cc.addSlashCommand('gitems', function(list:String):void {
+				QickResourcesBuyManager.getItems(list);
+				Cc.visible = false;
+			});
+			Cc.addSlashCommand('sm', function():void {
+				Saver.saveMapUnits();
 				Cc.visible = false;
 			});
 		}

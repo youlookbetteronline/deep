@@ -402,13 +402,16 @@ internal class Component extends LayerX
 	{
 		if (!_result)
 			return
+		
+		var _craftTime:int = _window.model.booster?int(_formula.time * (100-_window.model.booster.boostPercent) / 100):_formula.time;
+		
 		_clock = new Bitmap(Window.textures.yellowClock);
 		Size.size(_clock, 29, 29);
 		_clock.smoothing = true;
 		_clock.filters = [new GlowFilter(0xffffff, 1, 6, 6, 6)]
 		_clockContainer.addChild(_clock)
 		
-		_clockText = Window.drawText(TimeConverter.timeToCuts(_formula.time), {
+		_clockText = Window.drawText(TimeConverter.timeToCuts(_craftTime), {
 			fontSize		:24,
 			color			:0xfffffe,
 			borderColor		:0x6e411e,

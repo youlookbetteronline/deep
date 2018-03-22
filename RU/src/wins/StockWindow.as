@@ -209,19 +209,15 @@ package wins
 									return true
 							}
 						}
-					}
+					}	
 					return false
 		}
 	
 		private function findTargetPage(settings:Object):void {			
-			
-			//for (var section:* in sections) {
 			var j:int = Numbers.countProps(sections);
 			var collectionArray:Array = [];
 			while (j--){
 				var section:* = Numbers.getProp(sections, j).key;
-				//if (App.user.quests.currentQID == 158) 
-					//section = 'others';
 				for (var i:* in sections[section].items) {
 					
 					var sid:int = sections[section].items[i].sid;
@@ -238,7 +234,6 @@ package wins
 					}
 				}
 			}
-			//close();
 			
 			if (settings.hasOwnProperty('find') && settings.find != null && settings.findEvent != 'load' && settings.findEvent != 'unload')
 			{
@@ -276,7 +271,6 @@ package wins
 				"materials":{items:new Array(),page:0},
 				"decors":{items:new Array(),page:0},
 				"harvest":{items:new Array(),page:0},
-			//	"collections":{items:new Array(),page:0},
 				"workers":{items:new Array(),page:0}
 			};
 			

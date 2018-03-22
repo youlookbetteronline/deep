@@ -308,7 +308,7 @@ package units
 			if (data["times"])
 			{
 				kick = data.times;
-				Treasures.bonus(data.bonus, new Point(this.x, this.y));
+				//Treasures.bonus(data.bonus, new Point(this.x, this.y));
 			}
 			
 			showIcon();

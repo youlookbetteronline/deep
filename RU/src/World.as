@@ -24,6 +24,7 @@ package
 	import wins.RoomFader;
 	import wins.SimpleWindow;
 	import wins.Window;
+	import wins.ZoneTimeWindow;
 	import wins.elements.ShopMenu;
 	
 	/**
@@ -61,10 +62,9 @@ package
 			{
 				zones.push(zone);
 			}
-			for each(var czone:* in data.currentOpenZones) 
-			{
-				currentOpenZones.push(czone);
-			}
+			if (data.currentOpenZones)
+				currentOpenZones = data.currentOpenZones;
+
 			buildingStorage = null;
 			buildingStorage = {};
 		}
@@ -292,6 +292,13 @@ package
 					}
 				}
 				if (openWindow && App.user.mode == User.OWNER){
+					if (currentOpenZones.hasOwnProperty(node.z))
+					{
+						new ZoneTimeWindow({
+							zID:	node.z
+						}).show();
+						return false;
+					}
 					showOpenZoneWindow(node.z);
 				}
 				
@@ -342,6 +349,70 @@ package
 				zID:sID,
 				buy:int(buy)
 			}, onOpenZone, {sID:sID, require:require});
+		}
+		
+		public function boostZone(zID:int, callback:Function):void 
+		{
+			Post.send({
+				ctr:'world',
+				act:'boost',
+				uID:App.user.id,
+				wID:App.user.worldID,
+				zID:zID
+			}, onBoostZone, {
+				callback: callback
+			});
+		}
+		
+		private function onBoostZone(error:*, data:*, params:*):void 
+		{
+			if (error)
+				return;
+			App.user.stock.takeAll(data.__take);
+			currentOpenZones = data.currentOpenZones;
+			params.callback();
+		}
+		
+		public function currentOpen(zID:int):void 
+		{
+			Post.send({
+				ctr:'world',
+				act:'zone',
+				uID:App.user.id,
+				wID:App.user.worldID,
+				zID:zID
+			}, onCurrentOpen, {
+				zID:zID
+			});
+		}
+		
+		private function onCurrentOpen(error:*, data:*, params:*):void 
+		{
+			if (error)
+				return;
+				
+			var zID:int = params.zID;
+			
+			if (data.currentOpenZones)
+				currentOpenZones = data.currentOpenZones
+			
+			bonusCoords = new Point(App.map.mouseX, App.map.mouseY);
+			if (data.hasOwnProperty("bonus")) Treasures.bonus(data.bonus, bonusCoords);
+			if (data.hasOwnProperty("reward")) Treasures.bonus(data.reward, bonusCoords);
+			
+			if (currentOpenZones.hasOwnProperty(zID))
+				return;
+			
+			onOpenComplete(zID);
+			bonusCoords = null;
+			
+			removeFakes(zID);
+			
+			//Делаем push в _6e
+			if (App.social == 'FB') {
+				ExternalApi.og('investigate','area');
+			}
+			Fog.openZone(zID);
 		}
 		
 		public function onOpenExpeditionZone(error:*, data:*, params:*):void 
@@ -415,7 +486,12 @@ package
 			if (data.hasOwnProperty("reward")) Treasures.bonus(data.reward, bonusCoords);
 			
 			if (currentOpenZones.hasOwnProperty(sID))
+			{
+				new ZoneTimeWindow({
+					zID: sID
+				}).show()
 				return;
+			}
 			
 			onOpenComplete(sID);
 			bonusCoords = null;

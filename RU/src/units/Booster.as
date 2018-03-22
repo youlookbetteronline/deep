@@ -101,7 +101,10 @@ package units
 			var buildings:Array = Map.findUnits(bSids);
 			for each(var _building:* in buildings)
 			{
-				_building.booster = this;
+				if (_building is Building)
+					_building.booster = this;
+				if (_building is Craftfloors)
+					_building['model'].booster = this;
 			}
 		}
 		

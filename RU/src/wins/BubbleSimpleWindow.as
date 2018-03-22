@@ -1,6 +1,7 @@
 package wins 
 {
 	import buttons.Button;
+	import core.TimeConverter;
 	import flash.display.Bitmap;
 	import flash.events.MouseEvent;
 	import flash.text.TextField;
@@ -14,6 +15,7 @@ package wins
 		private var _leftBttn:Button;
 		private var _rightBttn:Button;
 		private var _confirmBttn:Button;
+		private var _timeToFinish:int = 0;
 		public function BubbleSimpleWindow(_settings:Object=null) 
 		{
 			if (settings == null)
@@ -39,6 +41,11 @@ package wins
 			settings["rightBttnText"] 		= settings.rightBttnText || Locale.__e('flash:1383041104026');
 			settings["confirmBttnText"] 	= settings.confirmBttnText || Locale.__e('flash:1382952380242');
 			settings["dialog"]				= settings.dialog || false;
+			settings["timer"]				= settings["timer"] || {
+				enabled	: false,
+				text	: '',
+				finish	: 0
+			}
 			super(settings);
 		}
 		
@@ -59,16 +66,46 @@ package wins
 		
 		private function drawDescription():void 
 		{
-			_label = Window.drawText(settings.label, {
-				color			:0xffffff,
-				borderColor		:0x2b4a84,
-				borderSize		:4,
-				fontSize		:32,
-				width			:settings.width - 100,
-				textAlign		:'center',
-				wrap			:true,
-				multiline		:true
-			})
+			if (settings.timer && settings.timer.enabled)
+			{
+				_timeToFinish = settings.timer.finish - App.time;
+				_label = Window.drawText(settings.timer.text + '\n' + TimeConverter.timeToDays(_timeToFinish), {
+					color			:0xffffff,
+					borderColor		:0x2b4a84,
+					borderSize		:4,
+					fontSize		:32,
+					width			:settings.width - 100,
+					textAlign		:'center',
+					wrap			:true,
+					multiline		:true
+				})
+				App.self.setOnTimer(rewriteDescription)
+			}
+			else
+			{
+				_label = Window.drawText(settings.label, {
+					color			:0xffffff,
+					borderColor		:0x2b4a84,
+					borderSize		:4,
+					fontSize		:32,
+					width			:settings.width - 100,
+					textAlign		:'center',
+					wrap			:true,
+					multiline		:true
+				})
+			}
+			
+		}
+		
+		private function rewriteDescription():void 
+		{
+			_timeToFinish = settings.timer.finish - App.time;
+			_label.text = settings.timer.text + '\n' + TimeConverter.timeToDays(_timeToFinish)
+			if (_timeToFinish <= 0)
+			{
+				Window.closeAll();
+				App.self.setOffTimer(rewriteDescription);
+			}
 		}
 		
 		private function drawDialogButtons():void 

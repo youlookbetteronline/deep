@@ -41,6 +41,7 @@ package
 	import units.Walkresource;
 	import utils.ActionsHelper;
 	import utils.ObjectsContent;
+	import utils.Saver;
 	import utils.SocketEventsHandler;
 	import wins.SimpleWindow;
 	import units.Character;

@@ -374,7 +374,7 @@ internal class ExtraReward extends Sprite
 	public function ExtraReward(reward:Object) 
 	{
 		for (var i:int = 1; i <= Numbers.countProps(reward.c);i++)
-		{
+		{	
 			extra[reward.m[i]] = reward.c[i];
 		}
 		bg = Window.backing(190, 125, 50, "tipUp");

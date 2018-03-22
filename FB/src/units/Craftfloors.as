@@ -31,6 +31,7 @@ package units
 				return parseTips();
 			}
 			multiple = false
+			stockable = false
 		}
 		
 		
@@ -227,7 +228,7 @@ package units
 		{
 			if (error)
 			{
-				Errors.show(error, data);
+				//Errors.show(error, data);
 				return;
 			}
 			showIcon()
@@ -248,7 +249,7 @@ package units
 		
 		private function craftingEvent(fID:int, craftCallback:Function):void 
 		{
-			Post.send({
+			var sendObj:Object = {
 				ctr		:this.type,
 				act		:'crafting',
 				uID		:App.user.id,
@@ -256,7 +257,13 @@ package units
 				wID		:App.user.worldID,
 				sID		:this.sid,
 				fID		:fID
-			}, onCraftingEvent, {
+			}
+			if (_model.booster)
+			{
+				sendObj['bSID'] = _model.booster.sid;
+				sendObj['bID'] = _model.booster.id;
+			}
+			Post.send(sendObj, onCraftingEvent, {
 				craftCallback:craftCallback
 			});
 		}

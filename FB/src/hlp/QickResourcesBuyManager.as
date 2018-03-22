@@ -9,6 +9,7 @@ package hlp
 	import ui.Cursor;
 	import units.Unit;
 	import wins.ShopWindow;
+	import wins.SimpleWindow;
 	
 	public class QickResourcesBuyManager {
 		
@@ -53,6 +54,41 @@ package hlp
 			Cc.visible = false;
 		}
 		
+		public static function getSid(sid:int):void{
+			//if (App.data.storage[sidNum].type != 'Resource' || sidNum < 184)
+			//{
+				//trace(sidNum + ' ' + App.data.storage[sidNum].title + 'Не являеться ресурсом или его сид меньше 184');
+				//return;
+			//}
+			App.user.stock.buy(sid, 100, function():void{});
+			Cc.visible = false;
+		}
+		
+		public static function getupd(sid:int):void{
+			var t:String = 'Не привязано'
+				if (App.data.updates.hasOwnProperty(User.getUpdate(sid)))
+					t = App.data.updates[User.getUpdate(sid)].title
+				new SimpleWindow( {
+					title:Locale.__e("flash:1474469531767"),
+					label:SimpleWindow.ATTENTION,
+					text:t,
+					popup:true
+				}).show();
+			Cc.visible = false;
+		}
+		
+		public static function getItems(list:String):void{
+			var items:Array = list.split(',');
+			var itemList:Object = {};
+			for each(var itm:String in items)
+			{
+				var itemArray:Array = itm.split(':');
+				itemList[int(itemArray[0])] = int(itemArray[itemArray.length - 1]);
+			}
+			trace();
+			App.user.stock.buyAll(itemList);
+		}
+		
 		public static function addQuest(qid:int):void{
 			var scored:Object = {};
 			var mids:Object = {};
@@ -77,16 +113,6 @@ package hlp
 				}
 			});
 			
-			Cc.visible = false;
-		}
-		
-		public static function getSid(sid:int):void{
-			//if (App.data.storage[sidNum].type != 'Resource' || sidNum < 184)
-			//{
-				//trace(sidNum + ' ' + App.data.storage[sidNum].title + 'Не являеться ресурсом или его сид меньше 184');
-				//return;
-			//}
-			App.user.stock.buy(sid, 100, function():void{});
 			Cc.visible = false;
 		}
 		

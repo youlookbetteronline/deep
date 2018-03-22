@@ -1985,6 +1985,10 @@ package
 		private var PopupBack:Class;
 		public var popupBack:BitmapData = new PopupBack().bitmapData;
 		
+		[Embed(source="Graphics2/Backings/PopupBackYellow.png")]
+		private var PopupBackYellow:Class;
+		public var popupBackYellow:BitmapData = new PopupBackYellow().bitmapData;
+		
 		[Embed(source="Graphics2/Backings/CircleBlueBacking.png")]
 		private var CircleBlueBacking:Class;
 		public var circleBlueBacking:BitmapData = new CircleBlueBacking().bitmapData;
