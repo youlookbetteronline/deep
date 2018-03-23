@@ -172,7 +172,8 @@ package wins
 				_item = new TopItem({
 					window	:this,
 					item	:this.settings.content[i],
-					index	:i
+					index	:i,
+					top		:settings.top
 				});
 				_itemsContainer.addChild(_item);
 				_items.push(_item);
@@ -190,7 +191,8 @@ package wins
 						window	:this,
 						item	:this.settings.content[getOwnerIndex],
 						index	:getOwnerIndex,
-						owner	:true
+						owner	:true,
+						top		:settings.top
 					})
 					_items.push(_ownerItem);
 					
@@ -284,6 +286,7 @@ package wins
 }
 import core.AvaLoad;
 import core.Size;
+import core.TimeConverter;
 import flash.display.Bitmap;
 import flash.display.Shape;
 import flash.display.Sprite;
@@ -445,9 +448,11 @@ internal class TopItem extends LayerX
 	
 	private function drawPoint():void 
 	{
+		var pointString:String = String(_user.points)
 		_pointBitmap = new Bitmap(Window.textures[_settings.bitmapPoints]);
-		
-		_pointText = Window.drawText(_user.points, {
+		if (_settings.top.hasOwnProperty('astime') && _settings.top.astime)
+			pointString = TimeConverter.timeToDays(_user.points)
+		_pointText = Window.drawText(pointString, {
 			color			:0xffe84b,
 			borderColor		:_settings.borderColor,
 			fontSize		:30,

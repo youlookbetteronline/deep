@@ -128,6 +128,8 @@ package utils
 			}
 			var top100DescText:String =  App.data.top[top].description;// Locale.__e('flash:1467807241824');
 			content = content.sortOn('points', Array.NUMERIC | Array.DESCENDING);
+			if (App.data.top[top].hasOwnProperty('reverse') && App.data.top[top].reverse)
+				content = content.reverse();
 			var windowSettings:Object = {
 				target		:null,
 				title		:info.title,

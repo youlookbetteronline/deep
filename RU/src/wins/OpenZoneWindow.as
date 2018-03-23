@@ -264,11 +264,15 @@ package wins
 		}
 		
 		public function onUpdateOutMaterial(e:* = null):void {
-			if (App.user.stock.checkAll(settings.require))
-				_applyBttn.state = Button.NORMAL
-			else
-				_applyBttn.state = Button.DISABLED
-			
+			_applyBttn.state = Button.NORMAL;
+			for (var sid:* in settings.require)
+			{
+				if (App.user.stock.count(sid) < settings.require[sid])
+				{
+					_applyBttn.state = Button.DISABLED;
+					return;
+				}
+			}			
 		}
 		
 		override public function dispose():void

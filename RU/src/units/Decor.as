@@ -56,7 +56,7 @@ package units
 			super(object);
 			
 			touchableInGuest = false;
-			if (App.user.worldID != User.AQUA_HERO_LOCATION)
+			//if (App.user.worldID != User.AQUA_HERO_LOCATION)
 				multiple = true;
 			stockable = true;
 			transable = false;
@@ -441,7 +441,7 @@ package units
 		public var onTouchDecor:Array = [925, 926, 927, 928, 929];
 		override public function calcState(node:AStarNodeVO):int
 		{
-			//return EMPTY;
+			return EMPTY;
 			/*if (onTouchDecor.indexOf(this.sid) == -1)
 				return EMPTY;*/
 				

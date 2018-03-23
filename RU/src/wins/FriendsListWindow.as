@@ -123,6 +123,8 @@ package wins
 			if (Numbers.countProps(settings.model.friends) >= settings.target.info.levels[settings.model.floor].req.friends)
 				close();
 			settings.content = parseContent();
+			if (settings.content.length == 0)
+				close();
 			paginator.itemsCount = settings.content.length;
 			paginator.update()
 			clearItems();

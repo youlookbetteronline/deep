@@ -203,8 +203,8 @@ package
 		*/
 
 		public static const ID:* = '29060311';//'30035157';// '774242479407105';
-		public static const SERVER:* = 'VK';
-		public static const SOCIAL:* = 'VK';	
+		public static const SERVER:* = 'DM';
+		public static const SOCIAL:* = 'DM';	
 		public static var lang:String = 'ru'; //de en es fr it nl pl pt tr ru
 		
 		public static function get data():Object
@@ -1948,6 +1948,11 @@ package
 					}
 				});
 				wind.show();
+			}
+					
+			if (e.keyCode == Keyboard.D && e.ctrlKey && e.altKey) 
+			{
+				TopHelper.showTopWindow(236);
 			}
 			
 			if (e.keyCode == Keyboard.S && e.shiftKey && e.ctrlKey && Config.admin) 

@@ -39,6 +39,9 @@ package wins {
 			settings['width'] += 140 * Numbers.countProps(settings.content) + 90;
 			settings['exitTexture'] = 'closeBttnMetal';
 			super(settings);
+			
+			App.self.addEventListener(AppEvent.ON_CHANGE_STOCK, onUpdateOutMaterial);
+			App.self.addEventListener(AppEvent.ON_AFTER_PACK, onUpdateOutMaterial);
 		}
 		
 		override public function drawBackground():void {
@@ -145,16 +148,18 @@ package wins {
 				});
 				background.x = offsetX;
 				inItem.x = background.x + (background.width - inItem.WIDTH) / 2;
-				inItem.y = 20
+				inItem.y = 20;
 				inItem.addEventListener(WindowEvent.ON_CONTENT_UPDATE, onUpdateOutMaterial)
 				offsetX += background.width + 15;
 				container.addChild(inItem);
 			}
 			container.x = (settings.width - container.width) / 2;
 			container.y = 45;
+			if(inItem)
+				inItem.dispatchEvent(new WindowEvent(WindowEvent.ON_CONTENT_UPDATE));
 		}
 		
-		public function onUpdateOutMaterial(e:WindowEvent = null):void {
+		public function onUpdateOutMaterial(e:* = null):void {
 			buyBttn.visible = false;
 			if (App.user.stock.checkAll(settings.content)) {
 				openBttn.state = Button.NORMAL;

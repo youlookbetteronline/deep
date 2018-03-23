@@ -505,6 +505,8 @@ package api
 				case 'OK':
 				case 'YN':
 					ExternalApi.apiNormalScreenEvent();
+					Cc.log(App.network);
+					Log.alert(App.network.hasOwnProperty('purchase'))
 					App.network.purchase(params);
 					break;
 				case 'YB':

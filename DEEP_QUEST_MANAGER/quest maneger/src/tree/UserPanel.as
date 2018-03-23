@@ -341,7 +341,7 @@ package tree
 					tipText += "\nДэйлик доступен до:\n" + TimeConverter.getDatetime("%Y.%m.%d %H:%i", data.user.daylics.expire)
 				
 				}
-				if (data.user.hasOwnProperty('pay') && App.social != 'FB' && App.social != 'AND' && App.social != 'MDM')
+				if (data.user.hasOwnProperty('pay') &&/* App.social != 'FB' &&*/ App.social != 'AND' && App.social != 'MDM')
 				{
 					tipText += "\n-----------------------";
 					var valute:String = User.getLocalValute(data.user.pay);

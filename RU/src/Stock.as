@@ -579,8 +579,13 @@ package
 			if (sID == Stock.FANTASY) {
 				Cc.log("Energy(add): +"+count+"  total:"+App.user.stock.data[Stock.FANTASY]);
 			}
-			
-			App.self.dispatchEvent(new AppEvent(AppEvent.ON_CHANGE_STOCK));		
+			try{
+				App.self.dispatchEvent(new AppEvent(AppEvent.ON_CHANGE_STOCK));	
+			}catch (err:Error)
+			{
+				trace('WARNING')
+			}
+				
 		}
 		
 		public function checkDaylics(sID:uint):void 

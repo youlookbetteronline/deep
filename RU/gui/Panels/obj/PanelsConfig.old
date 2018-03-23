@@ -16,7 +16,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'15.09.2017'</value>
+      <value>'23.03.2018'</value>
     </define>
     <define append="true">
       <name>CONFIG::air</name>
@@ -34,12 +34,12 @@
     <omit-trace-statements>true</omit-trace-statements>
     <verbose-stacktraces>false</verbose-stacktraces>
     <source-path append="true">
-      <path-element>D:\GIT\deep\gui\Panels\src</path-element>
+      <path-element>D:\DEEP_GIT\gui\Panels\src</path-element>
       <path-element>C:\Program Files (x86)\FlashDevelop\Library\AS3\classes</path-element>
     </source-path>
   </compiler>
   <file-specs>
-    <path-element>D:\GIT\deep\gui\Panels\src\PanelsLib.as</path-element>
+    <path-element>D:\DEEP_GIT\gui\Panels\src\PanelsLib.as</path-element>
   </file-specs>
   <default-background-color>#FFFFFF</default-background-color>
   <default-frame-rate>30</default-frame-rate>

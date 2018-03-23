@@ -617,6 +617,14 @@ package
 		private var RemoveFav:Class;
 		public var removeFav:BitmapData = new RemoveFav().bitmapData; 
 		
+		[Embed(source = "Graphics2/TopBacking.png")]
+		private var TopBacking:Class;
+		public var topBacking:BitmapData = new TopBacking().bitmapData; 
+		
+		[Embed(source = "Graphics2/RedBubbleSmall.png")]
+		private var RedBubbleSmall:Class;
+		public var redBubbleSmall:BitmapData = new RedBubbleSmall().bitmapData; 
+		
 		
 		public function PanelsLib():void 
 		{

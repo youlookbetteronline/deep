@@ -171,9 +171,10 @@ package
 				case "FS":
 					text = '%d ФМ'; 
 				case "FB":
+				case "FBD":
 					//price = price * App.network.currency.usd_exchange_inverse;
 					//price = int(price * 100) / 100;
-					//text = price + ' ' + App.network.currency.user_currency; 
+					text = String(price) + ' зелени'/* + ' ' + App.network.currency.user_currency*/; 
 				break;
 				/*case "NK":
 					text = '%d €GB'; 

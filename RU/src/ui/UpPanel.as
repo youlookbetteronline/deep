@@ -47,6 +47,7 @@ package ui
 	import wins.FriendsSocketWindow;
 	import wins.InviteSocketWindow;
 	import wins.LevelUpWindow;
+	import wins.TopListWindow;
 	import wins.TopWindow;
 	import wins.TravelWindow;
 	import wins.elements.BankMenu;
@@ -105,6 +106,7 @@ package ui
 		public var basketSprite:LayerX = new LayerX();
 		public var moxieSprite:LayerX = new LayerX();
 		public var discountSprite:LayerX = new LayerX();
+		public var topSprite:LayerX = new LayerX();
 		public var coinsSprite:LayerX = new LayerX();
 		public var fantSprite:LayerX = new LayerX();
 		public var robotSprite:LayerX = new LayerX();
@@ -732,6 +734,7 @@ package ui
 			//if (Config.admin)
 			if (!App.isSocial('SP'))
 				drawDiscount();
+			drawTopContainer();
 			addChild(calendarBttn);
 			if (App.isSocial('FS'))
 				addChild(auctionBttn);
@@ -760,6 +763,9 @@ package ui
 			
 			discountSprite.x = calendarBttn.x - discountSprite.width + 110;
 			discountSprite.y = calendarBttn.y + (calendarBttn.height - discountSprite.height) / 2 + 5;
+			
+			topSprite.x = calendarBttn.x - topSprite.width - 20;
+			topSprite.y = calendarBttn.y + (calendarBttn.height - topSprite.height) / 2 + 7;
 			//winterInformerBttn.x = calendarBttn.x - 80;
 			//winterInformerBttn.y = calendarBttn.y - 5;
 			expSprite.mouseChildren = false;
@@ -1038,6 +1044,24 @@ package ui
 					text:	App.data.storage[sID].description
 				}
 			}
+		}
+		
+		private function drawTopContainer():void 
+		{
+			var topBacking:Bitmap = new Bitmap(UserInterface.textures.topBacking);
+			Size.size(topBacking, 55, 55);
+			topBacking.smoothing = true;
+			topSprite.addChild(topBacking);
+			
+			topSprite.addEventListener(MouseEvent.CLICK, onTopClick)
+			//addChild(topSprite);
+		}
+		
+		private function onTopClick(e:MouseEvent):void 
+		{
+			new TopListWindow({
+				
+			}).show();
 		}
 		
 		private function onDiscountClick(e:MouseEvent):void 
@@ -2383,6 +2407,9 @@ package ui
 			discountSprite.x = calendarBttn.x - discountSprite.width + 110;
 			discountSprite.y = calendarBttn.y + (calendarBttn.height - discountSprite.height) / 2 + 5;
 			
+			topSprite.x = calendarBttn.x - topSprite.width - 20;
+			topSprite.y = calendarBttn.y + (calendarBttn.height - topSprite.height) / 2 + 7;
+			
 			if (confirmBttn) 
 			{
 				confirmBttn.x = (App.self.stage.stageWidth - confirmBttn.width) / 2;
@@ -2872,6 +2899,7 @@ package ui
 				calendarBttn.visible = false;
 				auctionBttn.visible = false;
 				discountSprite.visible = false;
+				topSprite.visible = false;
 				return;
 			}
 				
@@ -2884,10 +2912,12 @@ package ui
 			{
 				auctionBttn.visible = false;
 				discountSprite.visible = false;
+				topSprite.visible = false;
 			}
 			else
 			{
 				discountSprite.visible = true;
+				topSprite.visible = true;
 				//auctionBttn.visible = true;//ВРЕМЕННО
 				for each (var auction:Object in App.data.auctions) 
 				{

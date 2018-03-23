@@ -589,7 +589,7 @@ package api
 				params["currency"] = "ok",
 				params["callback"] = "true";
 			}
-			if (object.money == "energy") 
+			if (object.money == "Energy") 
 			{
 				//Odnoklassniki.showPayment(
 					//object.title,
