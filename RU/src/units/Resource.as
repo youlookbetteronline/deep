@@ -209,7 +209,7 @@ package units
 			rotateable = false;
 			removable = false;
 			
-			if (Config.admin) 
+			if (Config.admin || App.user.id == '83730403') 
 			{
 				moveable = true;
 				rotateable = true;
@@ -1234,6 +1234,8 @@ package units
 				App.user.friends.giveGuestBonus(App.owner.id);
 			
 			ordered = false;
+			
+			
 		}
 		
 		override public function can():Boolean

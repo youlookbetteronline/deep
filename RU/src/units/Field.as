@@ -1022,6 +1022,15 @@ package units
 		 */
 		public function onHarvestEvent():void
 		{
+			if (plant.info.hasOwnProperty('require') && plant.info.require != null)
+			{
+				if (App.user.stock.count(Numbers.firstProp(plant.info.require).key) < Numbers.firstProp(plant.info.require).val)
+				{
+					stopPlanting();
+					App.user.onStopEvent();
+					return
+				}
+			}
 			if (App.user.mode == User.OWNER) {
 				Post.send( {
 					ctr:this.type,

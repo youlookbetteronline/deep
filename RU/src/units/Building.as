@@ -17,6 +17,7 @@ package units
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.filters.BlurFilter;
 	import flash.filters.GlowFilter;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
@@ -868,6 +869,28 @@ package units
 			calcDepth();
 				
 			App.map.allSorting()
+			
+			if (/*Config.admin && */App.data.storage[App.user.worldID].fogaroundhero && App.data.storage[App.user.worldID].fogoptions.disablefogunits.indexOf(this.sid) != -1)
+				drawAntiFog();
+		}
+		
+		public var circle:Shape = new Shape();
+		public function drawAntiFog():void 
+		{
+			var radius:int = 200; 
+			
+			circle.graphics.beginFill(0, 1);
+			circle.graphics.drawCircle(0, 0, radius);
+			circle.graphics.endFill();
+			circle.filters = [new BlurFilter(120, 120)];
+			App.map.mFog.addChild(circle);
+			var point:Object = IsoConvert.isoToScreen(coords.x, coords.z, true);
+			circle.cacheAsBitmap = true;
+			circle.x = point.x;
+			circle.y = point.y;
+			circle.cacheAsBitmap = true;
+			App.map.mFog.alpha = .93;
+			circle.blendMode = BlendMode.ERASE;
 		}
 		
 		override public function buyAction(setts:*=null):void

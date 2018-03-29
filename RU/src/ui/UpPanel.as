@@ -764,7 +764,7 @@ package ui
 			discountSprite.x = calendarBttn.x - discountSprite.width + 110;
 			discountSprite.y = calendarBttn.y + (calendarBttn.height - discountSprite.height) / 2 + 5;
 			
-			topSprite.x = calendarBttn.x - topSprite.width - 20;
+			topSprite.x = calendarBttn.x - 60;
 			topSprite.y = calendarBttn.y + (calendarBttn.height - topSprite.height) / 2 + 7;
 			//winterInformerBttn.x = calendarBttn.x - 80;
 			//winterInformerBttn.y = calendarBttn.y - 5;
@@ -1035,7 +1035,7 @@ package ui
 			discountText.x = backDiscount.x + backDiscount.width + 6;
 			discountText.y = backDiscount.y + (backDiscount.height - discountText.height) / 2 + 1;
 			discountSprite.addChild(discountText);
-			addChild(discountSprite);
+			//addChild(discountSprite);
 			
 			discountSprite.addEventListener(MouseEvent.CLICK, onDiscountClick)
 			discountSprite.tip = function():Object{
@@ -1045,23 +1045,118 @@ package ui
 				}
 			}
 		}
-		
+		private var topBacking:Bitmap;
+		private var counterBack:Bitmap;
+		private var counterText:TextField;
 		private function drawTopContainer():void 
 		{
-			var topBacking:Bitmap = new Bitmap(UserInterface.textures.topBacking);
+			var counter:int = 0;
+			if (topSprite && topSprite.parent)
+				topSprite.parent.removeChild(topSprite);
+			if (counterBack && counterBack.parent)
+				counterBack.parent.removeChild(counterBack);
+			if (counterText && counterText.parent)
+				counterText.parent.removeChild(counterText);
+			if (topBacking && topBacking.parent)
+				topBacking.parent.removeChild(topBacking);
+			if (topSprite.hasEventListener(MouseEvent.CLICK))
+				topSprite.removeEventListener(MouseEvent.CLICK, onTopClick);
+			var content:Array = TopHelper.getActiveTops();
+			topBacking = new Bitmap(UserInterface.textures.topBacking);
+			var usertops:Object = App.user.storageRead('usertops', {});
 			Size.size(topBacking, 55, 55);
 			topBacking.smoothing = true;
 			topSprite.addChild(topBacking);
 			
-			topSprite.addEventListener(MouseEvent.CLICK, onTopClick)
-			//addChild(topSprite);
+			for each(var i:* in content)
+			{
+				if (!usertops.hasOwnProperty(i))
+					counter++;
+			}
+			if (counter > 0)
+			{
+				counterBack = new Bitmap(UserInterface.textures.redBubbleSmall);
+				Size.size(counterBack, 23, 23);
+				counterBack.smoothing = true;
+				counterBack.x = topBacking.x + (topBacking.width - counterBack.width) / 2;
+				counterBack.y = -7;
+				topSprite.addChild(counterBack);
+				
+				counterText = Window.drawText(String(counter),{
+					color:		0xf5ff57,
+					borderColor:0x82321a,
+					textAlign:	"center",
+					fontSize:	14
+				})
+				counterText.x = counterBack.x + (counterBack.width - counterText.width) / 2;
+				counterText.y = counterBack.y + (counterBack.height - counterText.height) / 2;
+				topSprite.addChild(counterText);
+			}
+			topSprite.addEventListener(MouseEvent.CLICK, onTopClick(content, usertops));
+			addChild(topSprite);
 		}
 		
-		private function onTopClick(e:MouseEvent):void 
+		private function onTopClick(content:Array, usertops:*):Function 
 		{
-			new TopListWindow({
+			return function(e:MouseEvent):void {
+				new TopListWindow({
+					content	:content
+				}).show();
+				for each(var _top:* in content)
+				{
+					usertops[_top] = 1;
+				}
+				App.user.storageStore('usertops', usertops);
+				redrawTopContainer();
+			}
+			
+		}
+		
+		private function redrawTopContainer():void 
+		{
+			var counter:int = 0;
+			if (topSprite && topSprite.parent)
+				topSprite.parent.removeChild(topSprite);
+			if (counterBack && counterBack.parent)
+				counterBack.parent.removeChild(counterBack);
+			if (counterText && counterText.parent)
+				counterText.parent.removeChild(counterText);
+			if (topBacking && topBacking.parent)
+				topBacking.parent.removeChild(topBacking);
+			var content:Array = TopHelper.getActiveTops();
+			topBacking = new Bitmap(UserInterface.textures.topBacking);
+			var usertops:Object = App.user.storageRead('usertops', {});
+			Size.size(topBacking, 55, 55);
+			topBacking.smoothing = true;
+			
+			topSprite.addChild(topBacking);
+			
+			for each(var i:* in content)
+			{
+				if (!usertops.hasOwnProperty(i))
+					counter++;
+			}
+			if (counter > 0)
+			{
+				counterBack = new Bitmap(UserInterface.textures.redBubbleSmall);
+				Size.size(counterBack, 23, 23);
+				counterBack.smoothing = true;
+				counterBack.x = topBacking.x + (topBacking.width - counterBack.width) / 2;
+				counterBack.y = -7;
 				
-			}).show();
+				topSprite.addChild(counterBack);
+				
+				counterText = Window.drawText(String(counter),{
+					color:		0xf5ff57,
+					borderColor:0x82321a,
+					textAlign:	"center",
+					fontSize:	14
+				})
+				counterText.x = counterBack.x + (counterBack.width - counterText.width) / 2;
+				counterText.y = counterBack.y + (counterBack.height - counterText.height) / 2;
+				topSprite.addChild(counterText);
+			}
+			addChild(topSprite);
 		}
 		
 		private function onDiscountClick(e:MouseEvent):void 
@@ -2407,7 +2502,7 @@ package ui
 			discountSprite.x = calendarBttn.x - discountSprite.width + 110;
 			discountSprite.y = calendarBttn.y + (calendarBttn.height - discountSprite.height) / 2 + 5;
 			
-			topSprite.x = calendarBttn.x - topSprite.width - 20;
+			topSprite.x = calendarBttn.x - 60;
 			topSprite.y = calendarBttn.y + (calendarBttn.height - topSprite.height) / 2 + 7;
 			
 			if (confirmBttn) 

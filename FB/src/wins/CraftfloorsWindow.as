@@ -252,7 +252,7 @@ package wins
 			if (!App.user.stock.check(3, int(e.currentTarget.countLabel.text)))
 			{
 				close();
-				new BanksWindow( { section:e.currentTarget.settings.mode } ).show();
+				/*new BanksWindow( { section:e.currentTarget.settings.mode } ).show();*/
 				return;
 			}
 			_model.boostCallback(_model.craftingSlot, contentChange)
@@ -604,6 +604,7 @@ package wins
 						targetGlowing(target)
 					})				
 				}
+				settings.target.helpTarget = 0;
 			}
 			else
 			{

@@ -208,10 +208,10 @@ package
 		 * Marcel Pijakowski:	FB: 1884987568449576
 		*/
 		//ФБшный ДИП
-		public static const ID:* = '116921159109380';//'30035157';// '774242479407105';
+		public static const ID:* = '830321993812336';//'30035157';// '774242479407105';
 		public static const SERVER:* = 'FB';
 		public static const SOCIAL:* = 'FB';
-		public static var lang:String = 'ru'; //de en es fr it nl pl pt tr ru
+		public static var lang:String = 'en'; //de en es fr it nl pl pt tr ru
 		
 		public function App():void 
 		{

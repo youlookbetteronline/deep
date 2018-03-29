@@ -545,7 +545,6 @@ internal class KickItem extends LayerX
 	{
 		if (e.currentTarget.mode == Button.DISABLED)
 			return;
-		e.currentTarget.state = Button.DISABLED;
 		if (_info.type == 'mdonate')
 		{
 			if (!App.user.stock.checkAll(App.data.storage[_info.m].price))

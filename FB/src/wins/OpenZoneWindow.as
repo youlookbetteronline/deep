@@ -35,7 +35,17 @@ package wins
 				settings = new Object();
 			
 			settings["width"] = 510;
-			settings["height"] = 420;
+			settings["height"] = 400;
+			/*if (App.user.stock.checkAll(settings.require))
+				settings["height"] = 400*/
+			for (var req:* in settings.require)
+			{
+				if (App.user.stock.count(req) < settings.require[req])
+				{
+					settings["height"] = 440;
+					break;
+				}
+			}
 			settings["popup"] = true;
 			settings["exitTexture"] = 'closeBttnMetal';
 			settings['hasPaper'] = true;
@@ -264,10 +274,15 @@ package wins
 		}
 		
 		public function onUpdateOutMaterial(e:* = null):void {
-			if (App.user.stock.checkAll(settings.require))
-				_applyBttn.state = Button.NORMAL
-			else
-				_applyBttn.state = Button.DISABLED
+			_applyBttn.state = Button.NORMAL;
+			for (var sid:* in settings.require)
+			{
+				if (App.user.stock.count(sid) < settings.require[sid])
+				{
+					_applyBttn.state = Button.DISABLED;
+					return;
+				}
+			}
 			
 		}
 		

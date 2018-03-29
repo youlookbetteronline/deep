@@ -195,15 +195,19 @@ package wins
 		private function onConfirmEvent(e:MouseEvent):void 
 		{
 			if (settings.confirmBttnEvent)
-				settings.confirmBttnEvent
+				settings.confirmBttnEvent();
 			else
 				close();
 		}
 		
 		private function build():void 
 		{
-			exit.y += 13;
-			exit.x -= 15;
+			if (exit)
+			{
+				exit.y += 13;
+				exit.x -= 15;
+			}
+			
 			
 			_label.x = (settings.width - _label.width) / 2;
 			_label.y = 30

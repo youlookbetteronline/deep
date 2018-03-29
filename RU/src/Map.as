@@ -606,7 +606,8 @@ package
 			//mUnits.addChild(mEffects);
 			mUnits.addChild(mIcon);
 			mFog.cacheAsBitmap = true;
-			//mUnits.addChild(mFog);
+			if (App.data.storage[App.user.worldID].fogaroundhero/* && Config.admin*/)
+				mUnits.addChild(mFog);
 			
 			
 			//mEffects.addChild(centerPoint);

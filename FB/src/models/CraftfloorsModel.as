@@ -25,6 +25,7 @@ package models
 		private var _unlockCallback :Function;
 		private var _boostCallback :Function;
 		private var _cancelCallback :Function;
+		private var _refreshCallback :Function;
 		private var _craftingSlot :int;
 		private var _finishedSlots :Array;
 		private var _toThrow:Object;
@@ -255,6 +256,16 @@ package models
 		public function set cancelCallback(value:Function):void 
 		{
 			_cancelCallback = value;
+		}
+		
+		public function get refreshCallback():Function 
+		{
+			return _refreshCallback;
+		}
+		
+		public function set refreshCallback(value:Function):void 
+		{
+			_refreshCallback = value;
 		}
 		
 	}

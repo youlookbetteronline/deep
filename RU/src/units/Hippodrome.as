@@ -251,7 +251,7 @@ package units
 			if (App.user.data.user.top && App.user.data.user.top.hasOwnProperty(topID) && App.user.data.user.top[topID][istanceTop])
 			{
 				var bonusInfo:Object = App.user.data.user.top[topID][istanceTop];
-				if (bonusInfo.hasOwnProperty('tbonus') && bonusInfo['tbonus'] != 0)
+				if (bonusInfo.hasOwnProperty('tbonus') && bonusInfo['tbonus'])
 				{
 					Post.send( {
 						ctr:	'top',
@@ -271,7 +271,7 @@ package units
 					return true;
 				}
 				
-				if (bonusInfo.hasOwnProperty('lbonus') && bonusInfo['lbonus'] != 0)
+				if (bonusInfo.hasOwnProperty('lbonus') && bonusInfo['lbonus'])
 				{
 					Post.send( {
 						ctr:	'top',

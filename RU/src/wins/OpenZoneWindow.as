@@ -35,7 +35,17 @@ package wins
 				settings = new Object();
 			
 			settings["width"] = 510;
-			settings["height"] = 420;
+			settings["height"] = 400;
+			/*if (App.user.stock.checkAll(settings.require))
+				settings["height"] = 400*/
+			for (var req:* in settings.require)
+			{
+				if (App.user.stock.count(req) < settings.require[req])
+				{
+					settings["height"] = 440;
+					break;
+				}
+			}
 			settings["popup"] = true;
 			settings["exitTexture"] = 'closeBttnMetal';
 			settings['hasPaper'] = true;

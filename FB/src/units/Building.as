@@ -53,8 +53,7 @@ package units
 	{
 		public static const BUILD:String = 'build';
 		public static const BOOST:String = 'boost';
-		public static const ALWAYS_ANIMATED:Array = [183, 306, 500, 988, 1722, 1884, 1891, 1890, 1889, 1888, 2081, 2315, 2207, 2399, 2622, 2739, 2799, 2804, 2957, 3061, 3067, 3264, 3265, 3317, 3516];	// Постоянная анимация при окончании постройки
-		
+		public static const ALWAYS_ANIMATED:Array = [183, 306, 500, 988, 1722, 1884, 1891, 1890, 1889, 1888, 2081, 2315, 2207, 2399, 2622, 2739, 2799, 2804, 2957, 3061, 3067, 3264, 3265, 3317, 3516, 3639, 3641, 3638, 3685];
 		public static const TRAVEL_COURTS:Array = [1679, 1685, 1686];	// Молянки для походной локи
 		public static const CHANK_ARRAY:Array = [1687]
 		

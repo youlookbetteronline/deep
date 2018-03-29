@@ -634,8 +634,8 @@ package wins
 				}
 				
 				//Скрываем залоченные портом локи
-				if (!App.user.worlds.hasOwnProperty(int(s)) && s == User.AQUA_HERO_LOCATION)
-					item.visible = false;
+				/*if (!App.user.worlds.hasOwnProperty(int(s)) && s == User.AQUA_HERO_LOCATION)
+					item.visible = false;*/
 					
 				//И другие костыли
 				if(Stock.isExist(1242) == false && s == User.SHARK_LOCATION && !App.user.worlds.hasOwnProperty(User.SHARK_LOCATION))

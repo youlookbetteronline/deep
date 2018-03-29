@@ -68,6 +68,10 @@ package utils
 					if (this.id == 791 || this.id == 829)
 						open = true;
 					break;
+				case 3602:
+					if (this.id == 160)
+						open = true;
+					break;
 			}
 			if (App.user.mode == User.PUBLIC)
 			{

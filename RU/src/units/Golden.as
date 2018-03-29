@@ -7,7 +7,9 @@ package units
 	import core.Post;
 	import core.TimeConverter;
 	import flash.display.Bitmap;
+	import flash.display.BlendMode;
 	import flash.display.Shape;
+	import flash.filters.BlurFilter;
 	import flash.filters.GlowFilter;
 	import flash.geom.Point;
 	import flash.system.System;
@@ -249,7 +251,7 @@ package units
 				return false;
 			}
 			
-			if (App.user.useSectors)
+			if (App.user.useSectors && sid != 3721)
 			{
 				var node1:AStarNodeVO = App.map._aStarNodes[this.coords.x][this.coords.z];
 				
@@ -291,6 +293,7 @@ package units
 		
 		override public function calcState(node:AStarNodeVO):int
 		{
+			//return EMPTY;
 			if (info.market == 17)
 			{
 				for (var n:uint = 0; n < cells; n++) 
@@ -742,7 +745,28 @@ package units
 				Load.clearCache(Config.getSwf(type, info.view));
 				data = null;
 			}
+			/*if (App.data.storage[App.user.worldID].fogaroundhero && App.data.storage[App.user.worldID].fogoptions.disablefogunits.indexOf(this.sid) != -1)
+				drawAntiFog();*/
 		}
+		
+		/*public var circle:Shape = new Shape();
+		public function drawAntiFog():void 
+		{
+			var radius:int = 200; 
+			
+			circle.graphics.beginFill(0, 1);
+			circle.graphics.drawCircle(0, 0, radius);
+			circle.graphics.endFill();
+			circle.filters = [new BlurFilter(120, 120)];
+			App.map.mFog.addChild(circle);
+			var point:Object = IsoConvert.isoToScreen(coords.x, coords.z, true);
+			circle.cacheAsBitmap = true;
+			circle.x = point.x;
+			circle.y = point.y;
+			circle.cacheAsBitmap = true;
+			App.map.mFog.alpha = .93;
+			circle.blendMode = BlendMode.ERASE;
+		}*/
 		
 		public function deleteParent():void 
 		{

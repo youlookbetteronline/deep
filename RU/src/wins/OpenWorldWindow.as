@@ -161,10 +161,19 @@ package wins {
 		
 		public function onUpdateOutMaterial(e:* = null):void {
 			buyBttn.visible = false;
-			if (App.user.stock.checkAll(settings.content)) {
+			/*if (App.user.stock.checkAll(settings.content)) {
 				openBttn.state = Button.NORMAL;
 			} else {
 				openBttn.state = Button.DISABLED;
+			}*/
+			openBttn.state = Button.NORMAL;
+			for (var sid:* in settings.content)
+			{
+				if (App.user.stock.count(sid) < settings.content[sid])
+				{
+					openBttn.state = Button.DISABLED;
+					return;
+				}
 			}
 		}
 		

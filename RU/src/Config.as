@@ -11,9 +11,9 @@ package
 	{
 		//public static var FVResourcesVersion:int;
 		public static var totalVersion:int;		
-		public static var versionObjects:int 		= 704  + totalVersion;		//Обьекты
-		public static var versionInterface:int 		= 354  + totalVersion;		//Интерфейс
-		public static var versionImages:int 		= 1094 + totalVersion;		//Icons + Images
+		public static var versionObjects:int 		= 708   + totalVersion;		//Обьекты
+		public static var versionInterface:int 		= 355  + totalVersion;		//Интерфейс
+		public static var versionImages:int 		= 1097 + totalVersion;		//Icons + Images
 		
 		public static var _mainIP:Array;
 		public static var _resIP:*;
@@ -180,7 +180,7 @@ package
 		
 		public static function getLandData(landId:String = '4'):String 
 		{
-			return secure + _curIP + '/app/data/php/islands/' + String(landId) + '.json?v=28';
+			return secure + _curIP + '/app/data/php/islands/' + String(landId) + '.json?v=29';
 		}
 		
 		public static function getLocale(lg:String):String

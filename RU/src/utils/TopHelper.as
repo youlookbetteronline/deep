@@ -16,6 +16,8 @@ package utils
 		public static const LOOSER:int = 2;
 		public function TopHelper() 
 		{	}
+		public static const WEEKLY:int = 1;
+		public static const MOUNTHLY:int = 2;
 		private static var expire:int;
 		private static var top:int = 0;
 		private static var targetSid:int = 0;
@@ -51,6 +53,20 @@ package utils
 			}
 			
 			return -1;
+		}
+		
+		/**
+		 * definition of active tops
+		 */
+		public static function getActiveTops():Array	
+		{
+			var result:Array = [];
+			for (var it:* in App.data.top)
+			{
+				if (App.data.top[it].expire.s < App.time && App.data.top[it].expire.e > App.time)
+					result.push(it);
+			}
+			return result;
 		}
 		
 		public static function showTopWindow(targetSid:int):void

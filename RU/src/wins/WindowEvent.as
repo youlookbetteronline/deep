@@ -21,14 +21,17 @@ package wins
 		
 		public static const ON_HUT_UPDATE:String 	= "onHutUpdate";
 		public static const ON_PROGRESS:String 		= "onProgress";
+		public static const ON_DELETE_WORLD:String 	= "onDeleteWorld";
 		
 		public static const ON_CLOSED_BY_USER:String		= "onClosedByUser";
 		
+		public var params:Object;
 		public var customMessage:String = "";
 		
-		public function WindowEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false):void
+		public function WindowEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false, params:Object = null):void
 		{
 			super(type, bubbles, cancelable);
+			this.params = params;
 		}
 	}
 }

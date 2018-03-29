@@ -116,7 +116,7 @@ package
 		public static const BOY_BODY:uint 			= 10;
 		public static const BOY_HEAD:uint 			= 718;
 		
-		public static var sectorsLocations:Array 	= [1627, 1733, 2001, 2633, 2698, 2740, 2975, 3148];
+		public static var sectorsLocations:Array 	= [1627, 1733, 2001, 2633, 2698, 2740, 2975, 3148, 3602];
 		public static var checkBoxState:int = 1;
 		
 		public var buyActions:Object = {};
@@ -842,6 +842,7 @@ package
 		{
 			if (App.user.mode == User.OWNER && !App.self.fakeMode && 
 			   (User.sectorsLocations.indexOf(App.user.worldID) != -1 || 
+			   /*(App.user.worldID == 3602 && Config.admin) || */
 			   (App.user.openedRadarMaps.indexOf(App.user.worldID) != -1)))
 				return true;
 			if (App.user.mode == User.PUBLIC)

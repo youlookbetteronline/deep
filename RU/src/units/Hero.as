@@ -21,6 +21,7 @@ package units
 	import ui.UnitIcon;
 	import ui.UserInterface;
 	import utils.InviteHelper;
+	import wins.BubblePreviewWindow;
 	import wins.HeroWindow;
 	import wins.SimpleWindow;
 	import wins.ValentineWindow;
@@ -307,9 +308,23 @@ package units
 				
 			addAnimation();
 			App.map.allSorting();
-			//drawAntiFog();
+			if (App.data.storage[App.user.worldID].fogaroundhero/* && Config.admin*/)
+				drawAntiFog();
+			if (App.data.storage[App.user.worldID].previewwindow)
+			{
+				var preview:Object = App.user.storageRead('previewwindow', {});
+				if (preview.hasOwnProperty(App.user.worldID))
+					return;
+				preview[App.user.worldID] = App.time;
+				App.user.storageStore('previewwindow', preview);
+				new BubblePreviewWindow({
+					description	:App.data.storage[App.user.worldID].windowoptions.description,
+					title	:App.data.storage[App.user.worldID].windowoptions.title,
+					image	:App.data.storage[App.user.worldID].windowoptions.preview
+				}).show();
+			}
 		}
-		/*
+		
 		override public function set x(value:Number):void 
 		{
 			super.x = value;
@@ -321,12 +336,12 @@ package units
 		{
 			super.y = value;
 			circle.y = y;
-		}*/
+		}
 		
 		public var circle:Shape = new Shape();
 		public function drawAntiFog():void 
 		{
-			var radius:int = 300; 
+			var radius:int = App.data.storage[App.user.worldID].fogoptions.radius; 
 			
 			circle.graphics.beginFill(0, 1);
 			circle.graphics.drawCircle(0, 0, radius);
@@ -461,6 +476,15 @@ package units
 		private var petTimer:uint = 1;
 		override public function initMove(cell:int, row:int, _onPathComplete:Function = null):void
 		{
+			if (App.data.storage[App.user.worldID].fogaroundhero && App.data.storage[App.user.worldID].fogoptions.blockwalking/* && Config.admin*/)
+			{
+				var heroPoint:* = IsoConvert.isoToScreen(this.cell, this.row, true);
+				var targetPoint:* = IsoConvert.isoToScreen(cell, row, true);
+				var lp:int = Math.pow(targetPoint.x - heroPoint.x, 2) + Math.pow(targetPoint.y - heroPoint.y, 2)
+				if (lp > Math.pow(300, 2))
+					return;
+			}
+			
 			if (Hero.crabBart)
 			{
 				var place:Object = findPlaceNearTarget({info:{area:{w:1, h:1}}, coords:{x:cell, z:row}}, 4);
@@ -542,7 +566,8 @@ package units
 				if (snails.indexOf(this.sid) != -1){
 					this.blocked = true;
 				}else{
-					noWay(cell, row);
+					if (App.user.worldID != 3602)
+						noWay(cell, row);
 				}
 				
 				if (path == null)

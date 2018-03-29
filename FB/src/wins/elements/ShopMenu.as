@@ -116,6 +116,9 @@ package wins.elements
 				case 3526: 
 					arrSquence = [100, 4, 2, 7];
 					break;
+				case 3629: 
+					arrSquence = [100, 3, 4, 2, 7];
+					break;
 				/*case User.VILLAGE_MAP: 
 					arrSquence = [100, 4, 2, 3, 13, 7];
 					break;*/

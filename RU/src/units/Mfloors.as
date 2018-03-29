@@ -479,6 +479,8 @@ package units
 				}
 				guests = { };
 				floor = data.floor;
+				clearAnimation();
+				//clearTextures
 				load();
 				
 				if (data.hasOwnProperty('bonus'))

@@ -160,7 +160,10 @@ package api
 						break;
 					case "bigsale":	
 							money = "5";
-						break;						
+						break;	
+					case "energy":	
+							money = "7";
+						break;	
 					default:
 							money = "2";
 						break;	

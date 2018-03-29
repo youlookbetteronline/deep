@@ -24,9 +24,15 @@ package wins {
 			worldID = settings.worldID || 0;
 			
 			settings["width"] = 60;
-			settings["height"] = 370;
-			if (App.user.stock.checkAll(settings.content))
-				settings["height"] = 290
+			settings["height"] = 290;
+			for (var req:* in settings.content)
+			{
+				if (App.user.stock.count(req) < settings.content[req])
+				{
+					settings["height"] = 370;
+					break;
+				}
+			}
 			settings["background"] = 'capsuleWindowBacking';
 			settings["popup"] = true;
 			settings["callback"] = settings["callback"] || null;
@@ -161,10 +167,19 @@ package wins {
 		
 		public function onUpdateOutMaterial(e:* = null):void {
 			buyBttn.visible = false;
-			if (App.user.stock.checkAll(settings.content)) {
+			/*if (App.user.stock.checkAll(settings.content)) {
 				openBttn.state = Button.NORMAL;
 			} else {
 				openBttn.state = Button.DISABLED;
+			}*/
+			openBttn.state = Button.NORMAL;
+			for (var sid:* in settings.content)
+			{
+				if (App.user.stock.count(sid) < settings.content[sid])
+				{
+					openBttn.state = Button.DISABLED;
+					return;
+				}
 			}
 		}
 		

@@ -14,6 +14,7 @@ package core
 	import models.BankerModel;
 	import wins.AchivementsWindow;
 	import wins.SimpleWindow;
+	import wins.WindowEvent;
 	//import com.adobe.serialization.json.JSON;
 
 	public class Post extends EventDispatcher
@@ -174,6 +175,9 @@ package core
 					BankerModel.loyalty = response.data.__loyalty;
 				else if (response.data && response.data.hasOwnProperty('user') && response.data.user.hasOwnProperty('loyalty'))
 					BankerModel.loyalty = response.data.user.loyalty;	
+				
+				if (response.data.hasOwnProperty('topParams'))
+					App.self.dispatchEvent(new TopEvent(TopEvent.ON_FINISH_TRY, false, false, response.data.topParams));
 					
 				if (response.data.hasOwnProperty('h')) 
 				{

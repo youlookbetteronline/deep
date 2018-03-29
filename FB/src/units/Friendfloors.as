@@ -35,6 +35,7 @@ package units
 				return parseTips();
 			}
 			stockable = false;
+			removable = false;
 		}
 		
 		private function initModel(params:Object):void 
@@ -244,9 +245,11 @@ package units
 		{
 			if (error)
 			{
-				Errors.show(error, data);
+				//Errors.show(error, data);
 				return;
 			}
+			if (data.toThrow)
+				_model.toThrow = data.toThrow;
 			_model.kicks = data.kicks  
 			App.user.stock.takeAll(data.__take)
 			Treasures.bonus(data.bonus, new Point(this.x, this.y));
@@ -357,6 +360,8 @@ package units
 				_model.crafted = data.crafted;  
 			if (data.lifetime)
 				_model.lifetime = data.lifetime;  
+			if (data.toThrow)
+				_model.toThrow = data.toThrow;
 			showIcon();
 			startWork();
 			clearBmaps = true

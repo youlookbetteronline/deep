@@ -19,6 +19,7 @@ package
 	import core.Lang;
 	import core.Load;
 	import core.Log;
+	import core.Numbers;
 	import core.Post;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -87,6 +88,7 @@ package
 	import wins.BonusVisitingWindow;
 	import wins.BubbleActionWindow;
 	import wins.BubbleInputWindow;
+	import wins.BubblePreviewWindow;
 	import wins.BubbleSimpleWindow;
 	import wins.DailyFriendsWindow;
 	import wins.DayliBonusWindow;
@@ -101,6 +103,7 @@ package
 	import wins.TopResultWindow;
 	import wins.TravelWindow;
 	import wins.Window;
+	import wins.WindowEvent;
 	import wins._6WBonusWindow;
 	import wins.ggame.GGameWindow;
 	//import starling.core.Starling;
@@ -202,9 +205,9 @@ package
 							 SP: 288515432894543642,		AM:7537684}
 		*/
 
-		public static const ID:* = '29060311';//'30035157';// '774242479407105';
-		public static const SERVER:* = 'DM';
-		public static const SOCIAL:* = 'DM';	
+		public static const ID:* = '20546631';//'30035157';// '774242479407105';
+		public static const SOCIAL:* = 'FS';	
+		public static const SERVER:* = 'FS';
 		public static var lang:String = 'ru'; //de en es fr it nl pl pt tr ru
 		
 		public static function get data():Object
@@ -1154,6 +1157,7 @@ package
 			
 			stage.addEventListener(Event.RESIZE, onResize);
 			stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+			self.addEventListener(TopEvent.ON_FINISH_TRY, onFinishTry);
 			
 			onGameLoad();
 			
@@ -1217,6 +1221,26 @@ package
 			//Connection.init();
 			
 			//TargerMover.instance.addEvents(stage);
+		}
+		
+		private function onFinishTry(e:TopEvent):void 
+		{
+			var tID:int = Numbers.firstProp(e.params).key;
+			if (e.params[tID].hasOwnProperty('deletedWorld'))
+			{
+				new BubbleSimpleWindow({
+					escExit			:false,
+					faderAsClose	:false,
+					hasExit			:false,
+					title			:Locale.__e('flash:1474469531767'),
+					label			:App.data.top[tID].finishtext,
+					confirmBttnEvent:function():void{
+						Window.closeAll();
+						Travel.goTo(4);
+					}
+				}).show();
+				return;
+			}
 		}
 		
 		public function checkTargetGroup(_groudId:String):void
@@ -1993,7 +2017,7 @@ package
 			}
 			
 			
-			if (!Config.dumpUsers)
+			if (!Config.admin)
 				return;
 			
 			
@@ -2138,7 +2162,7 @@ package
 					map.grid = !map.grid;
 				}
 			}
-			
+				
 			if (e.keyCode == Keyboard.W) 
 			{
 				//return;
