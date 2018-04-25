@@ -13,6 +13,8 @@ package tree
 	import flash.filters.GlowFilter;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
+	import flash.net.URLRequest;
+	import flash.net.navigateToURL;
 	import flash.text.TextField;
 	/**
 	 * ...
@@ -308,6 +310,11 @@ package tree
 			{
 				if (App.userID && App.social)
 					completeEvent();
+			}
+			
+			if (App.link)
+			{
+				navigateToURL(new URLRequest('https://deep.islandsville.com/admin/index.php?r=quests/update&id='+quest.id));
 			}
 		}
 		

@@ -62,6 +62,7 @@ package
         Security.allowInsecureDomain("*");
 		public static var lang:String = 'ru';		// ru en fr es pl nl jp
 		public static var complete:Boolean = false;
+		public static var link:Boolean = false;
 		
 		/* 
 		 * Николай	 		{DM: 159185922, OK:565449872326}
@@ -452,6 +453,10 @@ package
 			{
 				App.complete = true;
 			}
+			if (e.keyCode == Keyboard.L) 
+			{
+				App.link = true;
+			}
 			
 			if ( treeManeger )
 				treeManeger.onKeyDown(e);
@@ -460,6 +465,7 @@ package
 		private function onKeyUp(e:KeyboardEvent):void 
 		{
 			App.complete = false;
+			App.link = false;
 		}
 
 		private function onMouseUp(e:MouseEvent):void 
