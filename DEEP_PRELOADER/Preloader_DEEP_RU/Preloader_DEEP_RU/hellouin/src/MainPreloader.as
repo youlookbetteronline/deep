@@ -75,7 +75,7 @@ package {
 		public var CenterCloudRight:Class; 
 		public var centerCloudRight:BitmapData = new CenterCloudRight().bitmapData;
 		
-		[Embed(source="MainLogo.png")]
+		[Embed(source="MainLogoFB.png")]
 		public var MainLogo:Class; 
 		public var mainLogo:BitmapData = new MainLogo().bitmapData;
 		

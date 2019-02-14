@@ -1,0 +1,1089 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+                       xmlns:s="library://ns.adobe.com/flex/spark"
+                       xmlns:mx="library://ns.adobe.com/flex/mx"  x="10" y="10" minWidth="800" minHeight="480" width="1400" height="900" creationComplete="init()">
+						
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+	    <![CDATA[
+		import core.IsoConvert;
+		import core.Post;
+		import effects.Effect;
+		import flash.desktop.ClipboardFormats;
+		import flash.display.BitmapData;
+		import flash.display.Loader;
+		import flash.display.NativeWindow;
+		import flash.display.Stage;
+		import flash.events.Event;
+		import flash.events.IOErrorEvent;
+		import flash.events.KeyboardEvent;
+		import flash.events.MouseEvent;
+		import flash.events.NativeDragEvent;
+		import flash.events.TextEvent;
+		import flash.filesystem.File;
+		import flash.filesystem.FileMode;
+		import flash.filesystem.FileStream;
+		import flash.geom.Point;
+		import flash.system.LoaderContext;
+		import flash.system.Security;
+		import flash.ui.Keyboard;
+		import flash.utils.ByteArray;
+		import flash.utils.getTimer;
+		import flash.utils.setTimeout;
+		import mx.collections.ArrayList;
+		import mx.containers.HBox;
+		import mx.controls.Alert;
+		import mx.controls.Button;
+		import mx.controls.ColorPicker;
+		import mx.core.UIComponent;
+		import mx.core.UITextField;
+		import mx.events.ColorPickerEvent;
+		import mx.events.NumericStepperEvent;
+		import mx.graphics.codec.PNGEncoder;
+		import mx.managers.DragManager;
+		import spark.components.CheckBox;
+		import spark.components.TextArea;
+		import spark.components.TextInput;
+		import spark.events.IndexChangeEvent;
+		
+		[Bindable]
+		public var zoneList:ArrayList = new ArrayList([1,2,3,4,5,6,7,8,9,10,'+']);
+		
+		public static var main:Main;
+		public static var appName:String = 'MapGenerator';
+		
+		private var __mouseHandleMode:String = 'brush';
+		
+		public var currStage:Stage;
+		public var map:Map;
+		
+		public var zone:int = -1;
+		public var brushSize:int = 10;
+		
+		public var storage:Object = { };
+		public var gridAssets:Vector.<CheckBox> = new Vector.<CheckBox>;
+		
+		//public var colors:Object = { 1:0x99A52A2A, 2:0x999932CC, 3:0x99FF8C00, 4:0x99DAA520, 5:0x99008000, 6:0x9920B2AA, 7:0x996B8E23, 8:0x9990EE90, 9:0x99FF4500, 10:0x99663399, 11:0x992E8B57 };
+		public var zones:Object = {
+			1 : {
+				id:		1,
+				zone:	172,
+				color:	0xA52A2A
+			},
+			2 : {
+				id:		2,
+				zone:	180,
+				color:	0x9932CC
+			},
+			3 : {
+				id:		3,
+				zone:	181,
+				color:	0xFF8C00
+			},
+			4 : {
+				id:		4,
+				zone:	182,
+				color:	0xDAA520
+			}
+		};
+		
+		private function init() : void {
+			
+			//Security.allowDomain('*');
+			
+			getStage();
+			
+			main = this;
+			
+			//currStage.nativeWindow.x = 10;
+			//currStage.nativeWindow.y = 10;
+			
+			// Listeners
+			currStage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+			currStage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+			currStage.addEventListener(MouseEvent.MOUSE_WHEEL, onWheel);
+			
+			currStage.addEventListener(Event.MOUSE_LEAVE, onMouseLeave);
+			currStage.addEventListener(Event.RESIZE, onResize);
+			onResize();
+			
+			map = new Map(this);
+			
+			gridAssets.push(gridForBuild, gridForPers, gridForWater);
+			
+			
+			// Read stores
+			swfPath.text = Storage.read('swfPath', File.applicationDirectory.nativePath);
+			projectPath.text = Storage.read('projectPath', File.applicationDirectory.nativePath);
+			mapName.text = Storage.read('mapName', '');
+			var respPoint:Object = Storage.read('respawn', { } );
+			if (respPoint.hasOwnProperty('x') && respPoint.hasOwnProperty('y')) map.respawnPoint = new Point(respPoint.x, respPoint.y);
+			
+			var zonesData:Object = Storage.read('zoneData', { zones: { }, faders: { }} );
+			zones = zonesData.zones;
+			map.faders = zonesData.faders;
+			
+			for (var __zone:* in zones) { zone = int(__zone); break; }
+			
+			onMarker();
+			//onBrushChange();
+			onZonePanelChange();
+			map.createPersonage();
+			
+			//Updates.check('0.9.4242', 'MapGenerator', 'http://dreams.islandsville.com/gfx/version.txt', 'http://dreams.islandsville.com/gfx/MapGenerator.air');
+		}
+		
+		public function setCanvasBackgroundColor(color:uint = 0xffffffff):void {
+			var a:int = color << 24;
+			if (a == 0) color = 0xffffffff;
+			
+			canvas.drawRoundRect(0, 0, 2000, 2000, 0, color, 1);
+		}
+		
+		public function set mouseHandleMode(value:String):void {
+			if (__mouseHandleMode == value) return;
+			__mouseHandleMode = value;
+		}
+		public function get mouseHandleMode():String {
+			return __mouseHandleMode;
+		}
+		
+		public function get zoneColor():uint {
+			if (!zonesOnBttn.selected || zone == 0) return 0x00000000;
+			
+			return (zones[zone]) ? (0x99000000 + zones[zone]['color']) : 0x00000000;
+		}
+		public function getZoneColor(zone:int):uint {
+			return (zones[zone]) ? (0x99000000 + zones[zone]['color']) : 0x99000000;
+		}
+		
+		public function getStage():void {
+			var stage:* = this;
+			while (true) {
+				if (stage.parent != null) {
+					stage = stage.parent;
+					if (stage is Stage) {
+						currStage = stage;
+						break;
+					}
+				}else {
+					break;
+				}
+			}
+		}
+		
+		public function onResize(e:Event = null):void {
+			setTimeout(function():void {
+				canvas.scrollRect = new Rectangle(0, 0, canvas.width, canvas.height);
+			}, 25);
+		}
+		public function onMouseLeave(e:Event):void {
+			if (map.draging)
+				map.onUp();
+		}
+		
+		public function onKeyDown(e:KeyboardEvent):void {
+			if (currStage.focus is UITextField)
+				return;
+			
+			if (e.shiftKey)
+				startDraw();
+			
+			if (e.ctrlKey)
+				startClear();
+			
+			if (e.keyCode == Keyboard.G)
+				startDragGrid();
+			
+			if (e.keyCode == Keyboard.B)
+				map.gridBacking = !map.gridBacking;
+			
+			if (e.keyCode == Keyboard.R)
+				map.setRespawnPoint();
+				
+			if (e.keyCode == Keyboard.LEFT) {
+				if (currStage.focus == brush) {
+					brush.value--;
+				}
+			}
+			
+			if (e.keyCode == Keyboard.RIGHT) {
+				if (currStage.focus == brush) {
+					brush.value++;
+				}
+			}
+			
+			if (e.keyCode == Keyboard.SPACE) {
+				if (map.fadering)
+					map.addFaderPoint();
+			}
+			
+			if (e.keyCode == Keyboard.A) {
+				if (map.fadering)
+					map.addSimpleFaderPoint();
+			}
+			if (e.keyCode == Keyboard.D) {
+				if (map.fadering){
+					if (map.touchedPoint)
+						map.removeFaderPoint();
+				}
+			}
+			if (e.altKey && map.fadering){
+				if (map.touchedPoint)
+					addFPoint = true;
+			}
+			
+			if (e.keyCode == Keyboard.ESCAPE) {
+				map.escapeFader();
+			}
+		}
+		public var addFPoint:Boolean = false;
+		public function onKeyUp(e:KeyboardEvent):void {
+			if (e.keyCode == Keyboard.Q) {
+				map.gridFlood(Math.random() * 40, Math.random() * 40, Math.random() * 10, Math.random() * 10);
+			}
+			addFPoint = false;
+			stopDraw();
+			stopClear();
+			stopDragGrid();
+		}
+		public function onWheel(e:MouseEvent):void {
+			map.scale(e.delta > 0, new Point(canvas.mouseX, canvas.mouseY));
+		}
+		
+		// Draw 
+		public function startDraw():void {
+			map.addEventListener(Event.ENTER_FRAME, draw);
+		}
+		public function startClear():void {
+			map.addEventListener(Event.ENTER_FRAME, clear);
+		}
+		public function stopDraw():void {
+			map.removeEventListener(Event.ENTER_FRAME, draw);
+		}
+		public function stopClear():void {
+			map.removeEventListener(Event.ENTER_FRAME, clear);
+		}
+		public function draw(e:Event = null):void {
+			if (map.draging) return;
+			
+			//if (Numbers.countProps(Map.openTile) == 0) return;
+			
+			var object:Object = IsoConvert.screenToIso(map.gridCont.mouseX, map.gridCont.mouseY, true);
+			
+			switch(mouseHandleMode) {
+				case 'fill':
+					if (zonesOnBttn.selected) return;
+					
+					map.gridFill(Map.openTile, object.z, object.x);
+					break;
+				case 'brush':
+					if (zonesOnBttn.selected) {
+						map.gridFloodZone({z:zone}, object.z, object.x, brushSize, brushSize);
+					}else {
+						map.gridFlood(Map.openTile, object.z, object.x, brushSize, brushSize);
+					}
+					
+					break;
+				case 'pencil':
+					if (zonesOnBttn.selected) {
+						map.gridFloodZone({z:zone}, object.z, object.x);
+					}else {
+						map.gridFlood(Map.openTile, object.z, object.x);
+					}
+					
+					break;
+				
+			}
+		}
+		public function clear(e:Event = null):void {
+			if (map.draging) return;
+			
+			//if (Numbers.countProps(Map.openTile) == 0) return;
+			
+			var object:Object = IsoConvert.screenToIso(map.gridCont.mouseX, map.gridCont.mouseY, true);
+			
+			if (zonesOnBttn.selected) {
+				map.gridClearZone({z:0}, object.z, object.x, brushSize, brushSize);
+			}else {
+				map.gridClear(Map.openTile, object.z, object.x, brushSize, brushSize);
+			}
+		}
+		
+		
+		// Grid
+		public function startDragGrid():void {
+			currStage.focus = null;
+			Map.dragGrid = true;
+		}
+		public function stopDragGrid():void {
+			Map.dragGrid = false;
+		}
+		private function loadAndParseFile(file:File):void {
+			if (!file.exists) return;
+			
+			Load.openAsync(file, onLoadFileForParse);
+		}
+		
+		private function loadAndParseSwf(file:File):void {
+			if (!file.exists) return;
+			
+			Load.loading(file.nativePath, onLoadSwfForParse);
+			
+			/*Load.openAsync(file, function(data:ByteArray):void {
+				var loader:Loader = new Loader();
+				loader.addEventListener(Event.COMPLETE, function(e:Event):void {
+					onLoadSwfForParse(loader.content);
+				});
+				loader.addEventListener(IOErrorEvent.IO_ERROR, function(e:IOErrorEvent):void {
+					Alert.show('Не удалось загрузить swf!', appName);
+				});
+				loader.loadBytes(data, new LoaderContext(false));
+			});*/
+		}
+		private function onLoadSwfForParse(data:Object):void {
+			
+			if (data.hasOwnProperty('gridData'))
+				parseAsGrid(data.gridData);
+			
+			if (data.hasOwnProperty('tileDX') && data.hasOwnProperty('tileDY')) {
+				tileDX = -data.tileDX;
+				tileDY = -data.tileDY;
+				map.gridUpdate();
+			}
+			
+			if (data.hasOwnProperty('assetZones')) {
+				this.zones = {};
+				zonePanel.removeAllElements();
+				updateZoneData();
+				//var i:int = 0;
+				for (var _i:* in  data.assetZones){
+					if (data.assetZones[_i] == 0)
+						continue;
+					this.zones[_i] = {
+						color	:int(0xFFFFFF * Math.random()),
+						id		:_i,
+						zone	:data.assetZones[_i]
+					}
+					//i++;
+				}
+				saveZones();
+				onZonePanelChange();
+				zoneSelectLast();
+			}
+			
+			if (data.hasOwnProperty('zones')) {
+				map.faders
+				
+			}
+			
+			if (data.hasOwnProperty('tile') && data.tile is BitmapData) {
+				var encoder:PNGEncoder = new PNGEncoder();
+				var bytes:ByteArray = encoder.encode(data.tile);
+				
+				var file:File = new File(File.applicationStorageDirectory.nativePath + File.separator + 'tile.png');
+				
+				var stream:FileStream = new FileStream(); 
+				stream.open(file, FileMode.WRITE); 
+				stream.writeBytes(bytes);
+				stream.close();
+				
+				map.file = file;
+				map.loadMapBytes(bytes, file.nativePath);
+			}
+			
+			if (data.hasOwnProperty('heroPosition')) {
+				map.respawnPoint.x = data.heroPosition.x;
+				map.respawnPoint.y = data.heroPosition.z;
+			}
+			
+			mapGenerator.enabled = true;
+		}
+		
+		
+		private var loadedGrid:Array;
+		private var tileDX:int;
+		private var tileDY:int;
+		private function onLoadFileForParse(data:ByteArray):void {
+			
+			function getLineWith(string:String, from:String):String {
+				var pos:int = from.indexOf(string);
+				var begin:int = from.lastIndexOf('\n', pos);
+				var end:int = from.indexOf('\n', pos);
+				var line:String = from.substring(begin, end);
+				
+				line = line.replace(/[\n,\t,\r]/ig, '');
+				
+				return line;
+			}
+			
+			mapGenerator.enabled = true;
+			
+			var string:String = data.readUTFBytes(data.length);
+			var object:*;
+			
+			// Попытка обработать JSON и TXT
+			try {
+				object = JSON.parse(string);
+			}catch (e:Error) { }
+			
+			// 
+			try {
+				var pos:int;
+				var begin:int;
+				var end:int;
+				var line:String;
+				
+				pos = string.indexOf('gridData:Object');
+				
+				if (pos != -1) {
+					begin = string.indexOf('[[{', pos);
+					end = string.indexOf('}]]', begin);
+					
+					if (begin > 0 && end > 0 && begin < end) {
+						line = string.substring(begin, end + 3);
+						object = JSON.parse(line);
+						if ((object is Array) && object.length > 0 && (object[0] is Array) && object[0].length > 0)
+							loadedGrid = object;
+					}
+				}
+				
+				
+				line = getLineWith('public var tileDX', string);
+				object = new RegExp(/[-0-9]+/g).exec(line);
+				if (object) {
+					pos = int(object[0]);
+					if (!isNaN(pos))
+						tileDX = -pos;
+					
+					//if (loadedGrid && loadedGrid.length > loadedGrid[0].length)
+						//tileDX -= Map.NODE_WIDTH * (loadedGrid.length - loadedGrid[0].length) * 0.5;
+						
+					//trace(Map.NODE_WIDTH * (loadedGrid.length - loadedGrid[0].length) * 0.5);
+				}
+				
+				line = getLineWith('public var tileDY', string);
+				object = new RegExp(/[-0-9]+/g).exec(line);
+				if (object) {
+					pos = int(object[0]);
+					if (!isNaN(pos))
+						tileDY = -pos;
+				}
+				
+				
+				// Поиск позиции героя
+				// Не работает изза отсутствия кавычек в ключах объекта
+				/*line = getLineWith('public var heroPosition', string);
+				object = new RegExp(/\{[xz0-9\:\,\s\n\t]+\}/g).exec(line);
+				if (object && object[0] && object[0].length > 0) {
+					object = JSON.parse(object[0]);
+					map.respawnPoint.x = object.x;
+					map.respawnPoint.y = object.z;
+				}*/
+				
+				
+				// Поиск файла карты
+				object = new RegExp(/\[Embed\(source=\"[^?\:\|]+\", mimeType=\"[^?\:\|]+\"\)\]/).exec(string);
+				if (object && object[0]) {
+					line = object[0];
+					object = new RegExp(/[\/\"]+[^?\:\|\/]+\.(jpg|png)\"/).exec(string);
+					if (object && object[0]) {
+						line = object[0];
+						mapAsNeedLoad = line.substring(1, line.length - 1);
+						mapOnDragDrop();
+					}
+				}
+				
+			}catch (e:Error) {
+				trace(e.toString());
+			}
+			
+			if (loadedGrid) {
+				map.gridCont.x = tileDX;
+				map.gridCont.y = tileDY;
+				
+				parseAsGrid(loadedGrid);
+			}else if (tileDX || tileDY) {
+				map.gridCont.x = tileDX;
+				map.gridCont.y = tileDY;
+				map.gridUpdate();
+			}
+			
+		}
+		
+		
+		public function parseAsGrid(grid:*):void {
+			grid = gridFormatAsEdit(grid);
+			grid = gridRotate(grid);
+			
+			Map.markersData = new Vector.<Vector.<Object>>;
+			
+			map.updateMarkerData(grid);
+			map.createGrid(grid.length, grid[0].length);
+		}
+		public function gridRotate(grid:*):* {
+			var array:Array = [];
+			
+			if (grid.length > 0) {
+				for (var j:int = 0; j < grid[0].length; j++) {
+					if (!array[j]) array[j] = [];
+					for (var k:int = 0; k < grid.length; k++) {
+						array[j][k] = grid[k][j];
+					}
+				}
+			}else {
+				array = grid;
+			}
+			
+			return array;
+		}
+		public function gridFormatAsEdit(grid:*):* {
+			for (var i:int = 0; i < grid.length; i++) {
+				for (var j:int = 0; j < grid[i].length; j++) {
+					for (var s:* in grid[i][j]) {
+						if (s == 'b' || s == 'p') {
+							if (grid[i][j][s] == 1) {
+								grid[i][j][s] = 0;
+							}else {
+								grid[i][j][s] = 1;
+							}
+							continue;
+						}
+					}
+				}
+			}
+			
+			return grid;
+		}
+		
+		
+		
+		private var dragFiles:Vector.<File>;
+		private var loadingFile:Vector.<File>;
+		private var mapAsNeedLoad:String;
+		private function mapOnDragEnter(event:NativeDragEvent):void {
+			
+			if (parseableFile(event))
+				DragManager.acceptDragDrop(canvasPanel);
+			
+		}
+		private function mapOnDragDrop(event:NativeDragEvent = null):void {
+			
+			var action:Boolean = false;
+			var skipPictures:Boolean = false;
+			
+			if (dragFiles && dragFiles.length > 0) {
+				
+				for (var i:int = 0; i < dragFiles.length; i++) {
+					var file:File = dragFiles[i];
+					
+					if (mapAsNeedLoad && file.name != mapAsNeedLoad)
+						continue;
+					
+					switch(file.type.toLowerCase()) {
+						case '.swf':
+							action = true;
+							loadAndParseSwf(file);
+							break;
+						case '.png':
+						case '.jpg':
+						case '.bmp':
+							if (!skipPictures) {
+								map.loadMapFromFile(file);
+								skipPictures = true;
+								action = true;
+							}
+							break;
+						case '.txt':
+						case '.json':
+						case '.as':
+							skipPictures = true;
+							action = true;
+							loadAndParseFile(file);
+							break;
+					}
+				}
+				
+				if (mapAsNeedLoad && !action)
+					Alert.show('Картинка не загружена', appName);
+				
+				mapAsNeedLoad = null;
+			}
+			
+			if (action)
+				mapGenerator.enabled = false;
+			
+		}
+		private function parseableFile(nativeDragEvent:NativeDragEvent):Boolean {
+			
+			// Поиск фалов которые возможно могут быть обработаны (удовлетворительные форматы)
+			function findFiles(list:Array):void {
+				for (var i:int = 0; i < list.length; i++) {
+					var file:File = list[i];
+					
+					if (file.isDirectory) {
+						findFiles(file.getDirectoryListing());
+					}else{
+						if (sorterList.indexOf(file.type.toLowerCase()) != -1)
+							dragFiles.push(file);
+					}
+				}
+			}
+			
+			// Сортировка по важности обработки
+			function sorter(a:File, b:File):int {
+				if (sorterList.indexOf(a.type.toLowerCase()) > sorterList.indexOf(b.type.toLowerCase())) {
+					return -1;
+				}else if (sorterList.indexOf(a.type.toLowerCase()) < sorterList.indexOf(b.type.toLowerCase())) {
+					return 1;
+				}else {
+					return 0;
+				}
+			}
+			
+			var sorterList:Array = ['.swf','.bmp','.png','.jpg','.json','.txt','.as'];
+			
+			if (!dragFiles)
+				dragFiles = new Vector.<File>;
+			else
+				dragFiles.length = 0;
+			
+			try {
+				var object:Object = nativeDragEvent.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT);
+				
+				if (object is Array && object.length > 0)
+					findFiles(object as Array);
+				
+			}catch (e:Error) { }
+			
+			dragFiles.sort(sorter);
+			
+			return (dragFiles.length > 0);
+		}
+		
+		
+		
+		
+		private function onBrushChange(event:* = null):void {
+			brushSize = int(brush.value);
+			
+			map.createBrush();
+		}
+		private function onMarker(event:* = null):void {
+			Map.tile = {
+				b:	gridForBuild.selected,
+				p:	gridForPers.selected,
+				w:	gridForWater.selected
+			}
+			
+			for each(var checkBox:CheckBox in gridAssets) {
+				var key:String = checkBox.name;
+				if (Map.openTile.hasOwnProperty(key) && checkBox.selected == false) {
+					delete Map.openTile[key];
+				}else if (checkBox.selected) {
+					Map.openTile[key] = 1;
+				}
+			}
+			
+			map.updateGridColor();
+		}
+		
+		public function onGridSizeChange(event:NumericStepperEvent):void {
+			var value:int = 0;
+			switch (event.currentTarget) {
+				case TX:
+					value = int(TX.value);
+					if (!isNaN(value)) {
+						map.createGrid(value, Map.rows);
+					}
+					break;
+				case TZ:
+					value = int(TZ.value);
+					if (!isNaN(value)) {
+						map.createGrid(Map.cells, value);
+					}
+					break;
+			}
+		}
+		
+		public function onGridPosChange(event:TextEvent):void {
+			setTimeout(function():void {
+				map.gridCont.x = int(gridX.text);
+				map.gridCont.y = int(gridY.text);
+			}, 50);
+		}
+		
+		private function setTool():void {
+			if (toolPencil.selected) {
+				mouseHandleMode = 'pencil';
+			}else if (toolBrush.selected) {
+				mouseHandleMode = 'brush';
+			}else if (toolFill.selected) {
+				mouseHandleMode = 'fill';
+			}
+		}
+		
+		private function onZoneChange(event:IndexChangeEvent):void {
+			if (event.newIndex < 0) return;
+			
+			var value:* = zoneList.getItemAt(event.newIndex);
+			if (value == '+') {
+				zoneList.addItemAt(zoneList.length, zoneList.length - 1);
+			}else {
+				zone = value as int;
+			}
+		}
+		private function onZoneToggle(event:*):void {
+			map.updateGridColor();
+		}
+		private function onFaderToggle(event:*):void {
+			map.fadering = faderOnBttn.selected;
+		}
+		
+		
+		// Directories
+		private var pathValue:String;
+		private function chooseSWFPath(e:MouseEvent):void {
+			var file:File = (storage.swf) ? new File(storage.swfPath) : null;
+			if (!file || !file.exists) file = File.applicationDirectory;
+			
+			pathValue = 'swfPath';
+			
+			file.browseForDirectory('Папка для SWF');
+			file.addEventListener(Event.SELECT, onSelect);
+			file.addEventListener(Event.CANCEL, onCancel);
+		}
+		private function chooseProjectPath(e:MouseEvent):void {
+			var file:File = (storage.projectPath) ? new File(storage.projectPath) : null;
+			if (!file || !file.exists) file = File.applicationDirectory;
+			
+			pathValue = 'projectPath';
+			
+			file.browseForDirectory('Папка для проекта');
+			file.addEventListener(Event.SELECT, onSelect);
+			file.addEventListener(Event.CANCEL, onCancel);
+		}
+		private function onSelect(e:Event):void {
+			var file:File = e.target as File;
+			
+			storage[pathValue] = file.nativePath;
+			this[pathValue].text = file.nativePath;
+			Storage.store(pathValue, file.nativePath);
+			pathValue = null;
+			
+			file.removeEventListener(Event.SELECT, onSelect);
+			file.removeEventListener(Event.CANCEL, onCancel);
+		}
+		private function onCancel(e:Event):void {
+			var file:File = e.target as File;
+			file.removeEventListener(Event.SELECT, onSelect);
+			file.removeEventListener(Event.CANCEL, onCancel);
+		}
+		
+		private function generateProject(e:MouseEvent):void {
+			Storage.store('mapName', mapName.text);
+			onSaveGrid();
+			
+			Save.generateProject();
+		}
+		
+		
+		public function onSaveGrid(event:* = null):void {
+			
+			Storage.store('gridPos', { x:map.gridCont.x, y:map.gridCont.y } );
+			Storage.store('markersData', Map.markersData);
+			Storage.store('respawn', map.respawnPoint);
+			saveZones();
+			
+			Alert.show('Успешно сохранено!', 'Сохранение', 0);
+		}
+		public function onSaveJustGrid(event:* = null):void {
+			var file:File = new File(File.applicationDirectory.nativePath + File.separator + 'grid.txt');
+			file.browseForSave('Сохранение сетки карты');
+			file.addEventListener(Event.SELECT, function(event:Event):void {
+				var bytes:ByteArray = new ByteArray();
+				bytes.writeUTFBytes(JSON.stringify(Map.markersData));
+				
+				var stream:FileStream = new FileStream(); 
+				stream.open(file, FileMode.WRITE); 
+				stream.writeBytes(bytes);
+				stream.close();
+			});
+		}
+		
+		
+		//private var zoneChoose:String;
+		public function onZonePanelChange():void {
+			//while (zonePanel.numElements) {
+				zonePanel.removeAllElements();
+			//}
+			
+			var list:Array = [];
+			for (var id:* in zones) {
+				if (zones[id]['id'] != id)
+					zones[id]['id'] = id;
+				
+				list.push(zones[id]);
+			}
+			list.sortOn('id', Array.NUMERIC);
+			
+			var cont:HBox;
+			for (var i:int = 0; i < list.length; i++) {
+				cont = new HBox();
+				
+				/*var bttn:spark.components.Button = new spark.components.Button();
+				bttn.label = String(list[i]['id']);
+				bttn.width = 70;*/
+				var bttn:mx.controls.Button = new mx.controls.Button();
+				bttn.toggle = true;
+				bttn.label = String(list[i]['id']);
+				bttn.width = 70;
+				bttn.name = 'bttn';
+				bttn.addEventListener(MouseEvent.CLICK, onZoneChoose);
+				
+				if (String(zone) == bttn.label)
+					bttn.selected = true;
+				
+				var text:mx.controls.TextInput = new mx.controls.TextInput();
+				text.width = 60;
+				text.text = String(list[i]['zone']);
+				text.name = 'text';
+				
+				var color:ColorPicker = new ColorPicker();
+				color.addEventListener(ColorPickerEvent.CHANGE, onZoneColorChange);
+				color.selectedColor = (list[i].hasOwnProperty('color')) ? list[i].color : 0xff0000;
+				color.name = 'color';
+				
+				cont.addElement(bttn);
+				cont.addElement(text);
+				cont.addElement(color);
+				
+				zonePanel.addElement(cont);
+			}
+			
+			cont = new HBox();
+			
+			var zoneAdd:mx.controls.Button = new mx.controls.Button();
+			zoneAdd.width = 100;
+			zoneAdd.label = 'Добавить';
+			zoneAdd.addEventListener(MouseEvent.CLICK, onZoneAdd);
+			
+			var zoneRemove:mx.controls.Button = new mx.controls.Button();
+			zoneRemove.width = 60;
+			zoneRemove.label = 'Убрать';
+			zoneRemove.addEventListener(MouseEvent.CLICK, onZoneRemove);
+			
+			cont.addElement(zoneAdd);
+			cont.addElement(zoneRemove);
+			zonePanel.addElement(cont);
+		}
+		private function onZoneAdd(e:MouseEvent):void {
+			
+			var index:int = 1;
+			for (var zid:* in zones) {
+				if (zid >= index)
+					index = zid + 1;
+			}
+			
+			zones[index] = {
+				id:		index,
+				color:	0xff0000,
+				zone:	index
+			}
+			
+			zone = index;
+			
+			saveZones();
+			onZonePanelChange();
+		}
+		private function onZoneRemove(e:MouseEvent):void {
+			zoneSelectLast();
+			
+			if (!zones[zone]) return;
+			delete zones[zone];
+			
+			zoneSelectLast();
+			
+			saveZones();
+			onZonePanelChange();
+		}
+		private function onZoneChoose(e:MouseEvent):void {
+			var bttn:mx.controls.Button = e.currentTarget as mx.controls.Button;
+			zone = int(bttn.label);
+			
+			updateZoneData();
+			onZonePanelChange();
+		}
+		private function onZoneColorChange(e:ColorPickerEvent):void {
+			updateZoneData();
+		}
+		public function updateZoneData():void {
+			var selectedBttn:int = 0;
+			for (var i:int = 0; i < zonePanel.numElements; i++) {
+				var cont:HBox = zonePanel.getChildAt(i) as HBox;
+				
+				var bttn:mx.controls.Button = cont.getChildByName('bttn') as mx.controls.Button;
+				var text:mx.controls.TextInput = cont.getChildByName('text') as mx.controls.TextInput;
+				var color:ColorPicker = cont.getChildByName('color') as ColorPicker;
+				if (bttn && int(bttn.label) == zone){
+					//var cont2:HBox = zonePanel.getChildAt(0) as HBox;
+					//var bttn2:mx.controls.Button = cont.getChildByName('bttn') as mx.controls.Button;
+					//if(bttn2)
+						//bttn2.selected = false;
+					selectedBttn = i;
+				}
+				if(bttn)
+					bttn.selected = false;
+				
+				if (!bttn || !zones[bttn.label]) continue;
+				
+				trace(color.selectedColor);
+				
+				zones[bttn.label]['zone'] = int(text.text);
+				zones[bttn.label]['color'] = color.selectedColor;
+			}
+			if(cont){
+				cont = zonePanel.getChildAt(selectedBttn) as HBox;
+				bttn = cont.getChildByName('bttn') as mx.controls.Button;
+				if(bttn)
+					bttn.selected = true;
+			}
+		}
+		private function saveZones():void {
+			updateZoneData();
+			
+			var object:Object = {
+				zones: zones,
+				faders:	map.faders
+			}
+			
+			Storage.store('zoneData', object);
+		}
+		private function zoneSelectLast():void {
+			zone = 0;
+			for (var zid:* in zones) {
+				if (zid > zone)
+					zone = zid;
+			}
+		}
+		
+		private function onMapBack(e:*):void {
+			map.x = 0;
+			map.y = 0;
+			map.mapCont.x = 0;
+			map.mapCont.y = 0;
+		}
+		
+		private function onMapColorizeBttn(e:*):void {
+			if (!Map.map || !Map.map.bitmapData) return;
+			
+			if (!Map.map.filters || Map.map.filters.length == 0) {
+				Effect.light(Map.map, 0, 0);
+				mapColorizeBttn.label = "Цветная карта";
+			}else {
+				Map.map.filters = null;
+				mapColorizeBttn.label = "Бесцветная карта";
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		private function click(event:*):void {
+			
+		}
+		
+		
+	    ]]>
+    </fx:Script>
+	
+	<mx:Panel title="Генератор карты" id="mapGenerator" height="100%" width="100%" paddingTop="10" paddingLeft="10" paddingRight="10" paddingBottom="10">
+		<mx:VBox width="100%" height="100%">
+			<mx:HBox width="100%" height="100%">
+				<mx:VBox width="100%" height="100%">
+					<mx:Panel id="canvasPanel" title="Карта" height="100%" width="100%" paddingTop="5" paddingLeft="5" paddingRight="5" paddingBottom="5" nativeDragEnter="mapOnDragEnter(event)" nativeDragDrop="mapOnDragDrop(event)">
+						<mx:UIComponent id="canvas" width="100%" height="100%" />
+					</mx:Panel>
+					
+					<mx:HBox width="100%" height="26">
+						<mx:Label id="_gridX" text="x:" />
+						<mx:TextInput id="gridX" text="0" width="50" editable="true" restrict="-0123456789" textInput="onGridPosChange(event)" />
+						<mx:Label id="_gridY" text="y:"/>
+						<mx:TextInput id="gridY" text="0" width="50" editable="true" restrict="-0123456789" textInput="onGridPosChange(event)" />
+						<mx:Label id="labelZ" text="X:" />
+						<mx:NumericStepper id="TX" change="onGridSizeChange(event);" minimum="2" maximum="500" stepSize="1" value="72" width="60"/>
+						<mx:Label id="labelX" text="Z:"/>
+						<mx:NumericStepper id="TZ" change="onGridSizeChange(event);" minimum="2" maximum="500" stepSize="1" value="72" width="60"/>
+						
+						<mx:Button id="mapBackBttn" color="0x323232" label="Вернуть карту" click="onMapBack(event)"/>
+						<mx:Button id="mapColorizeBttn" color="0x323232" width="120" label="Бесцветная карта" click="onMapColorizeBttn(event)"/>
+						<!--<mx:Button id="zonesPointsClearBttn" color="0x966432" label="Очистить точки зон" click="click(event)"/>
+						
+						<s:Button id="gridBttn" label="Сетка"  width="100" click="click(event)" />
+						<s:Button id="zonesBttn" label="Добавить тайлы"  width="150" click="click(event); zonesBttn.visible = false;" />-->
+						
+					</mx:HBox>
+				</mx:VBox>
+				
+				<mx:VBox width="200" height="100%">
+					<mx:Panel title="Маркеры" height="130" width="100%" paddingTop="5" paddingLeft="5" paddingRight="5" paddingBottom="5">
+						<s:CheckBox id="gridForBuild" name="b" label="для зданий" click="onMarker(event)"  selected = "true"/>
+						<s:CheckBox id="gridForPers" name="p" label="для персонажей" click="onMarker(event)" selected = "false"/>
+						<s:CheckBox id="gridForWater" name="w" label="вода" click="onMarker(event)" selected = "false"/>
+					</mx:Panel>
+					<mx:Panel title="Кисть" height="160" width="100%" paddingTop="5" paddingLeft="5" paddingRight="5" paddingBottom="5">
+						<mx:VBox>
+							<s:VGroup>
+								<s:RadioButton groupName="tool" id="toolPencil" label="Карандаше" click="setTool()" />
+								<s:RadioButton groupName="tool" id="toolFill" label="Залить" click="setTool()" />
+								<s:RadioButton groupName="tool" id="toolBrush" label="Кисть" click="setTool()" selected="true" />
+							</s:VGroup>
+							
+							<s:HSlider id="brush" change="onBrushChange(event)" minimum="1" maximum="100" value="10" width="186" height="100%" />
+						</mx:VBox>
+					</mx:Panel>
+					<mx:Panel title="Зоны" height="200" width="100%" paddingTop="5" paddingLeft="5" paddingRight="5" paddingBottom="5">
+						<mx:HBox>
+							<s:CheckBox id="zonesOnBttn" label="Зоны" click="onZoneToggle(event);"/>
+							<s:CheckBox id="faderOnBttn" label="Fader" click="onFaderToggle(event);"/>
+						</mx:HBox>
+						<mx:VBox id="zonePanel">
+							
+						</mx:VBox>
+						
+						<!--<s:ButtonBar id="zoneBar" change="onZoneChange(event)" dataProvider="{zoneList}" selectedIndex = "0" horizontalCenter="0" verticalCenter="0">
+							<s:layout>
+								<s:VerticalLayout gap="2" />
+							</s:layout>
+						</s:ButtonBar>-->
+					</mx:Panel>
+					
+					<mx:Panel title="Операции" height="300" width="100%" paddingTop="5" paddingLeft="5" paddingRight="5" paddingBottom="5">
+						<mx:Label text="Название карты:" />
+						<mx:TextInput id="mapName" text="" width="100%"/>
+						<mx:HBox>
+							<mx:Button id="saveGridBttn" label="Сохранить сетку" width="150" click="onSaveGrid(event);"/>
+							<mx:Button id="saveJustGridBttn" label="G" width="30" click="onSaveJustGrid(event);"/>
+						</mx:HBox>
+						<mx:Button id="objectPath" label="Директория для SWF"  width="100%" click="chooseSWFPath(event);" />
+						<mx:TextInput id="swfPath" text="" width="100%" editable="true" />
+						<mx:Button id="projPath" label="Директория проекта"  width="100%" click="chooseProjectPath(event);" />
+						<mx:TextInput id="projectPath" text="" width="100%" editable="true" />
+						<mx:Button id="saveMapBttn" label="Сгенерировать карту" width="100%" height="50" click="generateProject(event);"/>
+					</mx:Panel>
+				</mx:VBox>
+			</mx:HBox>
+		</mx:VBox>
+	</mx:Panel>
+	
+</s:WindowedApplication>

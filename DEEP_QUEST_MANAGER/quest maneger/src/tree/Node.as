@@ -39,6 +39,8 @@ package tree
 		public var settings:Object;
 		public function Node(questID:uint = 0, rootID:uint = 0, _settings:Object = null) 
 		{
+			if (questID == 1358)
+				trace();
 			if ( !_settings )
 				_settings = { };
 			_settings['width'] = _settings.width || 120;
@@ -223,6 +225,8 @@ package tree
 				backing.parent.removeChild(backing);
 			backing = new Bitmap();	
 			backing = UI.backing(120, 80, 30, "questTaskBackingTopMini");
+			if (quest.type)
+				UI.colorize(backing, 0xf45f78, .4);
 			addChildAt(backing, 0);
 			addFilters();
 			

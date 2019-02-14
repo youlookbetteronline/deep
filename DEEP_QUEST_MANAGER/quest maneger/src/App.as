@@ -71,7 +71,7 @@ package
 		 * Наталья     		{DM: 50545195, OK: 571437926505}
 		*/
 		
-		public static const ID:* = '50545195';
+		public static const ID:* = '29060311';
 		public static const SERVER:* = 'DM';
 		public static const SOCIAL:* = 'DM';
 		

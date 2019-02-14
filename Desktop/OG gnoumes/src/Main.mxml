@@ -1,0 +1,3862 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:local="*"
+			   xmlns:logging="com.adobe.ac.logging.*"
+			   backgroundColor="#282828"
+			   minWidth="640"
+			   minHeight="480"
+			   width="1300"
+			   height="800"
+			   creationComplete="init()">
+
+	<fx:Script>
+		<![CDATA[
+		
+		import com.adobe.images.PNGEncoder;
+		import com.greensock.TweenLite;
+		import enixan.Compiler;
+		import enixan.FTP;
+		import enixan.Size;
+		import enixan.Util;
+		import enixan.components.*;
+		import enixan.net.Connections;
+		import enixan.worker.WorkerEvent;
+		import enixan.worker.WorkerManager;
+		import flash.desktop.ClipboardFormats;
+		import flash.desktop.NativeDragManager;
+		import flash.desktop.NativeProcess;
+		import flash.desktop.NativeProcessStartupInfo;
+		import flash.display.Bitmap;
+		import flash.display.BitmapData;
+		import flash.display.DisplayObject;
+		import flash.display.Graphics;
+		import flash.display.Loader;
+		import flash.display.LoaderInfo;
+		import flash.display.Shape;
+		import flash.display.Sprite;
+		import flash.display.Stage;
+		import flash.display.StageDisplayState;
+		import flash.events.Event;
+		import flash.events.FileListEvent;
+		import flash.events.FocusEvent;
+		import flash.events.HTTPStatusEvent;
+		import flash.events.IOErrorEvent;
+		import flash.events.KeyboardEvent;
+		import flash.events.MouseEvent;
+		import flash.events.NativeDragEvent;
+		import flash.events.ProgressEvent;
+		import flash.events.TextEvent;
+		import flash.filesystem.File;
+		import flash.filters.ColorMatrixFilter;
+		import flash.filters.GlowFilter;
+		import flash.geom.Matrix;
+		import flash.geom.Point;
+		import flash.geom.Rectangle;
+		import flash.net.FileFilter;
+		import flash.net.InterfaceAddress;
+		import flash.net.NetworkInfo;
+		import flash.net.NetworkInterface;
+		import flash.net.URLLoader;
+		import flash.net.URLRequest;
+		import flash.net.URLRequestMethod;
+		import flash.net.URLStream;
+		import flash.net.URLVariables;
+		import flash.system.Capabilities;
+		import flash.system.LoaderContext;
+		import flash.system.Security;
+		import flash.system.System;
+		import flash.text.Font;
+		import flash.text.TextField;
+		import flash.text.TextFieldAutoSize;
+		import flash.text.TextFieldType;
+		import flash.ui.Keyboard;
+		import flash.utils.ByteArray;
+		import flash.utils.Dictionary;
+		import flash.utils.clearTimeout;
+		import flash.utils.getTimer;
+		import flash.utils.setInterval;
+		import flash.utils.setTimeout;
+		import enixan.net.Connections;
+		import mx.controls.Alert;
+		import mx.core.IUIComponent;
+		import mx.events.CloseEvent;
+		import mx.events.DragEvent;
+		import mx.managers.DragManager;
+		import wins.*;
+		
+		[Embed(source="../res/TAHOMA.TTF",  fontName = "Tahoma",  mimeType = "application/x-font-truetype", fontWeight="normal", fontStyle="normal", advancedAntiAliasing="true", embedAsCFF="false")]
+		private static var Tahoma:Class;
+		
+		[Embed(source="../res/TAHOMABD.TTF",  fontName = "TahomaBold",  mimeType = "application/x-font-truetype", fontWeight="bold", fontStyle="bold", advancedAntiAliasing="true", embedAsCFF="false")]
+		private static var TahomaBold:Class;
+		
+		public static const EXE:String = '.exe';
+		public static const PNG:String = '.png';
+		public static const JPG:String = '.jpg';
+		public static const SWF:String = '.swf';
+		public static const AS:String = '.as';
+		public static const AS3PROJ:String = '.as3proj';
+		public static const JSN:String = '.json';
+		public static const ZIP:String = '.zip';
+		
+		public static var programmFolder:File;
+		public static var mainFolder:File;
+		public static var autoFolder:File;
+		public static var appName:String = 'ObjectGenerator';
+		public static var appWidth:int;
+		public static var appHeight:int;
+		public static var app:Main;
+		public static var shift:Boolean;
+		public static var ctrl:Boolean;
+		public static var mainCanvasMove:Boolean;
+		public static var storage:Object;
+		public static var connection:Connections;			// Разрешение для автоматического сохранения
+		
+		private var projectFolder:File;
+		private var srcFolder:File;
+		private var spritesFolder:File;
+		
+		public var swfContent:Object;
+		public var swfBytes:ByteArray;
+		public var swfNoncompressContent:Object;
+		public var swfNoncompressBytes:ByteArray;
+		
+		public var mainView:MainView;
+		private var magnetCanvas:MagnetCanvas;
+		public var settingsPanel:SettingsPanel;
+		public var windowLayer:ComponentBase;
+		public var messageView:MessageView;
+		
+		public var managers:Sprite;
+		public var stageManager:StageManager;
+		public var animListManager:AnimListManager;
+		public var viewManager:ViewManager;
+		
+		public var ftp:FTP;
+		public var server:ServerManager;
+		
+		private function init():void {
+			
+			app = this;
+			appWidth = appStage.stageWidth;
+			appHeight = appStage.stageHeight;
+			
+			appStage.addEventListener(Event.ACTIVATE, onActive);
+			appStage.addEventListener(Event.DEACTIVATE, onDeactive);
+			appStage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+			appStage.addEventListener(Event.MOUSE_LEAVE, onMouseLeave);
+			appStage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyboardDown);
+			appStage.addEventListener(KeyboardEvent.KEY_UP, onKeyboardUp);
+			appStage.addEventListener(Event.RESIZE, resize);
+			
+			Font.registerFont(Tahoma);
+			Font.registerFont(TahomaBold);
+			
+			Updates.check(appName, Updates.versionFileLink, Updates.applicationFileLink);
+			
+			programmFolder = File.applicationDirectory;
+			
+			server = new ServerManager();
+			
+			initStorage();
+			createMainComponents();
+			Compiler.init();
+			//initDisk();
+			ProjectManager.init();
+			
+			
+			connection = new Connections();
+			connection.addEventListener(Event.CONNECT, function(e:*):void {
+				settingsPanel.online = true;
+			});
+			connection.addEventListener(Event.CLOSE, function(e:*):void {
+				settingsPanel.online = false;
+			});
+			
+		}
+		
+		
+		// Состояние активности программы
+		private var deactiveTimeout:int = 0;
+		private function onActive(e:Event = null):void {
+			clearTimeout(deactiveTimeout);
+			appStage.frameRate = 30;
+		}
+		private function onDeactive(e:Event = null):void {
+			
+			if (storage.noSleep) return;
+			
+			appStage.frameRate = 5;
+			deactiveTimeout = setTimeout(function():void {
+				appStage.frameRate = 1;
+			}, 60000);
+		}
+		
+		
+		// Мышь покидает программу
+		private function onMouseLeave(e:Event):void {
+			dispatchEvent(new MouseEvent(MouseEvent.MOUSE_UP));
+			dispatchEvent(new MouseEvent(MouseEvent.RIGHT_MOUSE_UP));
+			dispatchEvent(new MouseEvent(MouseEvent.MIDDLE_MOUSE_UP));
+		}
+		
+		
+		// Размер
+		private function resize(e:Event = null):void {
+			
+			appWidth = appStage.stageWidth;
+			appHeight = appStage.stageHeight;
+			
+			if (!mainView) return;
+			mainView.resize();
+			
+			messageView.resize();
+			stageManager.resize(120, appHeight);
+			
+			animListManager.resize(120, appHeight);
+			animListManager.x = appWidth - animListManager.width;
+			
+			viewManager.resize(appWidth - 246, 140);
+			viewManager.y = appHeight - 140;
+			
+			settingsPanel.x = int(Main.appWidth * 0.5);
+			
+			windowLayer.x = int(Main.appWidth * 0.5);
+			windowLayer.y = int(Main.appHeight * 0.5);
+		}
+		
+		private function onMouseMove(e:MouseEvent):void {
+			if (ComponentToolTip.toolTip) {
+				ComponentToolTip.reinit(new Point(mouseX, mouseY));
+			}else {
+				ComponentToolTip.resetInit();
+			}
+		}
+		
+		
+		// Клавиши
+		private function onKeyboardDown(e:KeyboardEvent):void {
+			
+			if (e.shiftKey && e.keyCode == Keyboard.SHIFT && !shift) {
+				shift = e.shiftKey;
+				
+				// Создание слепков перемещения
+				mainView.createTrackMark();
+			}
+			
+			if (e.keyCode == Keyboard.ESCAPE) {
+				if (wins.Window.windows.length > 0 && wins.Window.closeAll())
+					return;
+			}
+			
+			if (e.ctrlKey && e.keyCode == Keyboard.CONTROL)
+				ctrl = e.ctrlKey;
+			
+			if (e.keyCode == Keyboard.F11)
+				appStage.displayState = (appStage.displayState == StageDisplayState.NORMAL) ? StageDisplayState.FULL_SCREEN_INTERACTIVE : StageDisplayState.NORMAL;
+			
+			if (e.keyCode == Keyboard.F2) {
+				if (animListManager.focusedNodes.length == 1 && animListManager.focusedNodes[0] is AnimNode)
+					(animListManager.focusedNodes[0] as AnimNode).edit();
+			}
+			
+			if (e.keyCode == Keyboard.SPACE)
+				viewManager.onPlay();
+			
+			if (e.keyCode == Keyboard.ESCAPE) {
+				if (appStage.focus) {
+					clearFocus();
+				}else if (compileState > 0) {
+					compileCancel();
+				}
+			}
+			
+			if (appStage.focus == viewManager.animationLine || (AnimationLine.editLabel && appStage.focus == AnimationLine.editLabel)) {
+				viewManager.animationLine.handleKey(e);
+				if (e.keyCode == Keyboard.LEFT || e.keyCode == Keyboard.RIGHT) return;
+			}
+			
+			if (appStage.focus is TextField) {
+				var textField:TextField = appStage.focus as TextField;
+				if (textField.type == TextFieldType.INPUT) {
+					if (e.keyCode == Keyboard.ENTER) {
+						if (textField.name == 'edit') {
+							textField.dispatchEvent(new FocusEvent(FocusEvent.MOUSE_FOCUS_CHANGE));
+						}else if (textField.name == 'previewWindowName') {
+							wins.PreviewWindow.instance.compileProject();
+						}
+					}
+					
+					if (e.keyCode == Keyboard.TAB) {
+						if (textField.name == 'edit') {
+							textField.dispatchEvent(new FocusEvent(FocusEvent.MOUSE_FOCUS_CHANGE));
+						}
+					}
+					
+					if (e.ctrlKey && e.keyCode == Keyboard.D) {
+						if (textField.selectionBeginIndex < textField.selectionEndIndex) {
+							var text:String = textField.text.substring(textField.selectionBeginIndex, textField.selectionEndIndex);
+							textField.text = textField.text.substring(0, textField.selectionEndIndex) + text + text + textField.text.substring(textField.selectionEndIndex, textField.text.length);
+						}
+					}
+					
+					if (e.keyCode == Keyboard.BACKSPACE && textField.hasEventListener(TextEvent.TEXT_INPUT))
+						textField.dispatchEvent(new TextEvent(TextEvent.TEXT_INPUT));
+				}
+				
+				return;
+			}
+			
+			if (e.keyCode == Keyboard.UP) mainView.move(0, (ctrl) ? -10 : -1);
+			if (e.keyCode == Keyboard.DOWN) mainView.move(0, (ctrl) ? 10 : 1);
+			if (e.keyCode == Keyboard.LEFT) mainView.move((ctrl) ? -10 : -1, 0);
+			if (e.keyCode == Keyboard.RIGHT) mainView.move((ctrl) ? 10 : 1, 0);
+			
+			if (e.keyCode == Keyboard.M)
+				Main.mainCanvasMove = true;
+			
+			if (e.keyCode == Keyboard.Z)
+				new PreviewWindow().show();
+			
+			if (e.keyCode == Keyboard.I)
+				new SettingsWindow().show();
+			
+			if (e.keyCode == Keyboard.H)
+				new HistoryWindow().show();
+			
+			if (e.keyCode == Keyboard.P)
+				showPointWindow();
+			
+			if (e.keyCode == Keyboard.A)
+				viewAnimation();
+			
+			if (e.keyCode == Keyboard.N)
+				onNewProject(null, true);
+			
+			if (e.keyCode == Keyboard.BACKQUOTE)
+				new ConsoleWindow().show();
+			
+			if (e.keyCode == Keyboard.S)
+				new ServerContentWindow().show();
+			
+			if (e.keyCode == Keyboard.B)
+				mainView.showBorders = !mainView.showBorders;
+			
+			//if (e.keyCode == Keyboard.T)
+				//new TextureWindow().show();
+				//if (PreviewWindow.instance) {
+					//if (PreviewWindow.instance.type == JSN)
+						//PreviewWindow.instance.type = SWF;
+					//else
+						//PreviewWindow.instance.type = JSN;
+				//}
+			
+			//if (e.keyCode == Keyboard.O) {
+				
+				//Compiler.setupSDK();
+				
+				/*var polygons:Array = createPolygon();
+				var g:Graphics = mainView.polygonLayer.graphics;
+				g.clear();
+				for (var j:int = 0; j < polygons.length; j++) {
+					g.lineStyle(1, 0xffffff * Math.random());
+					g.moveTo(polygons[j][0].x, polygons[j][0].y);
+					for (var i:int = 1; i < polygons[j].length; i++) {
+						g.lineTo(polygons[j][i].x, polygons[j][i].y);
+					}
+				}*/
+				
+				// Преобразовать swf в текстуры
+				//circleRecompile('D:/swf/', 'Zoner');
+				
+				// Преобразовать swf в текстуры
+				//circleBrokenRecompileNext('D:/swf/');
+				
+			//}
+			
+		}
+		private function onKeyboardUp(e:KeyboardEvent):void {
+			if (e.keyCode == Keyboard.SHIFT) {
+				shift = e.shiftKey;
+				
+				// Очистка слепков перемещения
+				mainView.clearTrackMark();
+			}
+			
+			if (e.keyCode == Keyboard.CONTROL)
+				ctrl = e.ctrlKey;
+			
+			Main.mainCanvasMove = false;
+		}
+		
+		
+		
+		// Пересборка 
+		private var circleRecompileStart:Boolean;
+		public function circleBrokenRecompile(path:String, type:String):void {
+			if (circleRecompileStart) return;
+			circleRecompileStart = true;
+			
+			var interval:int = 0;
+			var atlas:Boolean;
+			var pos:int = 0;
+			var file:File = new File(path + type);
+			var list:Array = file.getDirectoryListing();
+			
+			load();
+			
+			function load():void {
+				file = list[pos] as File;
+				pos ++;
+				atlas = false;
+				
+				if (list.length < pos) {
+					circleRecompileStart = false;
+					circleBrokenRecompileNext(path);
+					return;
+				}
+				
+				if (file.type != SWF) {
+					load();
+					return;
+				}
+				
+				if (PreviewWindow.instance)
+					PreviewWindow.instance.close();
+				
+				addSWFToLoad(file, true);
+				startLoad();
+				
+				interval = setInterval(check, 500);
+			}
+			
+			function check():void {
+				if (swfToLoadList.length > 0)
+					return;
+				
+				if (atlasList && atlasList.length > 0) {
+					if (!atlas) {
+						createAtlasData();
+						atlas = true;
+					}
+					
+					return;
+				}
+				
+				clearTimeout(interval);
+				interval = 0;
+				
+				compileName = file.name.replace(/.swf/g, '');
+				Main.storage.projPath = path.replace(/\/swf\//g, '/swf_broken/' + type);
+				
+				file = new File(Main.storage.projPath);
+				file.createDirectory();
+				
+				Main.app.addEventListener('compileComplete', next);
+				
+				/*var pw:PreviewWindow = new PreviewWindow();
+				pw.show();
+				pw.type = JSN;*/
+				
+				currentSwf = new File('D:/swf_broken_complete/' + type);
+				createDirectory(currentSwf);
+				
+				setTimeout(compileBrokenProject, 1000);
+			}
+			
+			function next(e:Event):void {
+				Main.app.removeEventListener('compileComplete', next);
+				
+				setTimeout(load, 1000);
+			}
+			
+		}
+		private function circleBrokenRecompileNext(path:String):void {
+			var file:File = new File(path);
+			var array:Array = file.getDirectoryListing();
+			
+			for (var i:int = 0; i < array.length; i++) {
+				var temp:File = new File('D:/swf_broken_complete/' + array[i].name);
+				
+				if (temp.exists) continue;
+				
+				circleBrokenRecompile(path, array[i].name);
+				break;
+			}
+		}
+		
+		
+		
+		
+		/*private var circleRecompileStart:Boolean;
+		public function circleRecompile(path:String, type:String):void {
+			if (circleRecompileStart) return;
+			circleRecompileStart = true;
+			
+			var interval:int = 0;
+			var atlas:Boolean;
+			var pos:int = 0;
+			var file:File = new File(path + type);
+			var list:Array = file.getDirectoryListing();
+			
+			load();
+			
+			function load():void {
+				file = list[pos] as File;
+				pos ++;
+				atlas = false;
+				
+				if (list.length < pos)
+					return;
+				
+				if (file.type != SWF) {
+					load();
+					return;
+				}
+				
+				if (PreviewWindow.instance)
+					PreviewWindow.instance.close();
+				
+				addSWFToLoad(file, true);
+				startLoad();
+				
+				interval = setInterval(check, 500);
+			}
+			
+			function check():void {
+				if (swfToLoadList.length > 0)
+					return;
+				
+				if (atlasList.length > 0) {
+					if (!atlas) {
+						createAtlasData();
+						atlas = true;
+					}
+					
+					return;
+				}
+				
+				clearTimeout(interval);
+				interval = 0;
+				
+				compileName = file.name.replace(/.swf/g, '');
+				Main.storage.projPath = path.replace(/\/swf\//g, '/swf_pixi/' + type);
+				
+				file = new File(Main.storage.projPath);
+				file.createDirectory();
+				
+				Main.app.addEventListener('compileComplete', next);
+				
+				var pw:PreviewWindow = new PreviewWindow();
+				pw.show();
+				pw.type = JSN;
+				
+				setTimeout(compileJSONProject, 1000);
+			}
+			
+			function next(e:Event):void {
+				Main.app.removeEventListener('compileComplete', next);
+				
+				setTimeout(load, 1000);
+			}
+			
+		}*/
+		
+		
+		
+		/**
+		 * Tips инфо
+		 */
+		private var infoLabel:TextField;
+		public function set info(value:Object):void {
+			if (!value || Util.countProps(value) == 0) {
+				if (infoLabel && infoLabel.parent) {
+					infoLabel.parent.removeChild(infoLabel);
+					infoLabel = null;
+				}
+				
+				return;
+			}
+			
+			if (!infoLabel) {
+				infoLabel = Util.drawText( {
+					color:			0xffffff,
+					size:			12,
+					width:			200,
+					autoSize:		TextFieldAutoSize.LEFT,
+					multiline:		true,
+					wordWrap:		true
+				});
+				infoLabel.x = 130;
+				infoLabel.y = 10;
+				infoLabel.filters = [new GlowFilter(0x111111, 1, 2, 2, 16)];
+				main.addChild(infoLabel);
+			}
+			
+			var text:String = '';
+			for (var s:String in value) {
+				if (text.length > 0) text += '\n';
+				text += s + ': ' + String(value[s]);
+			}
+			
+			infoLabel.text = text;
+		}
+		
+		
+		
+		// Хранилище данных
+		private function initStorage():void {
+			
+			animationTypeChecked = false;
+			
+			var _default:Object = {
+				swfPath:		File.documentsDirectory.nativePath,
+				projPath:		File.documentsDirectory.nativePath,
+				animationPath:	File.documentsDirectory.nativePath,
+				resourcePath:	File.documentsDirectory.nativePath,
+				projName:		'myProject',
+				animations:		{ },
+				animType:		0,
+				shadow:			{ scaleX:1, scaleY:1, alpha:1 },
+				multiAnim:		false,
+				points:			{
+					smoke: { name:'Точка дыма', count:100, color:0xff0000, stageLink:1, projName:'smokePoints', link:'http://gnome.islandsville.com/resources/swf/Effects/smoke2.swf?v=5'},
+					icon: { name:'Точка иконки', count:1, color:0x33ff66, projName:'iconPoints', link:'http://dreams.islandsville.com/resources/icons/promo/icons/star.png' },
+					shoot: { name:'Точка выстрела', count:360, color:0xddcc00, projName:'shootPoints' }
+				},
+				ccLayers:		{ 1:1, 2:1, 3:1, 4:1, 5:1 },
+				sdk:			null,
+				java:			null,
+				remote:			''
+			}
+			
+			storage = Storage.read('saves', _default);
+			
+			for (var s:String in _default) {
+				if (!storage.hasOwnProperty(s))
+					storage[s] = _default[s];
+			}
+			storage['points'] = {
+				smoke: { name:'Точка дыма', count:100, color:0xff0000, stageLink:1, projName:'smokePoints', link:'http://gnome.islandsville.com/resources/swf/Effects/smoke2.swf?v=5'},
+				icon: { name:'Точка иконки', count:1, color:0x33ff66, projName:'iconPoints', link:'http://dreams.islandsville.com/resources/icons/promo/icons/star.png' },
+				shoot: { name:'Точка выстрела', count:360, color:0xddcc00, projName:'shootPoints' }
+			};
+			
+			
+			// Создание директории для сборки файлов
+			autoFolder = File.applicationStorageDirectory;
+			
+			// Создание главной временной директории
+			mainFolder = File.cacheDirectory.resolvePath(appName);
+			createDirectory(mainFolder);
+			
+			projectFolder = mainFolder.resolvePath('project');
+			if (projectFolder.exists && projectFolder.isDirectory) projectFolder.deleteDirectory(true);
+			
+			// Создание необходимых поддиректорий
+			srcFolder = projectFolder.resolvePath('src');
+			spritesFolder = srcFolder.resolvePath('sprites');
+			createDirectory(spritesFolder);
+			
+			// обновление парамаетров сервера
+			if (Main.storage.hasOwnProperty('server')) {
+				ServerManager.iconPath = Main.storage.server.iconPath;
+				ServerManager.swfPath = Main.storage.server.swfPath;
+				ServerManager.path = Main.storage.server.path;
+			}
+			
+		}
+		
+		/**
+		 * 
+		 */
+		private var storageTimeout:int;
+		public function saveStorage(timeout:int = 0):void {
+			if (storageTimeout) {
+				clearTimeout(storageTimeout);
+				storageTimeout = 0;
+			}
+			
+			if (timeout > 0) {
+				storageTimeout = setTimeout(saveStorage, timeout);
+				return;
+			}
+			
+			Storage.store('saves', Main.storage);
+			
+			/*var file:File = File.applicationDirectory.resolvePath('settings.txt');
+			try {
+				Files.saveText(file, JSON.stringify(storage));
+			}catch(e:Error) {
+				Alert.show('Не удалось сохранить данные!\n' + e.errorID + ': ' + e.message); 
+			}*/
+		}
+		
+		
+		/**
+		 * Stage
+		 */
+		private var __appStage:Stage;
+		public function get appStage():Stage {
+			
+			if (!__appStage) {
+				var stage:* = main;
+				while (true) {
+					if (stage.parent != null) {
+						stage = stage.parent;
+						if (stage is Stage) {
+							__appStage = stage;
+							return __appStage;
+						}
+					}else {
+						break;
+					}
+				}
+			}
+			
+			return __appStage;
+		}
+		
+		
+		/**
+		 * Очистка фокуса
+		 */
+		public static function clearFocus(target:* = null):void {
+			if (target && Main.app.appStage.focus == target) {
+				Main.app.appStage.focus = null;
+			}else{
+				Main.app.appStage.focus = null;
+			}
+		}
+		
+		
+		
+		private var fader:Sprite;
+		public function set appBlock(value:Boolean):void {
+			
+			if (value) {
+				if (fader) return;
+				
+				fader = new Sprite();
+				fader.graphics.beginFill(0x111120, 0.4);
+				fader.graphics.drawRect(0, 0, Capabilities.screenResolutionX, Capabilities.screenResolutionY);
+				fader.graphics.endFill();
+				main.addChild(fader);
+			}else {
+				if (fader && main.contains(fader))
+					main.removeChild(fader);
+				
+				fader = null;
+			}
+		}
+		public function get appBlock():Boolean {
+			return Boolean(fader);
+		}
+		
+		
+		private var progressContainer:Sprite;
+		private var progressText:TextField;
+		private var progressBack:Shape;
+		private var progressProgress:Shape;
+		public function showMainProgress(percent:Number, text:String = null):void {
+			if (!appBlock)
+				appBlock = true;
+			
+			if (!progressContainer) {
+				progressContainer = new Sprite();
+				progressContainer.graphics.beginFill(0x444444);
+				progressContainer.graphics.drawRect(0, 0, 320, 80);
+				progressContainer.graphics.endFill();
+				main.addChild(progressContainer);
+				
+				progressText = Util.drawText( {
+					text:		'Loading ...',
+					color:		0xffffff,
+					size:		14,
+					width:		progressContainer.width - 40,
+					textAlign:	'right'
+				});
+				progressText.x = 20;
+				progressText.y = 20;
+				progressContainer.addChild(progressText);
+				
+				progressBack = new Shape();
+				progressBack.graphics.beginFill(0x666666);
+				progressBack.graphics.drawRect(0, 0, progressText.width, 6);
+				progressBack.graphics.endFill();
+				progressBack.x = progressText.x;
+				progressBack.y = progressText.y + progressText.height + 10;
+				progressContainer.addChild(progressBack);
+				
+				progressProgress = new Shape();
+				progressProgress.graphics.beginFill(0x3ddef6);
+				progressProgress.graphics.drawRect(0, 0, 6, 6);
+				progressProgress.graphics.endFill();
+				progressProgress.x = progressBack.x;
+				progressProgress.y = progressBack.y;
+				progressContainer.addChild(progressProgress);
+				
+				progressContainer.x = int(appWidth * 0.5 - progressContainer.width * 0.5);
+				progressContainer.y = int(appHeight * 0.5 - progressContainer.height * 0.5);
+			}
+			
+			if (percent < 0) percent = 0;
+			if (percent > 1) percent = 1;
+			
+			progressProgress.width = int(progressText.width * percent);
+			progressText.text = (text) ? text : 'Loading ...';
+			
+		}
+		public function hideMainProgress():void {
+			appBlock = false;
+			
+			if (!progressContainer) return;
+			
+			progressProgress.width = progressText.width;
+			
+			TweenLite.to(progressContainer, 0.3, { alpha:0, onComplete:function():void {
+				if (progressContainer && main.contains(progressContainer))
+					main.removeChild(progressContainer);
+				
+				progressContainer = null;
+			}});
+		}
+		
+		private function createMainComponents():void {
+			
+			mainView = new MainView();
+			main.addChild(mainView);
+			
+			
+			managers = new Sprite();
+			main.addChild(managers);
+			
+			settingsPanel = new SettingsPanel();
+			settingsPanel.x = int(Main.appWidth * 0.5);
+			main.addChild(settingsPanel);
+			
+			windowLayer = new ComponentBase();
+			windowLayer.x = int(Main.appWidth * 0.5);
+			windowLayer.y = int(Main.appHeight * 0.5);
+			main.addChild(windowLayer);
+			
+			// Messages
+			messageView = new MessageView();
+			main.addChild(messageView);
+			
+			// Stages 
+			stageManager = new StageManager(appStage, 120, appHeight);
+			managers.addChild(stageManager);
+			
+			// AnimList
+			animListManager = new AnimListManager(appStage, 120, appHeight);
+			animListManager.x = appWidth - animListManager.width;
+			managers.addChild(animListManager);
+			
+			// View
+			viewManager = new ViewManager(appStage, appWidth - 246, 140);
+			viewManager.x = 123;
+			viewManager.y = appHeight - viewManager.height;
+			managers.addChild(viewManager);
+			
+		}
+		
+		
+		
+		/**
+		 * Добавление файлов через браузер
+		 */
+		public function addFromBrowse(title:String, path:String = null, filters:Array = null):void {
+			
+			var browse:File = new File(path);
+			browse.addEventListener(Event.SELECT, onSelect);
+			browse.addEventListener(FileListEvent.SELECT_MULTIPLE, onSelect);
+			browse.addEventListener(Event.CANCEL, onCancel);
+			
+			if (!filters) {
+				browse.browseForDirectory(title);	
+			}else{
+				browse.browseForOpenMultiple(title, filters);
+			}
+			
+			function onSelect(e:Event):void {
+				onCancel();
+				
+				var list:Array;
+				
+				if (e is FileListEvent) {
+					list = (e as FileListEvent).files;
+				}else {
+					var file:File = e.target as File;
+					list = file.getDirectoryListing();
+					
+					for (var i:int = 0; i < list.length; i++) {
+						if (!list[i].isDirectory) {
+							list.splice(i, 1);
+							i--;
+						}
+					}
+					if (list.length == 0)
+						list = [file];
+					
+				}
+				
+				load(list);
+				
+			}
+			function onCancel(e:Event = null):void {
+				browse.removeEventListener(FileListEvent.SELECT_MULTIPLE, onSelect);
+				browse.removeEventListener(Event.SELECT, onSelect);
+				browse.removeEventListener(Event.CANCEL, onCancel);
+			}
+		}
+		
+		
+		
+		/**
+		 * Перетаскивание файлов на рабочую область
+		 */
+		private function onDragEnter(event:NativeDragEvent):void {
+			NativeDragManager.acceptDragDrop(main);
+		}
+		private function onDragDrop(event:NativeDragEvent):void {
+			if (appStage.frameRate < 30)
+				onActive();
+			
+			if (compileState > 0) return;
+			
+			var object:Object;
+			if (event.clipboard.hasFormat(ClipboardFormats.FILE_LIST_FORMAT)) {
+				object = event.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT);
+				
+				if (ServerContentWindow.instance) {
+					ServerContentWindow.instance.load(object);
+				}else{
+					load(object);
+				}
+			}else if (event.clipboard.hasFormat(ClipboardFormats.URL_FORMAT)) {
+				object = event.clipboard.getData(ClipboardFormats.URL_FORMAT);
+				loadUrl(object as String);
+			}
+		}
+		
+		
+		/**
+		 * Загрузка с массива
+		 */
+		private function load(object:Object):void {
+			if (object is Array && (object as Array).length > 0 && object[0] is File) {
+				var folder:File = (object[0] as File).parent;
+				if (folder && folder.exists) {
+					storage.resourcePath = folder.nativePath;
+					saveStorage(10000);
+				}
+			}
+			
+			for each(var file:File in object) {
+				switch(file.type) {
+					case JPG:
+					case PNG:
+						addStageToLoad(file);
+						break;
+					case SWF:
+						addSWFToLoad(file);
+						break;
+					default:
+						addAnimationToLoad(file);
+				}
+			}
+			
+			startLoad();
+		}
+		
+		/**
+		 * Загрузка по ссылке
+		 * @param	link	url ссылка
+		 */
+		public function loadUrl(link:String):void {
+			
+			if (!link) return;
+			
+			if (link.indexOf(PNG) > -1) {
+				addStageToLoad(new File(link));
+			}else if (link.indexOf(SWF) > -1) {
+				addSWFToLoad(new File(link));
+			}
+			
+			startLoad();
+		}
+		
+		
+		public var stagesList:Vector.<StageInfo> = new Vector.<StageInfo>;
+		public var animationsList:Vector.<AnimInfo> = new Vector.<AnimInfo>;
+		
+		private var stageToLoadList:Vector.<File> = new Vector.<File>;
+		private var swfToLoadList:Vector.<File> = new Vector.<File>;
+		private var animationToLoadList:Vector.<File> = new Vector.<File>;
+		
+		private function addStageToLoad(file:File):void {
+			stagesList.push(new StageInfo(file, file.name));
+			stageToLoadList.push(file);
+		}
+		private function addSWFToLoad(file:File, newProject:Boolean = true):void {
+			if (newProject)
+				onNewProject(file.name.substring(0, file.name.indexOf(file.type)));
+			
+			swfToLoadList.push(file);
+		}
+		private function addAnimationToLoad(folder:File):void {
+			if (!folder.isDirectory) return;
+			
+			var list:Array = folder.getDirectoryListing();
+			var file:File;
+			var forSort:Array = [];
+			var maskName:String;
+			var maxNameLength:int;
+			var minNameLength:int;
+			var noType:Boolean;
+			
+			for (var i:int = 0; i < list.length; i++) {
+				if (!list[i].isDirectory && [AS, AS3PROJ, PNG, JPG, SWF].indexOf(list[i].type) == -1) {
+					list.splice(i, 1);
+					i--;
+					continue;
+				}
+				
+				if (!maskName) maskName = list[i].name;
+				else if(maskName != list[i].name) {
+					for (var j:int = 0; j < maskName.length; j++) {
+						if (maskName.charAt(j) != list[i].name.charAt(j)){
+							maskName = maskName.substring(0, j);
+							break;
+						}
+					}
+				}
+			}
+			if (list.length > 0) {
+				if (maskName.length > 0 && list[0].name.length >= maskName + 4) {
+					for (i = 0; i < list.length; i++) {
+						forSort.push( { order:i, file:list[i], subname:list[i].name.substring(maskName.length, list[i].name.length - 4) } );
+					}
+				}else {
+					for (i = 0; i < list.length; i++) {
+						file = list[i] as File;
+						if (file.isDirectory || !file.type) {
+							noType = true;
+							continue;
+						}
+						forSort.push( { order:i, file:file, subname:file.name.substring(0, file.name.length - file.type.length) } );
+					}
+				}
+				if (!noType)
+					list = sorting(forSort);
+			}
+			
+			
+			
+			
+			
+			var files:Vector.<File> = new Vector.<File>;
+			var animName:String = folder.name.replace(/\s/ig, '_');
+			var takeImageInDirectory:int = -1;
+			
+			for (i = 0; i < list.length; i++) {
+				
+				file = list[i] as File;
+				
+				// Если содержитсья .as3proj
+				if (!file.isDirectory && file.type == AS3PROJ) {
+					files.length = 0;
+					parseProject(folder, null, function():void {
+						MessageView.message('Не удалось разобрать проект!');
+					});
+					return;
+				}else if (!file.isDirectory && (file.type == PNG || file.type == JPG)) {
+					files.push(file);
+				}else if (file.isDirectory) {
+					
+					if (takeImageInDirectory != 0) {
+						var tempList:Array = file.getDirectoryListing();
+						var temp:File = tempList[0] as File;
+						
+						// Если ОДНА картинка в папке (так бывает)
+						if (tempList.length == 1 && (temp.type == PNG || temp.type == JPG)) {
+							files.push(temp);
+							takeImageInDirectory = 1;
+						}
+						
+						if (takeImageInDirectory == -1) {
+							addAnimationToLoad(file);
+						}
+						
+					}
+				}
+			}
+			
+			if (animName && files.length > 0) {
+				animationDeleteByName(animName);
+				
+				animName = customAutoRename(animName);
+				
+				var animation:Object = storage.animations[animName];
+				var animType:int = (animation && animation.t) ? animation.t : 1;
+				var repeat:int = (animation && animation.r) ? animation.r : 3;
+				var animInfo:AnimInfo = new AnimInfo(folder, animName, 0, 0, files, animType, repeat);
+				
+				animationsList.push(animInfo);
+				animationToLoadList = animationToLoadList.concat(files);
+			}
+		}
+		
+		/**
+		 * Автозамена имен анимаций
+		 * @param	name
+		 * @return
+		 */
+		private function customAutoRename(name:String):String {
+			
+			/*storage.customNames[0] = {
+				prefix:		'rest',
+				values:		['rest','idle','idel']
+			}*/
+			
+			try {
+				for each(var object:Object in storage.customNames) {
+					for (var i:int = 0; i < object.values.length; i++) {
+						if (name.toLowerCase().indexOf(object.values[i].toLowerCase()) != -1) {
+							
+							name = object.prefix;
+							var nameCount:uint = 1;
+							
+							for (i = 0; i < animationsList.length; i++) {
+								if (animationsList[i].name == name + nameCount.toString()) {
+									nameCount ++;
+									i = 0;
+								}
+							}
+							
+							return name + nameCount.toString();
+						}
+					}
+				}
+			}catch (e:Error) { }
+			
+			return name;
+		}
+		
+		
+		/**
+		 * Окно настройки анимаций
+		 */
+		public function viewAnimation():void {
+			if (wins.Window.isOpenClass(wins.AnimationWindow))
+				return;
+			
+			new AnimationWindow( {
+				animInfo:		(mainView.viewInfo is AnimInfo) ? mainView.viewInfo : null
+			}).show();
+		}
+		private function sorting(array:Array):Array {
+			array.sort(function(object1:Object, object2:Object):int {
+				// По последней части имени
+				if (int(object1.subname) > int(object2.subname))
+					return 1;
+				
+				if (int(object1.subname) < int(object2.subname))
+					return -1;
+				
+				if (object1.file.name > object2.file.name)
+					return 1;
+				
+				if (object1.file.name < object2.file.name)
+					return -1;
+				
+				return 0;
+			});
+			
+			for (var i:int = 0; i < array.length; i++) {
+				array[i] = array[i].file;
+			}
+			
+			return array;
+		}
+		
+		
+		
+		private var loadings:Array = [];
+		private var toLoad:uint;
+		private function startLoad():void {
+			
+			function onComplete(e:Event):void {
+				var index:int;
+				var stageInfo:StageInfo;
+				var animInfo:AnimInfo;
+				var i:int, j:int, k:*;
+				
+				
+				for (i = 0; i < loadings.length; i++) {
+					if (loadings[i].loader == e.target) {
+						var object:Object = loadings.splice(i, 1)[0];
+						
+						dispose(object.loader);
+						
+						index = stageToLoadList.indexOf(object.file);
+						if (index != -1) {
+							stageToLoadList.splice(index, 1);
+							for each(stageInfo in stagesList) {
+								if (stageInfo.file == object.file) {
+									stageInfo.bmd = (e.target.content as Bitmap).bitmapData;
+									stageInfo.x = -int(stageInfo.bitmapData.width * 0.5);
+									stageInfo.y = -int(stageInfo.bitmapData.height * 0.65);
+									
+									break;
+								}
+							}
+							
+							break;
+						}
+						
+						index = animationToLoadList.indexOf(object.file);
+						if (index != -1) {
+							animationToLoadList.splice(index, 1);
+							for each(animInfo in animationsList) {
+								index = animInfo.files.indexOf(object.file);
+								if (index != -1) {
+									animInfo.addBitmapData((e.target.content as Bitmap).bitmapData, index);
+									//animInfo.bmds[index] = (e.target.content as Bitmap).bitmapData;
+									
+									if (!animInfo.x) animInfo.x = -int((e.target.content as Bitmap).width * 0.5);
+									if (!animInfo.y) animInfo.y = -int((e.target.content as Bitmap).height * 0.65);
+									
+									break;
+								}
+							}
+							
+							break;
+						}
+						
+						index = swfToLoadList.indexOf(object.file);
+						if (index != -1) {
+							swfToLoadList.splice(index, 1);
+							swfContent = e.target.content;
+							swfBytes = e.target.bytes;
+							
+							if (compileState == 0) {
+								if (!swfContent.hasOwnProperty('sprites') && swfContent.hasOwnProperty('animation')) {
+									Alert.show('Непонятная конструкция файла', appName);
+								}else{
+									if (swfContent.hasOwnProperty('sprites')) {
+										for (j = 0; j < swfContent.sprites.length; j++) {
+											stageInfo = new StageInfo(null, j.toString() + PNG, swfContent.sprites[j].dx, swfContent.sprites[j].dy, swfContent.sprites[j].bmp);
+											stagesList.push(stageInfo);
+											atlasDataAdd(stageInfo);
+										}
+									}
+									
+									if (swfContent.hasOwnProperty('animation') && swfContent.animation.animations) {
+										for (var s:* in swfContent.animation.animations) {
+											var anims:Object = swfContent.animation.animations[s];
+											if (anims.frames[0] is Array) {
+												for (k in anims.frames) {
+													animInfo = new AnimInfo(null, s + ((k == 1) ? '_back' : ''), 0, 0, new Vector.<File>(anims.frames.length), AnimInfo.ADVANCED_ANIMATION);
+													animInfo.chain = anims.chain;
+													for (j= 0; j < anims.frames[k].length; j++) {
+														animInfo.bmds[j] = anims.frames[k][j].bmd;
+														animInfo.indents[j] = new Point(anims.frames[k][j].ox, anims.frames[k][j].oy);
+													}
+													animationsList.push(animInfo);
+													atlasDataAdd(animInfo);
+												}
+											}else {
+												animInfo = new AnimInfo(null, s, 0, 0, new Vector.<File>(anims.frames.length), AnimInfo.ADVANCED_ANIMATION);
+												animInfo.chain = anims.chain;
+												for (j = 0; j < anims.frames.length; j++) {
+													animInfo.bmds[j] = anims.frames[j].bmd;
+													animInfo.indents[j] = new Point(anims.frames[j].ox, anims.frames[j].oy);
+												}
+												animationsList.push(animInfo);
+												atlasDataAdd(animInfo);
+											}
+										}
+									}
+								}
+							}
+							
+							stageInfo = null;
+							animInfo = null;
+							
+							dispatchEvent(new Event('swfLoadComplete'));
+							
+							break;
+						}
+					}
+				}
+				
+				if (animInfo) atlasDataAdd(animInfo);
+				if (stageInfo) atlasDataAdd(stageInfo);
+				
+				if (loadings.length == 0) {
+					hideMainProgress();
+					updateView();
+				}else {
+					showMainProgress(loadings.length / toLoad, loadings.length.toString() + '/' + toLoad.toString());
+				}
+			}
+			
+			function onError(e:IOErrorEvent):void {
+				for (i = 0; i < loadings.length; i++) {
+					if (loadings[i].loader == e.target) {
+						var index:int = stageToLoadList.indexOf(loadings[i].file);
+						if (index != -1) {
+							stageToLoadList.splice(index, 1);
+							for (index = 0; index < stagesList.length; index++) {
+								if (stagesList[index].file == loadings[i].file) {
+									stagesList.splice(index, 1);
+								}
+							}
+						}
+						
+						index = animationToLoadList.indexOf(loadings[i].file);
+						if (index != -1) animationToLoadList.splice(index, 1);
+						if (index != -1) {
+							animationToLoadList.splice(index, 1);
+							for (index = 0; index < animationsList.length; index++) {
+								if (animationsList[index].file == loadings[i].file) {
+									animationsList.splice(index, 1);
+								}
+							}
+						}
+						
+						index = swfToLoadList.indexOf(loadings[i].file);
+						if (index != -1) swfToLoadList.splice(index, 1);
+						
+						MessageView.message('File load error: ' + loadings[i].link + ' errorID:' + e.errorID);
+						
+						dispose(loadings[i].loader);
+						loadings.splice(i, 1);
+					}
+				}
+				
+				if (loadings.length == 0) {
+					hideMainProgress();
+					updateView();
+				}else {
+					showMainProgress(loadings.length / toLoad, loadings.length.toString() + '/' + toLoad.toString());
+				}
+			}
+			
+			function dispose(loader:*):void {
+				if (loader is LoaderInfo) {
+					var loaderInfo:LoaderInfo = loader;
+					loaderInfo.removeEventListener(Event.COMPLETE, onComplete);
+					loaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onError);
+				}else if (loader is URLLoader) {
+					var urlloader:URLLoader = loader;
+					urlloader.removeEventListener(Event.COMPLETE, onComplete);
+					urlloader.removeEventListener(IOErrorEvent.IO_ERROR, onError);
+				}
+			}
+			
+			var files:Vector.<File> = new Vector.<File>;
+			files = files.concat(stageToLoadList, animationToLoadList, swfToLoadList);
+			
+			for (var i:int = 0; i < files.length; i++) {
+				var link:String;
+				
+				if (!files[i].exists && files[i].nativePath.indexOf('http') == 0) {
+					link = files[i].url;
+					link = link.replace('file:///', '');
+				}else {
+					link = files[i].nativePath;
+				}
+				
+				var loader:Loader = new Loader();
+				loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onComplete);
+				loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onError);
+				loader.load(new URLRequest(link));
+				loadings.push( { loader:loader.contentLoaderInfo, link:link, file:files[i] } );
+			}
+			
+			toLoad = loadings.length;
+			
+			if (loadings.length) {
+				showMainProgress(0, '0/' + toLoad.toString());
+			}
+		}
+		
+		
+		
+		public function updateView():void {
+			// Обновление панелей
+			stageManager.show(stagesList);
+			animListManager.show(animationsList);
+			
+			// Отобразить загруженный (последний) контент
+			mainView.review();
+			createAtlasData();
+		}
+		
+		
+		
+		
+		// ANIMATIONS
+		public function animationDeleteByName(name:String, update:Boolean = false):void {
+			for (var i:int = 0; i < animationsList.length; i++) {
+				if (animationsList[i].name == name) {
+					animationsList.splice(i, 1);
+					i--;
+				}
+			}
+			
+			if (update) animListManager.show(animationsList);
+		}
+		public function animationDelete(animInfo:AnimInfo):void {
+			var index:int = animationsList.indexOf(animInfo);
+			if (index >= 0) {
+				animationsList.splice(index, 1);
+				animListManager.show(animationsList);
+				mainView.review();
+			}
+		}
+		
+		/**
+		 * Клонирует анимацию
+		 * @param	animInfo
+		 * @return
+		 */
+		public function animationClone(animInfo:AnimInfo):AnimInfo {
+			var index:int = animationsList.indexOf(animInfo);
+			if (index >= 0) {
+				
+				// Клонирование данных и назначение имени
+				var newAniminfo:AnimInfo = animInfo.clone();
+				newAniminfo.name = nextName(animInfo.name);
+				
+				// Клонирование атласа анимации
+				var file:File = newAniminfo.file;
+				if (file && file.exists && !file.isDirectory)
+					file.copyTo(file.parent.resolvePath('newAniminfo.name' + file.type), true);
+				
+				// Добавление и отображение клона в списке
+				animationsList.splice(index + 1, 0, newAniminfo);
+				animListManager.show(animationsList);
+				
+				return newAniminfo;
+			}
+			
+			return null;
+		}
+		public function animationCheckName(name:String, source:Object = null):Boolean {
+			for (var i:int = 0; i < animationsList.length; i++) {
+				if (animationsList[i].name == name)
+					return false;
+			}
+			
+			if (name.search(/[\sа-я]+/gi) > -1)
+				return false;
+			
+			return true;
+		}
+		
+		
+		/**
+		 * Следующее имя
+		 * @param	name	Имя по умолчанию
+		 * @return
+		 */
+		public function nextName(name:String):String {
+			var array:Array;
+			var value:int;
+			while (true) {
+				array = name.split('_');
+				value = int(array[array.length - 1]);
+				if (isNaN(value) || !value) {
+					name = name + '_1';
+				}else {
+					array[array.length - 1] = int(array[array.length - 1]) + 1;
+					name = array.join('_');
+				}
+				
+				if (animationCheckName(name))
+					break;
+			}
+			
+			return name;
+		}
+		
+		
+		/**
+		 * Следующее имя в папке назначения
+		 * @param	name	Имя по умолчанию
+		 * @param	folder	Папка назначения
+		 * @return
+		 */
+		public function nextNameInFolder(name:String, folder:File, fileType:String = null):String {
+			
+			if (!folder || !folder.exists || !folder.isDirectory)
+				return name;
+			
+			var nameCounter:uint = 0;
+			var file:File = folder.resolvePath(name + nameCounter.toString() + ((fileType) ? fileType : ''));
+			
+			while (file.exists) {
+				nameCounter ++;
+				file = folder.resolvePath(name + nameCounter.toString() + ((fileType) ? fileType : ''));
+			}
+			
+			return name + nameCounter.toString() + ((fileType) ? fileType : '');
+			
+		}
+		
+		
+		/**
+		 * Смена имени анимации
+		 * @param	animInfo
+		 * @param	name
+		 */
+		public function animationChangeName(animInfo:AnimInfo, name:String):void {
+			var index:int = animationsList.indexOf(animInfo);
+			if (index < 0) return;
+			
+			animInfo.name = name;
+			
+			/*if (!animInfo.file) return;
+			
+			var file:File = animInfo.file;
+			if (file && file.exists && file.isDirectory) return;
+			
+			var parentFile:File = file.parent;
+			var newFile:File = parentFile.resolvePath(name + file.type);
+			
+			try {
+				file.copyTo(newFile, true);
+				file.deleteFile();
+			}catch (e:Error) {
+				// Привет праивлам ОС где Walk.png и walk.png один и тот же файл
+				newFile = parentFile.resolvePath('tempforcopy');
+				file.copyTo(newFile, true);
+				file.deleteFile();
+				file = newFile;
+				
+				newFile = parentFile.resolvePath(name + animInfo.file.type);
+				file.copyTo(newFile, true);
+				file.deleteFile();
+			}
+			
+			animInfo.file = newFile;
+			
+			file = null;
+			newFile = null;
+			parentFile = null;*/
+		}
+		
+		public function animationChange(params:Object):void {
+			
+		}
+		public function aniamtionPlay(played:Boolean):void {
+			mainView.play = played;
+		}
+		public function animationSetFrame(frame:int):void {
+			mainView.play = false;
+			mainView.animationSetFrame(frame, viewManager.animInfo);
+		}
+		public function animationSetChainframe(frame:int):void {
+			mainView.play = false;
+			mainView.animationSetChainframe(frame, viewManager.animInfo);
+		}
+		public function get played():Boolean {
+			return mainView.play;
+		}
+		public function onFrame(e:Event):void {
+			mainView.animationUpdate();
+			viewManager.animationUpdate();
+		}
+		
+		
+		
+		
+		/**
+		 * Обработка массива данных с переменными (type:[stage|anim], file, content)
+		 */
+		public function handleProjectData(list:Array):void {
+			if (list.length > 0)
+				onNewProject();
+			
+			for (var i:int = 0; i < list.length; i++) {
+				if (!list[i].type) continue;
+				
+				var file:File = list[i].file;
+				file.copyTo(spritesFolder.resolvePath(file.name), true);
+				
+				switch(list[i].type) {
+					case 'stage':
+						var stageInfo:StageInfo = new StageInfo(file, file.name, list[i].dx, list[i].dy, list[i].content);
+						stagesList.push(stageInfo);
+						break;
+					case 'anim':
+						var animInfo:AnimInfo = new AnimInfo(file, file.name, 0, 0, new Vector.<File>(list[i].frames.length), AnimInfo.ADVANCED_ANIMATION, 3);
+						animInfo.atlas = list[i].content;
+						animInfo.chain = list[i].chain;
+						animationsList.push(animInfo);
+						
+						for (var j:int = 0; j < list[i].frames.length; j++) {
+							var object:Object = list[i].frames[j];
+							var bmd:BitmapData = new BitmapData(object.w, object.h, true, 0);
+							bmd.copyPixels(animInfo.atlas, new Rectangle(object.x, object.y, object.w, object.h), new Point());
+							animInfo.bmds[j] = bmd;
+							animInfo.indents[j] = new Point(object.ox, object.oy);
+							animInfo.atlasPositions[j] = new Point(object.x, object.y);
+						}
+						
+						break;
+				}
+				
+			}
+			
+			updateView();
+		}
+		
+		/**
+		 * Обработка проекта из папки проекта
+		 */
+		public function parseProject(folder:File = null, complete:Function = null, error:Function = null):void {
+			
+			if (!folder || !folder.exists || !folder.isDirectory) return;
+			
+			var anim:File = folder.resolvePath('src/Animation.as');
+			var main:File = folder.resolvePath('src/' + folder.name + '.as');
+			var sprites:File = folder.resolvePath('src/sprites');
+			
+			if (!main.exists || !sprites.exists) {
+				Alert.show('Не удалось загрузить проект\nНет файлов src/Animation.as и/или src/' + folder.name + '.as', Main.appName);
+				if (error != null) error();
+				return;
+			}
+			
+			var animContent:String = (anim.exists) ? Files.openText(anim) : null;
+			var mainContent:String = Files.openText(main);
+			
+			var loadings:Array = [];
+			var lines:Array = mainContent.split('\n');
+			var array:Array;
+			var array2:Array;
+			var object:Object;
+			var params:Object;
+			var string:String;
+			var line:String;
+			var i:int;
+			var index:int;
+			var r:RegExp;
+			var count:int = 0;
+			
+			for (i = 0; i < lines.length; i++) {
+				string = lines[i];
+				
+				// Поиск файла карты
+				object = new RegExp(/\[Embed\(source=\"[^?\:\|]+\", mimeType=\"[^?\:\|]+\"\)\]/).exec(string);
+				if (object && object[0]) {
+					line = object[0];
+					object = new RegExp(/\"[^?\:\|]+\.(jpg|png)\"/).exec(string);
+					if (object && object[0]) {
+						line = object[0];
+						line = line.substring(1, line.length - 1);
+						loadings.push({ loader:null, file:folder.resolvePath('src/' + line), type:'stage', content:null });
+					}
+				}
+				
+				if (string.indexOf('dx') >= 0) {
+					object = new RegExp(/dx:[-0-9]+/).exec(string);
+					if (object && object[0]) {
+						line = object[0];
+						line = line.substring(3, line.length);
+						loadings[count]['dx'] = int(line);
+					}
+				}
+				
+				if (string.indexOf('dy') >= 0) {
+					object = new RegExp(/dy:[-0-9]+/).exec(string);
+					if (object && object[0]) {
+						line = object[0];
+						line = line.substring(3, line.length);
+						loadings[count]['dy'] = int(line);
+						count ++;
+					}
+				}
+			}
+			
+			if (animContent) {
+				lines = animContent.split('\n');
+				for (i = 0; i < lines.length; i++) {
+					string = lines[i];
+					
+					// Поиск файла карты
+					object = new RegExp(/\[Embed\(source=\"[^?\:\|]+\", mimeType=\"[^?\:\|]+\"\)\]/).exec(string);
+					if (object && object[0]) {
+						line = object[0];
+						object = new RegExp(/\"[^?\:\|]+\.(jpg|png)\"/).exec(string);
+						if (object && object[0]) {
+							line = object[0];
+							line = line.substring(1, line.length - 1);
+							loadings.push({ loader:null, file:folder.resolvePath('src/' + line), type:'anim', content:null });
+						}
+					}
+					
+					
+					object = new RegExp(/\[\{[0-9a-z\:\-\.\s\,\{\}]+\}\]/g).exec(string);
+					if (object && object[0]) {
+						
+						// Данные по кадру
+						line = object[0];
+						array = line.split('},');
+						for (var j:int = 0; j < array.length; j++) {
+							if (!loadings[count]['frames']) loadings[count]['frames'] = [];
+							r = new RegExp(/[a-z]+\:[0-9\-]+/g);
+							params = { };
+							index = 0;
+							
+							while (index >= 0) {
+								r.lastIndex = index;
+								var obj:Object = r.exec(array[j]);
+								if (obj && obj[0]) {
+									index = obj.index + obj[0].length;
+									array2 = obj[0].split(':');
+									params[array2[0]] = int(array2[1]);
+								}else {
+									index = -1;
+								}
+							}
+							loadings[count].frames.push(params);
+						}
+						
+						// Индексы кадров
+						r = new RegExp(/\[[0-9\,]+\]/g);
+						object = r.exec(lines[i + 1]);
+						if (object && object[0]) {
+							loadings[count]['chain'] = object[0].substring(1, object[0].length - 1).split(',');
+							
+							if (loadings[count].file.name.indexOf('_back') > -1 && loadings[count].chain.length == 1) {
+								var name:String = loadings[count].file.name.substring(0, loadings[count].file.name.indexOf('_back'));
+								for (j = 0; j < loadings.length; j++) {
+									if (loadings[j].file.name == name + Main.PNG) {
+										loadings[count].chain = loadings[j].chain;
+									}
+								}
+							}
+							
+						}
+						
+						count++;
+					}
+				}
+			}
+			
+			// Загрузить
+			count = 0;
+			var loader:Loader;
+			for (i = 0; i < loadings.length; i++) {
+				if (!loadings[i].file || !loadings[i].file.exists) continue;
+				
+				loader = new Loader();
+				loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onComplete);
+				loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onError);
+				loader.load(new URLRequest(loadings[i].file.nativePath));
+				loadings[i].loader = loader.contentLoaderInfo;
+			}
+			
+			function onComplete(e:Event):void {
+				var loaderInfo:LoaderInfo = e.target as LoaderInfo;
+				loaderInfo.removeEventListener(Event.COMPLETE, onComplete);
+				loaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onError);
+				
+				for (i = 0; i < loadings.length; i++) {
+					if (loadings[i].loader != loaderInfo) continue;
+					
+					var content:* = loaderInfo.content;
+					if (content is Bitmap) {
+						switch (loadings[i].type) {
+							case 'stage': loadings[i].content = content.bitmapData; break;
+							case 'anim': loadings[i].content = content.bitmapData; break;
+						}
+					}
+					
+					count++;
+				}
+				
+				if (count >= loadings.length) {
+					handleProjectData(loadings);
+					if (complete != null)
+						complete();
+				}
+				
+				loaderInfo = null;
+			}
+			function onError(e:IOErrorEvent):void {
+				var loaderInfo:LoaderInfo = e.target as LoaderInfo;
+				loaderInfo.removeEventListener(Event.COMPLETE, onComplete);
+				loaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onError);
+				loaderInfo = null;
+				
+				if (error != null)
+					error();
+			}
+		}
+		
+		
+		/**
+		 * Обработка полученного контента: создлание атласов, обрезка картинок 
+		 */
+		private var atlasList:Array;
+		private var forsing:Boolean;
+		public var atlasCreating:Boolean;
+		public var atlasCreatingBusy:Boolean;
+		public function atlasDataAdd(view:ViewInfo):void {
+			if (!atlasList) atlasList = [];
+			
+			for (var i:int = 0; i < atlasList.length; i++) {
+				if (atlasList[i].view == view) return;
+			}
+			
+			atlasList.push( {
+				view:		view,
+				file:		null,
+				status:		0
+			});
+		}
+		public function createAtlasData(forse:Boolean = false):void {
+			
+			if (forse)
+				forsing = forse;
+			
+			if (atlasCreatingBusy || !atlasList) return;
+			if (atlasList.length > 0) {
+				atlasCreatingBusy = true;
+				atlasCreating = true;
+			}
+			
+			var completed:uint = 0;
+			var object:Object;
+			var i:int;
+			
+			for (i = 0; i < atlasList.length; i++) {
+				if (atlasList[i].status == 0) {
+					
+					if (atlasList[i].status == 2)
+						completed ++;
+					
+					// StageInfo
+					if (atlasList[i].view is StageInfo && atlasList[i].view.bmd) {
+						object = atlasList[i];
+						break;
+					}
+					
+					// AnimInfo
+					if (atlasList[i].view is AnimInfo) {
+						var full:Boolean = true;
+						for (var j:int = 0; j < atlasList[i].view.bmds.length; j++) {
+							if (!atlasList[i].view.bmds[i]) full = false;
+						}
+						if (full) {
+							object = atlasList[i];
+							break;
+						}
+					}
+				}
+			}
+			if (!object) return;
+			
+			object.status = 1;
+			
+			if (object.view is StageInfo) {
+				atlasHandleStageInfo(object.view as StageInfo);
+			}else if (object.view is AnimInfo) {
+				atlasHandleAnimInfo(object.view as AnimInfo);
+			}
+		}
+		private function atlasHandleStageInfo(stageInfo:StageInfo):void {
+			var object:Object = {
+				width:stageInfo.bmd.width,
+				height:stageInfo.bmd.height,
+				bytes:stageInfo.bmd.getPixels(stageInfo.bmd.rect)
+			}
+			
+			WorkerManager.work('work1', object, function(data:Object):void {
+				//var file:File = new File(spritesFolder.nativePath + File.separator + stageInfo.name);
+				
+				makeAssociateFile(stageInfo, data.png);
+				//Files.save(file, data.png);
+				
+				// Очистка лишних данных
+				//if (stageInfo && stageInfo.bmd) {
+					//stageInfo.bmd.dispose();
+					//stageInfo.bmd = null;
+				//}
+				
+				stageInfo.bmd = new BitmapData(data.width, data.height, true, 0);
+				stageInfo.bmd.setPixels(stageInfo.bmd.rect, data.bytes);
+				
+				object.bytes = null;
+				data.png = null;
+				data.bytes = null;
+				
+				atlasEndHandle(stageInfo);
+			});
+		}
+		private var atlasAnimInfo:AnimInfo;
+		private function atlasHandleAnimInfo(animInfo:AnimInfo):void {
+			
+			atlasAnimInfo = animInfo;
+			
+			animCircleWork();
+			
+		}
+		private function animCircleWork(data:Object = null):void {
+			
+			var bmd:BitmapData;
+			var id:int = 0;
+			
+			if (data) {
+				bmd = new BitmapData(data.width, data.height, true, 0);
+				bmd.setPixels(bmd.rect, data.bytes);
+				atlasAnimInfo.bmds[data.id] = bmd;
+				if (atlasAnimInfo.indents[data.id]) {
+					atlasAnimInfo.indents[data.id].x += Math.round(data.dx);
+					atlasAnimInfo.indents[data.id].y += Math.round(data.dy);
+				}else{
+					atlasAnimInfo.indents[data.id] = new Point(Math.round(data.dx), Math.round(data.dy));
+				}
+				id = data.id + 1;
+				
+				if (atlasAnimInfo.bmds.length <= id) {
+					atlasCreateAtlas();
+					return;
+				}
+			}
+			
+			bmd = atlasAnimInfo.bmds[id];
+			var params:Object = {
+				id:			id,
+				width:		bmd.width,
+				height:		bmd.height,
+				bytes:		bmd.getPixels(bmd.rect)
+			}
+			
+			WorkerManager.work('work3', params, animCircleWork);
+		}
+		private function atlasCreateAtlas():void {
+			
+			const MAX_WIDTH:uint = 8192;
+			var bitmapData:BitmapData;
+			var atlas:BitmapData;
+			var matrix:Matrix;
+			var currWidth:int = 0;
+			var currHeight:int = 0;
+			var maxWidth:int = 0;
+			var maxHeight:int = 0;
+			var sorter:Array = [];
+			var forSkip:Array = [];
+			var widthBlock:int = 0;
+			var id:int;
+			
+			if (!atlasAnimInfo.atlas) {
+				for (var i:int = 0; i < atlasAnimInfo.bmds.length; i++) {
+					bitmapData = atlasAnimInfo.bmds[i];
+					sorter[i] = { id:i, w:bitmapData.width, h:bitmapData.height, ox:0, oy:0 };
+				}
+				
+				for (i = 0; i < sorter.length; i++) {
+					if (sorter[i].h > maxHeight) maxHeight = sorter[i].h;
+					if (currWidth + sorter[i].w < MAX_WIDTH) {
+						currWidth += sorter[i].w;
+						if (maxWidth < currWidth) maxWidth = currWidth;
+					}else {
+						currHeight += maxHeight;
+						maxHeight = 0;
+						currWidth = 0;
+						currWidth = sorter[i].w;
+						if (sorter[i].h > maxHeight) maxHeight = sorter[i].h;
+					}
+				}
+				
+				atlas = new BitmapData(maxWidth, currHeight + maxHeight, true, 0);
+				matrix = new Matrix();
+				currWidth = 0;
+				currHeight = 0;
+				maxWidth = 0;
+				maxHeight = 0;
+				
+				for (i = 0; i < sorter.length; i++) {
+					
+					if (forSkip.indexOf(i) >= 0) continue;
+					
+					id = sorter[i].id;
+					
+					bitmapData = atlasAnimInfo.bmds[id];
+					
+					if (bitmapData.height > maxHeight) maxHeight = bitmapData.height;
+					if (currWidth + bitmapData.width < MAX_WIDTH) {
+						matrix.tx = currWidth;
+						matrix.ty = currHeight;
+						currWidth += bitmapData.width;
+						if (maxWidth < currWidth) maxWidth = currWidth;
+					}else {
+						currHeight += maxHeight;
+						maxHeight = 0;
+						currWidth = 0;
+						
+						matrix.tx = currWidth;
+						matrix.ty = currHeight;
+						
+						currWidth = bitmapData.width;
+						if (bitmapData.height > maxHeight) maxHeight = bitmapData.height;
+					}
+					
+					atlasAnimInfo.atlasPositions[id] = new Point(matrix.tx, matrix.ty);
+					atlas.draw(bitmapData, matrix);
+					
+				}
+			}else {
+				atlas = atlasAnimInfo.atlas;
+			}
+			
+			WorkerManager.work('work1', {
+				bytes:		atlas.getPixels(atlas.rect),
+				width:		atlas.width,
+				height:		atlas.height
+			}, function(data:Object):void {
+				/*var file:File = new File(spritesFolder.nativePath + File.separator + atlasAnimInfo.name + PNG);
+				
+				Files.save(file, data.png);
+				
+				atlasAnimInfo.file = file;*/
+				
+				makeAssociateFile(atlasAnimInfo, data.png, PNG);
+				
+				atlasAnimInfo.atlas = new BitmapData(data.width, data.height, true, 0);
+				atlasAnimInfo.atlas.setPixels(atlasAnimInfo.atlas.rect, data.bytes);
+				
+				data.bytes = null;
+				data.png = null;
+				atlas.dispose();
+				atlas = null;
+				
+				atlasEndHandle(atlasAnimInfo);
+				atlasAnimInfo = null;
+			});
+		}
+		
+		private function atlasEndHandle(view:ViewInfo):void {
+			for (var i:int = 0; i < atlasList.length; i++) {
+				if (atlasList[i].view != view) continue;
+				MessageView.message('Завершена обработка ' + atlasList[i].view.name);
+				atlasList.splice(i, 1);
+				atlasCreatingBusy = false;
+				break;
+			}
+			
+			if (atlasList.length == 0) {
+				atlasCreating = false;
+				if (PreviewWindow.instance)
+					PreviewWindow.instance.update();
+			}else{
+				setTimeout(createAtlasData, 100);
+			}
+		}
+		
+		
+		private var viewFilesAssociation:Dictionary = new Dictionary();
+		
+		/**
+		 * Создать ассоциацию на контент
+		 * @param	viewInfo
+		 * @param	bytes
+		 */
+		private function makeAssociateFile(viewInfo:ViewInfo, bytes:ByteArray, fileType:String = null):void {
+			
+			if (!fileType)
+				fileType = (viewInfo.file) ? viewInfo.file.type : null;
+			
+			var name:String = nextNameInFolder('temp', spritesFolder, fileType);
+			var file:File = spritesFolder.resolvePath(name);
+			
+			Files.save(file, bytes);
+			
+			viewInfo.file = file;
+		}
+		
+		
+		
+		/**
+		 * Добавить вид на поле (MainView) и в панель обработчика вида (ViewManager)
+		 * @param	viewInfo
+		 */
+		public function viewShow(viewInfo:ViewInfo):void {
+			if (animationsList.indexOf(viewInfo) != -1 || stagesList.indexOf(viewInfo) != -1) {
+				mainView.review(viewInfo, Main.ctrl);
+				viewManager.view(viewInfo);
+			}else {
+				mainView.clearViews();
+				viewManager.clear();
+			}
+		}
+		
+		
+		
+		
+		
+		// STAGES
+		public function stageClone(stageInfo:StageInfo):StageInfo {
+			var index:int = stagesList.indexOf(stageInfo);
+			if (index < 0) return null;
+			
+			var newStageinfo:StageInfo = stageInfo.clone();
+			newStageinfo.name = nextName('Stage');
+			
+			stagesList.splice(index + 1, 0, newStageinfo);
+			stageManager.show(stagesList);
+			
+			return newStageinfo;
+		}
+		public function stageDelete(stageInfo:StageInfo):void {
+			var index:int = stagesList.indexOf(stageInfo);
+			if (index >= 0) {
+				stagesList.splice(index, 1);
+				stageManager.show(stagesList);
+				mainView.review();
+			}
+		}
+		public function stageAdd(stageInfo:StageInfo = null):void {
+			var bitmapData:BitmapData = new BitmapData(1, 1, true, 0);
+			var file:File;
+			var name:String = 'Stage';
+			
+			while (!file || file.exists){ 
+				file = spritesFolder.resolvePath(name + PNG);
+				name = nextName(name);
+			}
+			
+			Files.save(file, PNGEncoder.encode(bitmapData));
+			
+			if (!stageInfo)
+				stageInfo = new StageInfo(file, file.name, 0, 0, bitmapData);
+			
+			stagesList.push(stageInfo);
+			stageManager.show(stagesList);
+			mainView.review(null, true);
+		}
+		
+		
+		
+		
+		/**
+		 * Новый проект
+		 */
+		public function onNewProject(name:String = null, reask:Boolean = false):void {
+			if (reask) {
+				Alert.okLabel = 'Да';
+				Alert.cancelLabel = 'Отмена';
+				Alert.show('Создать новый проект?', appName, Alert.OK | Alert.CANCEL, null, function(e:CloseEvent):void {
+					if (e.detail == Alert.OK)
+						onNewProject();
+				});
+				return;
+			}
+			
+			swfContent = null;
+			swfBytes = null;
+			swfNoncompressContent = null;
+			swfNoncompressBytes = null;
+			
+			animationsList.length = 0;
+			stagesList.length = 0;
+			stageManager.clear();
+			animListManager.clear();
+			viewManager.clear();
+			mainView.clear();
+			
+			spritesFolder.deleteDirectory(true);
+			createDirectory(spritesFolder);
+			
+			mainView.resetLayer();
+			
+			System.gc();
+			
+			if (name) storage.projName = name;
+			
+			MessageView.message('Новый проект');
+		}
+		
+		
+		
+		/**
+		 * Может ли чтото скомпилировать?
+		 */
+		public function get hasCompile():Boolean {
+			return Boolean(stagesList.length > 0 || animationsList.length > 0);
+		}
+		
+		
+		/**
+		 * Путь к директориям контента
+		 */
+		public function get projectPath():String {
+			if (!Files.validPath(Main.storage.projPath, 1)) {
+				if (autoFolder.exists) {
+					if (ProjectManager.project && ProjectManager.view) {
+						return autoFolder.resolvePath(ProjectManager.project + '/' + ProjectManager.view).nativePath;
+					}else {
+						return autoFolder.resolvePath('temp').nativePath;
+					}
+				}else {
+					return File.cacheDirectory.resolvePath('OGTemp').nativePath;
+				}
+			}
+			
+			return Main.storage.projPath;
+		}
+		public function get swfPath():String {
+			//if (autoSave && autoFolder.exists && ProjectManager.project && ProjectManager.view)
+				//return autoFolder.resolvePath('swf').nativePath;
+			
+			return Main.storage.swfPath;
+		}
+		
+		
+		
+		
+		/**
+		 * Сборка SWF проекта
+		 */
+		private var currentProject:File;
+		public var currentSwf:File;
+		public var compileName:String;
+		public var compileState:uint = 0;
+		public function compileProject():void {
+			
+			if (compileState > 0) return;
+			
+			swfContent = null;
+			swfBytes = null;
+			PreviewWindow.bitmapData = null;
+			
+			if (!Compiler.mxmlc) {
+				Compiler.initSDK();
+				if (!Compiler.mxmlc) {
+					Alert.show('Не удалось определить путь к AIR SDK', appName, 1 | 2, null, function(e:CloseEvent):void {
+						if (e.detail != 1) return;
+						Files.openDirectory(function(file:File):void {
+							if (Compiler.testSDK(file)) {
+								storage['sdk'] = file.nativePath;
+								saveStorage(1000);
+							}
+						});
+					});
+					return;
+				}
+			}
+			
+			if (!Compiler.java) {
+				Compiler.initJava();
+				if (!Compiler.java) {
+					Alert.show('Не удалось определить путь к Java', appName, 1 | 2, null, function(e:CloseEvent):void {
+						if (e.detail != 1) return;
+						Files.openDirectory(function(file:File):void {
+							if (Compiler.testJava(file)) {
+								storage['java'] = file.nativePath;
+								saveStorage(1000);
+							}
+						});
+					});
+					return;
+				}
+			}
+			
+			if (Compiler.dropletsUpdate())
+				return;
+			
+			if (!compileName || compileName.length == 0) {
+				Alert.show('Введите имя проекта', appName);
+				return;
+			}
+			
+			// Отсечение русских символов и замена пробелов в имени на "_"
+			compileName = compileName.replace(/[\s]/gi, '_');
+			var symbols:Array = compileName.match(/[а-яА-Я]/gi);
+			if (symbols && symbols.length > 0) {
+				Alert.show('Путь или имя не должны содержать кириллицы', appName);
+				return;
+			}
+			
+			if (stagesList.length == 0 && animationsList.length == 0) {
+				MessageView.alert('Нечего собирать');
+				return;
+			}
+			
+			var tempProjFile:File = new File(this.projectPath);
+			var projectPath:String = tempProjFile.resolvePath(compileName).nativePath;
+			
+			/*if (projectPath.indexOf(' ') >= 0) {
+				Alert.show('Нельзя собрать проект в папку с пробелами в расположении', appName);
+				return;
+			}*/
+			
+			currentProject = new File(projectPath);
+			if (currentProject.exists) {
+				Alert.yesLabel = 'Заменить';
+				Alert.noLabel = 'Отмена';
+				Alert.show('Такая папка существует! Заменить?', appName, Alert.YES | Alert.NO, null, function(e:CloseEvent):void {
+					if (e.detail == Alert.YES) {
+						compileStart(projectPath);
+					}
+				});
+			}else {
+				compileStart(projectPath);
+			}
+			
+		}
+		private function compileStart(projectPath:String):void {
+			
+			
+			compileState = 1;
+			dispatchEvent(new Event('compileStart'));
+			Compiler.state(Compiler.COMPILE_START);
+			Compiler.stateProgress('Подготовка файлов');
+			
+			storage.projName = compileName;
+			
+			Compiler.stateProgress('Создание дериктории проекта');
+			currentProject = new File(projectPath);
+			if (!createDirectory(currentProject)) {
+				compileComplete();
+				return;
+			}
+			
+			Compiler.stateProgress('Копирование содержимого дериктории');
+			srcFolder.copyToAsync(currentProject.resolvePath('src'), true);
+			srcFolder.addEventListener(Event.COMPLETE, compileOnCopy);
+			srcFolder.addEventListener(IOErrorEvent.IO_ERROR, compileOnError);
+			
+		}
+		public function compileCancel():void {
+			switch(compileState) {
+				case 1:
+					srcFolder.removeEventListener(Event.COMPLETE, compileOnCopy);
+					break;
+			}
+			
+			clearTimeout(ccTimeout);
+			compileComplete();
+		}
+		private function compileOnError(e:IOErrorEvent):void {
+			
+			srcFolder.removeEventListener(Event.COMPLETE, compileOnCopy);
+			srcFolder.removeEventListener(IOErrorEvent.IO_ERROR, compileOnError);
+			
+			Compiler.stateProgress('Копирование содержимого дериктории: ПРОВАЛ');
+		}
+		
+		
+		private function compileOnCopy(e:Event = null):void {
+			
+			srcFolder.removeEventListener(Event.COMPLETE, compileOnCopy);
+			srcFolder.removeEventListener(IOErrorEvent.IO_ERROR, compileOnError);
+			compileState = 2;
+			
+			var src:File = currentProject.resolvePath('src');
+			var bin:File = currentProject.resolvePath('bin');
+			var obj:File = currentProject.resolvePath('obj/Config.xml');
+			var proj:File = currentProject.resolvePath(compileName + '.as3proj');
+			var main:File = src.resolvePath(compileName + AS);
+			var animation:File = src.resolvePath('Animation.as');
+			
+			createDirectory(bin);
+			
+			currentSwf = bin.resolvePath(compileName + SWF);//new File(storage.swfPath).resolvePath(compileName + SWF);
+			if (!currentSwf.parent.exists) createDirectory(currentSwf.parent);
+			if (!currentSwf.parent.isDirectory) currentSwf = bin.resolvePath(compileName + SWF);
+			
+			var objContent:String = Config.CONFIG;
+			objContent = objContent.replace('[date]', new Date().getDate().toString() + '.' + (new Date().getMonth() + 1).toString() + '.' + new Date().getDate().toString());
+			objContent = objContent.replace('[path]', src.nativePath);
+			objContent = objContent.replace('[class]', main.nativePath);
+			Files.saveText(obj, objContent);
+			
+			var projContent:String = Config.PROJ;
+			projContent = projContent.replace('[path]', 'bin/' + compileName + SWF);
+			projContent = projContent.replace('[class]', 'src/' + compileName + AS);
+			
+			Files.saveText(proj, projContent);
+			Files.saveText(main, getMainContent());
+			Files.saveText(animation, getAnimationContent());
+			
+			Compiler.state(Compiler.COMPILE_COPY_FILES);
+			//MessageView.message('Проект сохранен!');
+			
+			if (compileState) {
+				if (Main.storage.actionStep[1] == 1) {
+					compileMakeCC();
+				}else {
+					compileBandle();
+				}
+			}
+		}
+		
+		// Цветокоррекция
+		private var ccList:Array;
+		private var ccTimeout:int;
+		private var ccListCount:int;
+		private function compileMakeCC():void {
+			
+			compileState = 3;
+			
+			var source:File = currentProject.resolvePath('src/sprites');
+			if (!source.exists) source = currentProject;
+			ccList = source.getDirectoryListing();
+			
+			for (var i:int = 0; i < ccList.length; i++) {
+				var find:Boolean = false;
+				for (var j:int = 0; j < animationsList.length; j++) {
+					if (ccList[i].name == animationsList[j].file.name) {
+						find = true;
+					}
+				}
+				if (!find) {
+					ccList.splice(i, 1);
+					i--;
+				}
+			}
+			
+			ccListCount = ccList.length;
+			compileCCCircle();
+		}
+		private function compileCCCircle(... args):void {
+			var droplet:File = getDropletFile();
+			if (!droplet || !ccList || ccList.length == 0 || compileState == 0) {
+				compileCCCancel();
+				return;
+			}
+			
+			Compiler.stateProgress('Применение цветокоррекции ' + String(ccListCount - ccList.length + 1) + '/' + String(ccListCount));
+			
+			appStage.nativeWindow.alwaysInFront = true;
+			if (ccTimeout) clearTimeout(ccTimeout);
+			ccTimeout = setTimeout(compileCCProblem, 30000);
+			
+			var file:File = ccList.shift() as File;
+			Compiler.photoshopDroplet(droplet, file, compileCCCircle, null, function(... args):void {
+				Compiler.stateProgress('Цветокоррекция: ПРОВАЛ!');
+				compileCCCircle();
+			});
+		}
+		public function getDropletFile():File {
+			var name:String = '';
+			var file:File;
+			for (var s:* in Main.storage.ccLayers) {
+				if (Main.storage.ccLayers[s] == 1)
+					name += s;
+			}
+			for (s = 0; s < Compiler.droplets.length; s++) {
+				if (Compiler.droplets[s].name == 'D' + name + EXE)
+					return Compiler.droplets[s] as File;
+			}
+			
+			return null;
+		}
+		private function compileCCCancel():void {
+			clearTimeout(ccTimeout);
+			appStage.nativeWindow.alwaysInFront = false;
+			compileBandle();
+		}
+		private function compileCCProblem():void {
+			
+			if (compileState == 0) return;
+			
+			Alert.buttonWidth = 90;
+			Alert.yesLabel = 'Прервать';
+			Alert.noLabel = 'Подождать';
+			Alert.show('Droplet долго не отвечает!\nНаверное в Photoshop вылетела ошибка\nПрервать выполнение?', appName, 1 | 2, null, function(e:CloseEvent):void {
+				switch(e.detail) {
+					case 1:
+						compileCCCancel();
+						break;
+					case 2:
+						ccTimeout = setTimeout(compileCCProblem, 10000);
+						break;
+				}
+			});
+		}
+		
+		
+		// Сборка необходимого пака
+		private function compileBandle():void {
+			if (!PreviewWindow.instance) {
+				Compiler.stateProgress('ПРОВАЛ! Не удалось определить метод сборки.');
+				compileComplete();
+				return;
+			}
+			
+			switch (PreviewWindow.instance.type) {
+				case JSN:	compileJSON(); break;
+				default:	compileSwf();
+			}
+		}
+		
+		
+		// Компиляция проекта и загрузка несжатого контента
+		private function compileSwf():void {
+			
+			if (!compileState) return;
+			compileState = 4;
+			
+			Compiler.stateProgress('Сборка проекта');
+			Compiler.compile(currentProject.resolvePath('obj/Config.xml'), currentProject.resolvePath('bin/' + compileName + SWF), compileOnSwfComplete, function(data:String):void {
+				Compiler.stateProgress(data);
+				Compiler.stateProgress('Сборка проекта: ПРОВАЛ!');
+			});
+		}
+		private function compileOnSwfComplete(result:String = null):void {
+			Compiler.state(Compiler.COMPILE_COMPILE_SWF);
+			Compiler.stateProgress('Сборка завершена');
+			
+			var cache:File = currentProject.resolvePath('bin/' + compileName + SWF + '.cache');
+			if (cache.exists)
+				cache.deleteFileAsync();
+			
+			// Загрузка несжатой swf
+			Compiler.stateProgress('Загрузка несжатой swf файла');
+			addEventListener('swfLoadComplete', onNoncompressSwfLoad);
+			var swf:File = currentProject.resolvePath('bin/' + compileName + SWF);
+			
+			// Начать загрузку
+			addSWFToLoad(swf, false);
+			startLoad();
+		}
+		private function onNoncompressSwfLoad(e:Event):void {
+			removeEventListener('swfLoadComplete', onNoncompressSwfLoad);
+			
+			if (swfContent) {
+				swfNoncompressContent = swfContent;
+				swfNoncompressBytes = swfBytes;
+				
+				PreviewWindow.instance.createIcon(swfNoncompressContent);
+				saveIcon();
+				
+				swfContent = null;
+			}
+			
+			if (compileState)
+				compileZipSwf();
+			
+		}
+		
+		
+		// Сжатие
+		private function compileZipSwf():void {
+			
+			if (!Compiler.java) {
+				Compiler.stateProgress('Сжатие не произошло: ПРОВАЛ!');
+				compileCopyNeedFiles();
+				return;
+			}
+			
+			compileState = 5;
+			Compiler.state(Compiler.COMPILE_ZIP);
+			Compiler.stateProgress('Сжатие swf файла');
+			Compiler.zip(currentSwf, currentSwf, function(data:String):void {
+				compileCopyNeedFiles();
+			}, null, function(data:String):void {
+				Alert.show(data, appName);
+				Compiler.stateProgress(data);
+				Compiler.stateProgress('Сжатие: ПРОВАЛ!');
+				compileCopyNeedFiles();
+			});
+		}
+		
+		
+		// Копирование swf в нужную папку
+		private function compileCopyNeedFiles():void {
+			Compiler.stateProgress('Копирование файлов');
+			
+			var swf:File = currentProject.resolvePath('bin/' + compileName + SWF);
+			var dest:File = new File(swfPath);
+			if (!dest.exists) {
+				if (!createDirectory(dest)) {
+					compileComplete();
+					return;
+				}
+			}
+			swf.copyToAsync(dest.resolvePath(compileName + SWF), true);
+			
+			// To disk
+			copyToDisk(currentProject);
+			
+			compileCreateIcon();
+		}
+		
+		
+		// Валидация создания иконки
+		public var iconTypeChecked:Boolean;
+		private var _createIcon:Boolean;
+		public function get createIcon():Boolean {
+			return _createIcon;
+		}
+		public function set createIcon(value:Boolean):void {
+			if (value == _createIcon) return;
+			iconTypeChecked = true;
+			_createIcon = value;
+		}
+		
+		// Создание иконки
+		private function compileCreateIcon():void {
+			compileState = 6;
+			compilerUploadOnServer();
+		}
+		private function onSwfLoad(e:Event):void {
+			compilerUploadOnServer();
+		}
+		
+		private var pictureBytes:ByteArray;
+		public function saveIcon():void {
+			var file:File = currentProject.resolvePath('bin/' + compileName + PNG);
+			pictureBytes = PNGEncoder.encode(PreviewWindow.bitmapData);
+			Files.save(file, pictureBytes);
+		}
+		
+		
+		// Загрузка на сервер
+		private function compilerUploadOnServer():void {
+			
+			if (!PreviewWindow.upload) {
+				compileState = 7;
+				compileComplete();
+				return;
+			}
+			
+			// Загрузка сжатой swf
+			addEventListener('swfLoadComplete', onCompressSwfLoad);
+			var swf:File = currentProject.resolvePath('bin/' + compileName + SWF);
+			addSWFToLoad(swf, false);
+			startLoad();
+			
+			
+		}
+		private function onCompressSwfLoad(e:Event):void {
+			removeEventListener('swfLoadComplete', onCompressSwfLoad);
+			
+			// Добавление картинок и swf'ок в загружчик
+			var contentForLoad:Array = [];
+			var path:String;
+			if (createIcon && pictureBytes) {
+				path = '/home/' + ProjectManager.project + '/public_html/resources/icons/store/' + ProjectManager.view + '/' + compileName + PNG;
+				Compiler.stateProgress('Загрузка на сервер ' + pictureBytes.length.toString() + ' Байт (PNG): ' + path);
+				contentForLoad.push( { path:path, bytes:pictureBytes } );
+			}
+			if (storage.actionStep && storage.actionStep[7] == 1 && swfBytes) {
+				path = '/home/' + ProjectManager.project + '/public_html/resources/swf/' + ProjectManager.view + '/' + compileName + SWF;
+				Compiler.stateProgress('Загрузка на сервер ' + swfBytes.length.toString() + ' Байт (SWF): ' + path);
+				contentForLoad.push( { path:path, bytes:swfBytes } );
+			}
+			if (swfNoncompressBytes) {
+				path = '/home/non_compressed_content/' + ProjectManager.project + '/swf/' + ProjectManager.view + '/' + compileName + SWF;
+				Compiler.stateProgress('Загрузка несжатой SWF на сервер ' + swfNoncompressBytes.length.toString() + ' Байт (Архив)');
+				contentForLoad.push( { path:path, bytes:swfNoncompressBytes } );
+				//server.upload([ { path:path, bytes:swfNoncompressBytes } ], complete, error);
+			}
+			
+			if (contentForLoad.length > 0) {
+				compileState = 7;
+				Compiler.state(Compiler.COMPILE_UPLOAD);
+				server.upload(contentForLoad, complete, error);
+			}else {
+				compileComplete();
+			}
+			
+			function complete():void {
+				Compiler.stateProgress('Загрузка завершена!');
+				compileComplete();
+			}
+			function error():void {
+				Compiler.stateProgress('Загрузка: ПРОВАЛ');
+				compileComplete();
+			}
+		}
+		
+		
+		
+		// Compile complete
+		private function compileComplete():void {
+			compileState = 0;
+			Compiler.state(Compiler.COMPILE_COMPLETE);
+			Compiler.stateProgress('Готово!');
+			dispatchEvent(new Event('compileComplete'));
+		}
+		
+		
+		
+		
+		
+		
+		
+		/**
+		 * Создание JSON проекта
+		 */
+		public function compileJSONProject():void {
+			if (compileState > 0) return;
+			
+			PreviewWindow.bitmapData = null;
+			
+			if (!Compiler.java) {
+				Compiler.initJava();
+				if (!Compiler.java) {
+					Alert.show('Не удалось определить путь к Java', appName, 1 | 2, null, function(e:CloseEvent):void {
+						if (e.detail != 1) return;
+						Files.openDirectory(function(file:File):void {
+							if (Compiler.testJava(file)) {
+								storage['java'] = file.nativePath;
+								saveStorage(1000);
+							}
+						});
+					});
+					return;
+				}
+			}
+			
+			if (Compiler.dropletsUpdate())
+				return;
+			
+			if (!compileName || compileName.length == 0) {
+				Alert.show('Введите имя проекта', appName);
+				return;
+			}
+			
+			// Отсечение русских символов и замена пробелов в имени на "_"
+			compileName = compileName.replace(/[\s]/gi, '_');
+			var symbols:Array = compileName.match(/[а-яА-Я]/gi);
+			if (symbols && symbols.length > 0) {
+				Alert.show('Путь или имя не должны содержать кириллицы', appName);
+				return;
+			}
+			
+			if (stagesList.length == 0 && animationsList.length == 0) {
+				MessageView.alert('Нечего собирать');
+				return;
+			}
+			
+			var tempProjFile:File = new File(this.projectPath);
+			var projectPath:String = tempProjFile.resolvePath(compileName).nativePath;
+			
+			currentProject = new File(projectPath);
+			if (currentProject.exists) {
+				Alert.yesLabel = 'Заменить';
+				Alert.noLabel = 'Отмена';
+				Alert.show('Такая папка существует! Заменить?', appName, Alert.YES | Alert.NO, null, function(e:CloseEvent):void {
+					if (e.detail != Alert.YES) return;
+					compileJSONStart(projectPath);
+				});
+			}else {
+				compileJSONStart(projectPath);
+			}
+		}
+		
+		private function compileJSONStart(projectPath:String):void {
+			
+			compileState = 1;
+			dispatchEvent(new Event('compileStart'));
+			Compiler.state(Compiler.COMPILE_START);
+			Compiler.stateProgress('Подготовка файлов');
+			
+			storage.projName = compileName;
+			
+			Compiler.stateProgress('Создание дериктории проекта');
+			currentProject = new File(projectPath);
+			if (!createDirectory(currentProject)) {
+				compileJSONComplete();
+				return;
+			}
+			
+			Compiler.stateProgress('Копирование содержимого дериктории');
+			
+			var spritesFolder:File = srcFolder.resolvePath('sprites');
+			spritesFolder.copyToAsync(currentProject, true);
+			spritesFolder.addEventListener(Event.COMPLETE, compileJSONOnCopy);
+			spritesFolder.addEventListener(IOErrorEvent.IO_ERROR, compileJSONOnError);
+			
+		}
+		private function compileJSONOnCopy(event:Event):void {
+			
+			if (compileState) {
+				compileBandle();
+				return;
+				
+				if (Main.storage.actionStep[1] == 1) {
+					compileMakeCC();
+				}else {
+					compileBandle();
+				}
+			}
+			
+			//compileBandle();
+		}
+		private function compileJSONOnError(event:IOErrorEvent):void {
+			compileJSONComplete();
+			Compiler.stateProgress('Копирование содержимого дериктории: ПРОВАЛ');
+		}
+		
+		
+		// Сборка JSON проекта
+		private function compileJSON():void {
+			
+			var data:Object = {
+				polygons:	createPolygon(),
+				sprites:	[],
+				animations:	{ },
+				metadata:	{ }
+			}
+			
+			
+			// Стадии
+			for (var i:int = 0; i < stageManager.content.length; i++) {
+				if (stageManager.content[i].hidden) continue;
+				
+				data.sprites.push( {
+					texture:	stageManager.content[i].data.item.name,
+					dx:			stageManager.content[i].data.item.x,
+					dy:			stageManager.content[i].data.item.y
+				});
+			}
+			
+			// Анимации
+			for (i = 0; i < animationsList.length; i++) {
+				var animInfo:AnimInfo = animationsList[i];
+				
+				if (animInfo.extra.hidden) continue;
+				
+				var animName:String = animInfo.name;
+				
+				var frames:Array = [];
+				for (var j:int = 0; j < animInfo.bmds.length; j++) {
+					frames.push({
+						x:	animInfo.atlasPositions[j].x,
+						y:	animInfo.atlasPositions[j].y,
+						ox:	animInfo.indents[j].x,
+						oy:	animInfo.indents[j].y,
+						w:	animInfo.bmds[j].width,
+						h:	animInfo.bmds[j].height
+					});
+				}
+				
+				data.animations[animInfo.name] = {
+					texture:	animName + PNG,
+					ax:			0,
+					ay:			0,
+					x:			animInfo.x,
+					y:			animInfo.y,
+					width:		animInfo.sourceWidth,
+					height:		animInfo.sourceHeight,
+					frames:		frames
+				}
+			}
+			
+			Files.saveText(currentProject.resolvePath('data.json'), JSON.stringify(data));
+			
+			compileJSONComplete();
+		}
+		
+		
+		// Завершение процесса сборки
+		private function compileJSONComplete():void {
+			compileState = 0;
+			Compiler.state(Compiler.COMPILE_COMPLETE);
+			Compiler.stateProgress('Готово!');
+			dispatchEvent(new Event('compileComplete'));
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		/**
+		 * Сборка проекта с разбитыми ресурсами
+		 * @return
+		 */
+		public function compileBrokenProject():void {
+			if (compileState > 0) return;
+			
+			PreviewWindow.bitmapData = null;
+			
+			if (!Compiler.java) {
+				Compiler.initJava();
+				if (!Compiler.java) {
+					Alert.show('Не удалось определить путь к Java', appName, 1 | 2, null, function(e:CloseEvent):void {
+						if (e.detail != 1) return;
+						Files.openDirectory(function(file:File):void {
+							if (Compiler.testJava(file)) {
+								storage['java'] = file.nativePath;
+								saveStorage(1000);
+							}
+						});
+					});
+					return;
+				}
+			}
+			
+			if (Compiler.dropletsUpdate())
+				return;
+			
+			if (!compileName || compileName.length == 0) {
+				Alert.show('Введите имя проекта', appName);
+				return;
+			}
+			
+			// Отсечение русских символов и замена пробелов в имени на "_"
+			compileName = compileName.replace(/[\s]/gi, '_');
+			var symbols:Array = compileName.match(/[а-яА-Я]/gi);
+			if (symbols && symbols.length > 0) {
+				Alert.show('Путь или имя не должны содержать кириллицы\n' + compileName, appName);
+				return;
+			}
+			
+			if (stagesList.length == 0 && animationsList.length == 0) {
+				MessageView.alert('Нечего собирать');
+				return;
+			}
+			
+			var tempProjFile:File = new File(this.projectPath);
+			var projectPath:String = tempProjFile.resolvePath(compileName).nativePath;
+			
+			currentProject = new File(projectPath);
+			if (currentProject.exists) {
+				Alert.yesLabel = 'Заменить';
+				Alert.noLabel = 'Отмена';
+				Alert.show('Такая папка существует! Заменить?', appName, Alert.YES | Alert.NO, null, function(e:CloseEvent):void {
+					if (e.detail != Alert.YES) return;
+					compileJSONStart(projectPath);
+				});
+			}else {
+				compileBrokenStart();
+			}
+		}
+		
+		private var compileBrokenList:Array;
+		private function compileBrokenStart():void {
+			
+			compileState = 2;
+			
+			compileBrokenList = [];
+			
+			compileCreateProjectStructure(currentProject, compileName, getMainBrokenContent(compileName));
+			compileBrokenList.push( { name:compileName, folder:currentProject } );
+			
+			var folder:File = currentProject.resolvePath('addition');
+			var string:String;
+			var name:String;
+			var count:int = 0;
+			var destination:File;
+			var resource:File;
+			
+			for (var i:int = 0; i < stageManager.content.length; i++) {
+				//var stageInfo:StageInfo = stageManager.content[i].data.item;
+				if (stageManager.content[i].hidden) continue;
+				
+				name = 'stage' + count.toString();
+				
+				string = Config.IMPORT;
+				string = string.replace(/{name}/gi, name);
+				string = string.replace('{include}', '[Embed(source="' + name + PNG + '", mimeType="image/png")]\n\t\tprivate var MainClass:Class;\n\t\tpublic var bmd:BitmapData = new MainClass().bitmapData;\n\t\t');
+				compileCreateProjectStructure(folder, name, string);
+				compileBrokenList.push( { name:name, folder:folder, resolve:compileName } );
+				
+				destination = folder.resolvePath('src/' + name + PNG);
+				resource = srcFolder.resolvePath('sprites/' + stageManager.content[i].data.item.name);
+				resource.copyTo(destination);
+				
+				count ++;
+			}
+			
+			for (i = 0; i < animationsList.length; i++) {
+				var animInfo:AnimInfo = animationsList[i];
+				if (animInfo.extra.hidden) continue;
+				
+				name = animInfo.name;
+				
+				string = Config.IMPORT;
+				string = string.replace(/{name}/gi, name);
+				string = string.replace('{include}', '[Embed(source="' + name + PNG + '", mimeType="image/png")]\n\t\tprivate var MainClass:Class;\n\t\tpublic var bmd:BitmapData = new MainClass().bitmapData;\n\t\t');
+				compileCreateProjectStructure(folder, name, string);
+				compileBrokenList.push( { name:name, folder:folder, resolve:compileName } );
+				
+				destination = folder.resolvePath('src/' + name + PNG);
+				resource = srcFolder.resolvePath('sprites/' + name + PNG);
+				resource.copyTo(destination);
+			}
+			
+			setTimeout(compileBrokenCompileSWF, 500);
+		}
+		private function compileCreateProjectStructure(folder:File, name:String, mainContent:String = null):void {
+			var src:File = folder.resolvePath('src');
+			var bin:File = folder.resolvePath('bin');
+			var obj:File = folder.resolvePath('obj/' + name + '.xml');
+			var proj:File = folder.resolvePath(name + '.as3proj');
+			var main:File = src.resolvePath(name + AS);
+			var animation:File = src.resolvePath('Animation.as');
+			
+			
+			var objContent:String = Config.CONFIG;
+			objContent = objContent.replace('[date]', new Date().getDate().toString() + '.' + (new Date().getMonth() + 1).toString() + '.' + new Date().getDate().toString());
+			objContent = objContent.replace('[path]', src.nativePath);
+			objContent = objContent.replace('[class]', main.nativePath);
+			
+			var projContent:String = Config.PROJ;
+			projContent = projContent.replace('[path]', 'bin/' + name + SWF);
+			projContent = projContent.replace('[class]', 'src/' + name + AS);
+			
+			createDirectory(bin);									// bin
+			Files.saveText(obj, objContent);						// obj
+			Files.saveText(proj, projContent);						//
+			Files.saveText(main, (mainContent) ? mainContent : '');	// src
+		}
+		
+		// Собрать
+		private function compileBrokenCompileSWF():void {
+			
+			if (!compileState) return;
+			
+			compileState = 4;
+			
+			for (var i:int = 0; i < compileBrokenList.length; i++) {
+				var object:Object = compileBrokenList[i];
+				var config:File = object.folder.resolvePath('obj/' + object.name + '.xml');
+				var destination:File = currentSwf.resolvePath(((object.resolve) ? object.resolve + '/' : '') + object.name + SWF);
+				
+				object.swf = destination;
+				
+				Compiler.compile(config, destination, finish);
+			}
+			
+			function finish(... args):void {
+				if (Compiler.compileQueue.length > 0) return;
+				compileBrokenZIP();
+			}
+			
+		}
+		
+		
+		// Сжать
+		private function compileBrokenZIP():void {
+			
+			var position:int = 0;
+			
+			nextZIP();
+			
+			function nextZIP():void {
+				var object:Object = compileBrokenList[position];
+				if (object) {
+					Compiler.zip(object.swf, object.swf, completeZIP, completeZIP);
+				}else {
+					compileBrokenComplete();
+				}
+			}
+			function completeZIP(... args):void {
+				position ++;
+				nextZIP();
+			}
+		}
+		
+		
+		// Завершение процесса сборки
+		private function compileBrokenComplete():void {
+			
+			compileBrokenList.length = 0;
+			
+			compileState = 0;
+			Compiler.state(Compiler.COMPILE_COMPLETE);
+			Compiler.stateProgress('Готово!');
+			dispatchEvent(new Event('compileComplete'));
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		private function getMainContent():String {
+			var content:String = Config.MAIN;
+			
+			var points:String;
+			var pnts:Object;
+			var includes:String = '';
+			var levels:String = 'public var sprites:Array = [';
+			var index:int = 0;
+			
+			for (var i:int = 0; i < stageManager.content.length; i++) {
+				if (stageManager.content[i].hidden) continue;
+				
+				includes += '[Embed(source="sprites/' + stageManager.content[i].data.item.file.name + '", mimeType="image/png")]\n\t\tprivate var Stage' + index.toString() + ':Class;\n\t\t\n\t\t';
+				
+				if (index != 0) levels += ',';
+				levels += '\n\t\t\t{\n\t\t\t\tbmp:new Stage' + index.toString() + '().bitmapData,\n\t\t\t\tdx:' + stageManager.content[i].data.item.x + ',\n\t\t\t\tdy:' + stageManager.content[i].data.item.y + '\n\t\t\t}';
+				index ++;
+			}
+			levels += '\n\t\t];';
+			
+			// Точки
+			for (i = 0; i < mainView.pointLayer.numChildren; i++) {
+				var point:* = mainView.pointLayer.getChildAt(i);
+				var name:String = point.name;
+				var array:Array = name.split('_');
+				
+				if (array.length <= 1 || array[0] != 'point') continue;
+				
+				index = int(array[2]);
+				if (index == -1) index = 0;
+				
+				if (!pnts) pnts = { };
+				if (!pnts[array[1]]) pnts[array[1]] = [];
+				if (!pnts[array[1]][index]) pnts[array[1]][index] = [];
+				
+				var joins:Array = [];
+				joins.push('dx:' + point.x);
+				joins.push('dy:' + point.y);
+				joins.push('scale:' + point.scaleX);
+				
+				if (point.extra && Util.countProps(point.extra) > 0) {
+					for (name in point.extra) {
+						if (name == 'dx' || name == 'dy' || name == 'scale') continue;
+						joins.push(name + ':' + ((isNaN(Number(point.extra[name]))) ? '"' + point.extra[name] + '"' : point.extra[name]));
+					}
+				}
+				
+				//pnts[array[1]][index].push( '{ dx:' + point.x + ', dy:' + point.y + ', scale:' + point.scaleX + ' }' );
+				pnts[array[1]][index].push( '{ ' + joins.join(', ') + ' }' );
+				
+			}
+			for (var s:* in pnts) {
+				if (!(pnts[s] is Array))
+					continue;
+				
+				var info:Object = Main.storage.points[s];
+				array = pnts[s];
+				points = null;
+				
+				for (i = 0; i < array.length; i++) {
+					if (!points) {
+						points = 'public var ' + ((info.projName) ? info.projName : s) + ':Array = [';
+					}
+					
+					if (i > 0)
+						points += ',';
+					
+					if (!(array[i] is Array)) {
+						points += '\n\t\t\t[]';
+						continue;
+					}
+					
+					points += '\n\t\t\t\[';
+					
+					for (var j:int = 0; j < array[i].length; j++) {
+						if (j > 0) points += ',';
+						points += '\n\t\t\t\t' + array[i][j];
+					}
+					points += '\n\t\t\t]';
+				}
+				points += '\n\t\t];\n\t\t';
+				
+				pnts[s] = points;
+			}
+			points = '';
+			for (s in pnts)
+				points += pnts[s];
+			
+			
+			content = content.replace( /{name}/gi, compileName );
+			content = content.replace('{include}', includes );
+			content = content.replace('{levels}', levels );
+			content = content.replace('{animation}', 'new Animation()');
+			content = content.replace('{points}', points);
+			
+			return content;
+		}
+		private function getAnimationContent():String {
+			
+			function sorter(a:ViewInfo, b:ViewInfo):int {
+				if (a.name > b.name)
+					return 1;
+				
+				if (a.name < b.name)
+					return -1;
+				
+				return 0;
+			}
+			
+			function persAnim(last:Boolean = false):String {
+				return (animationType) ? ((last) ? ']' : '[') : '';
+			}
+			
+			animationsList.sort(sorter);
+			
+			var created:Array = [];
+			var content:String = Config.ANIM;
+			var includes:String = '';
+			var atlases:String = '';
+			var animation:String = '';
+			var dispose:String = '';
+			var index:int = 0;
+			
+			for (var i:int = 0; i < animationsList.length; i++) {
+				var animInfo:AnimInfo = animationsList[i];
+				
+				if (animInfo.extra.hidden) continue;
+				
+				var animName:String = animInfo.name;
+				var fileName:String = (animInfo.file) ? animInfo.file.name : animName;
+				var atlasName:String = 'atlas_' + animName;
+				
+				if (created.indexOf(animName) == -1) {
+					includes += '[Embed(source="sprites/' + fileName + '", mimeType="image/png")]\n\t\tprivate var Stage' + index.toString() + ':Class;\n\t\t\n\t\t';
+					atlases += 'var ' + atlasName + ':BitmapData = new Stage' + index.toString() + '().bitmapData;\n\t\t\t';
+				}
+				
+				animation += 'frames = [';
+				for (var j:int = 0; j < animInfo.bmds.length; j++) {
+					if (j > 0) animation += ',';
+					animation += '{ox:' + String(animInfo.x + animInfo.indents[j].x) + ', oy:' + String(animInfo.y + animInfo.indents[j].y) + ', x:' + animInfo.atlasPositions[j].x + ', y:' + animInfo.atlasPositions[j].y + ', w:' + animInfo.bmds[j].width + ', h:' + animInfo.bmds[j].height + '}';
+				}
+				animation += '];';
+				
+				if (animationType && animName.indexOf('_back') != -1 && animName.indexOf('_back') + 5 == animName.length && created.indexOf(animName.substring(0, animName.indexOf('_back'))) > -1) {
+					animation += '\n\t\t\tanimations[\'' + animName.substring(0, animName.indexOf('_back')) + '\'][\'frames\'][1] = getFrames(frames, ' + atlasName+');\n\t\t\t\n\t\t\t';
+				}else {
+					animation += '\n\t\t\tanimations[\'' + animName + '\'] = {frames:'+persAnim()+'getFrames(frames, '+atlasName+')'+persAnim(true)+', chain:['+animInfo.chain.join(',')+']};\n\t\t\t\n\t\t\t';
+				}
+				
+				if (created.indexOf(animName) == -1) {
+					dispose += atlasName + '.dispose();\n\t\t\t' + atlasName + ' = null;\n\t\t\t\n\t\t\t';
+					created.push(animName);
+				}
+				
+				index++;
+			}
+			
+			created.length = 0;
+			
+			content = content.replace('{ax}', 0);
+			content = content.replace('{ay}', 0);
+			content = content.replace('{include}', includes);
+			content = content.replace('{animations}', atlases + '\n\t\t\t\n\t\t\t' + animation + '\n\t\t\t\n\t\t\t' + dispose);
+			
+			return content;
+		}
+		
+		
+		
+		
+		private function getMainBrokenContent(mainName:String):String {
+			
+			function sorter(a:ViewInfo, b:ViewInfo):int {
+				if (a.name > b.name)
+					return 1;
+				
+				if (a.name < b.name)
+					return -1;
+				
+				return 0;
+			}
+			
+			function persAnim(last:Boolean = false):String {
+				return (animationType) ? ((last) ? ']' : '[') : '';
+			}
+			
+			animationsList.sort(sorter);
+			
+			var content:String = Config.MAIN_NO_IMPORT;
+			
+			var points:String;
+			var pnts:Object;
+			var levels:String = 'public var sprites:Array = [';
+			var index:int = 0;
+			
+			for (var i:int = 0; i < stageManager.content.length; i++) {
+				if (stageManager.content[i].hidden) continue;
+				
+				if (index != 0) levels += ',';
+				levels += '\n\t\t\t{\n\t\t\t\tdx:' + stageManager.content[i].data.item.x + ',\n\t\t\t\tdy:' + stageManager.content[i].data.item.y + '\n\t\t\t}';
+				index ++;
+			}
+			levels += '\n\t\t];';
+			
+			// Точки
+			for (i = 0; i < mainView.pointLayer.numChildren; i++) {
+				var point:* = mainView.pointLayer.getChildAt(i);
+				var name:String = point.name;
+				var array:Array = name.split('_');
+				
+				if (array.length <= 1 || array[0] != 'point') continue;
+				
+				index = int(array[2]);
+				if (index == -1) index = 0;
+				
+				if (!pnts) pnts = { };
+				if (!pnts[array[1]]) pnts[array[1]] = [];
+				if (!pnts[array[1]][index]) pnts[array[1]][index] = [];
+				
+				var joins:Array = [];
+				joins.push('dx:' + point.x);
+				joins.push('dy:' + point.y);
+				joins.push('scale:' + point.scaleX);
+				
+				if (point.extra && Util.countProps(point.extra) > 0) {
+					for (name in point.extra) {
+						if (name == 'dx' || name == 'dy' || name == 'scale') continue;
+						joins.push(name + ':' + ((isNaN(Number(point.extra[name]))) ? '"' + point.extra[name] + '"' : point.extra[name]));
+					}
+				}
+				
+				pnts[array[1]][index].push( '{ ' + joins.join(', ') + ' }' );
+				
+			}
+			for (var s:* in pnts) {
+				if (!(pnts[s] is Array))
+					continue;
+				
+				var info:Object = Main.storage.points[s];
+				array = pnts[s];
+				points = null;
+				
+				for (i = 0; i < array.length; i++) {
+					if (!points) {
+						points = 'public var ' + ((info.projName) ? info.projName : s) + ':Array = [';
+					}
+					
+					if (i > 0)
+						points += ',';
+					
+					if (!(array[i] is Array)) {
+						points += '\n\t\t\t[]';
+						continue;
+					}
+					
+					points += '\n\t\t\t\[';
+					
+					for (var j:int = 0; j < array[i].length; j++) {
+						if (j > 0) points += ',';
+						points += '\n\t\t\t\t' + array[i][j];
+					}
+					points += '\n\t\t\t]';
+				}
+				points += '\n\t\t];\n\t\t';
+				
+				pnts[s] = points;
+			}
+			points = '';
+			for (s in pnts)
+				points += pnts[s];
+			
+			
+			
+			// Анимации
+			var created:Array = [];
+			var frames:String = '';
+			var animation:String = '\n\t\tpublic var animations:Object = {\n\t\t\tax: 0,\n\t\t\tay: 0,\n\t\t\tanimation: {';
+			
+			index = 0;
+			
+			for (i = 0; i < animationsList.length; i++) {
+				var animInfo:AnimInfo = animationsList[i];
+				
+				if (animInfo.extra.hidden) continue;
+				
+				var animName:String = animInfo.name;
+				
+				frames = '[';
+				for (j = 0; j < animInfo.bmds.length; j++) {
+					if (j > 0) frames += ',';
+					frames += '{ox:' + String(animInfo.x + animInfo.indents[j].x) + ', oy:' + String(animInfo.y + animInfo.indents[j].y) + ', x:' + animInfo.atlasPositions[j].x + ', y:' + animInfo.atlasPositions[j].y + ', w:' + animInfo.bmds[j].width + ', h:' + animInfo.bmds[j].height + '}';
+				}
+				frames += ']';
+				
+				if (index > 0) animation += ',';
+				animation += '\n\t\t\t\t' + animName + ': {\n\t\t\t\t\tframes:' + frames + ',\n\t\t\t\t\tchain:[' + animInfo.chain.join(',') + ']\n\t\t\t\t}';
+				
+				if (created.indexOf(animName) == -1)
+					created.push(animName);
+				
+				index++;
+			}
+			
+			animation += '\n\t\t\t}\n\t\t}';
+			
+			created.length = 0;
+			
+			
+			
+			
+			
+			
+			
+			content = content.replace( /{name}/gi, mainName );
+			content = content.replace('{levels}', levels );
+			content = content.replace('{animation}', animation);
+			content = content.replace('{points}', points);
+			
+			return content;
+		}
+		
+		
+		
+		
+		/**
+		 * Нормальзация (не факт)
+		 */
+		public function normilizeStages():void {
+			
+			if (stagesList.length < 2) {
+				MessageView.alert('Нечего совмещать. Мало стадий!');
+			}
+			
+			appBlock = true;
+			
+			setTimeout(startNormalizeStages, 50);
+		}
+		private function startNormalizeStages():void {
+			
+			const visualizate:Boolean = false;
+			const maskSize:int = 20;
+			
+			var maps:Array = [];
+			var compare:Array;
+			var halfWidth:int;
+			var halfHeight:int;
+			var bytes:ByteArray;
+			var value:uint;
+			var i:int;
+			var j:int;
+			var k:int;
+			var p:int;
+			var time:int = getTimer();
+			var startPoint:Point;		//
+			var startPoint2:Point;		//
+			var pointNext:Point;		//
+			var pointNext2:Point;		//
+			var match:int;				// Количество повторенных сдвигов
+			var diff:int;
+			var next:Object;
+			var object:Object;
+			
+			for (i = 0; i < stageManager.content.length; i++) {
+				var bmd:BitmapData = stageManager.content[i].data.item.bitmapData;
+				
+				object = {
+					bmd:		bmd,
+					bytes:		bmd.getPixels(bmd.rect),
+					width:		bmd.width,
+					height:		bmd.height,
+					points:		[[], [], [], []],
+					indents:	new Vector.<Point>
+				}
+				
+				maps.push(object);
+			}
+			
+			for (i = 0; i < maps.length; i++) {
+				
+				object = maps[i];
+				
+				halfWidth = object.width * 0.5;
+				halfHeight = object.height * 0.5;
+				bytes = object.bytes;
+				bmd = object.bmd;
+				
+				for (j = 0; j < object.width; j++) {
+					// Сверху
+					for (var h:int = 0; h < halfHeight; h++) {
+						bytes.position = (j + object.width * h) * 4;
+						value = bytes.readInt();
+						if (value == 0) continue;
+						if (visualizate) bmd.setPixel32(j, h, 0xffff0000);
+						object.points[0].push(new Point(j, h));
+						break;
+					}
+					if (value == 0) object.points[0].push(null);
+					
+					// Снизу
+					for (h = 0; h < halfHeight; h++) {
+						bytes.position = (object.width * object.height - object.width + j - object.width * h) * 4;
+						value = bytes.readInt();
+						if (value == 0) continue;
+						if (visualizate) bmd.setPixel32(j, object.height - h - 1, 0xffffff00);
+						object.points[1].push(new Point(j, object.height - h - 1));
+						break;
+					}
+					if (value == 0) object.points[1].push(null);
+				}
+				
+				
+				for (j = 0; j < object.height; j++) {
+					// --->
+					for (h = 0; h < halfWidth; h++) {
+						bytes.position = (object.width * j + h) * 4;
+						value = bytes.readInt();
+						if (value == 0) continue;
+						if (visualizate) bmd.setPixel32(h, j, 0xffff00ff);
+						object.points[2].push(new Point(h, j));
+						break;
+					}
+					if (value == 0) object.points[2].push(null);
+					
+					// <---
+					for (h = 0; h < halfWidth; h++) {
+						bytes.position = (object.width * j + object.width - h - 1) * 4;
+						value = bytes.readInt();
+						if (value == 0) continue;
+						if (visualizate) bmd.setPixel32(object.width - h - 1, j, 0xff00ffff);
+						object.points[3].push(new Point(object.width - h - 1, j));
+						break;
+					}
+					if (value == 0) object.points[3].push(null);
+				}
+			}
+			
+			for (i = maps.length - 1; i > 0; i--) {
+				object = maps[i];
+				next = maps[i - 1];
+				
+				for (j = 0; j < object.points.length; j++) {
+					for (p = 0; p < object.points[j].length; p++) {
+						if (!object.points[j][p]) continue;
+						
+						startPoint = object.points[j][p];
+						
+						for (k = 0; k < next.points[j].length; k++) {
+							if (!next.points[j][k]) continue;
+							
+							startPoint2 = next.points[j][k];
+							
+							match = 0;
+							while (true) {
+								match ++;
+								
+								pointNext = object.points[j][p + match];
+								pointNext2 = next.points[j][k + match];
+								
+								if (!pointNext || !pointNext2 || j > 3) {
+									match = 0;
+									break;
+								}
+								
+								if (j == 0 || j == 1) {
+									if (startPoint.y - pointNext.y != startPoint2.y - pointNext2.y)
+										break;
+								}else if (j == 2 || j == 3) {
+									if (startPoint.x - pointNext.x != startPoint2.x - pointNext2.x)
+										break;
+								}
+							}
+							
+							if (match >= maskSize) {
+								k += match;
+								p += match;
+								
+								next.indents.push(new Point(startPoint.x - startPoint2.x, startPoint.y - startPoint2.y));
+								trace(j, match, startPoint);
+							}
+						}
+					}
+				}
+				
+				trace(next.indents);
+			}
+			
+			for (i = 0; i < maps.length; i++) {
+				object = maps[i];
+				
+				object.bytes = null;
+				
+				compare = [];
+				
+				//if (object.indents.length > 5) {
+					for (p = 0; p < object.indents.length; p++) {
+						match = 0;
+						for (j = 0; j < compare.length; j++) {
+							if (compare[j].point.x == object.indents[p].x && compare[j].point.y == object.indents[p].y) {
+								compare[j].order ++;
+								match = 1;
+								break;
+							}
+						}
+						
+						if (match == 0) {
+							compare.push({point:object.indents[p], order:1});
+						}
+					}
+					
+					compare.sortOn('order', Array.NUMERIC | Array.DESCENDING);
+					
+					if (compare.length > 0) {
+						object.x = compare[0].point.x;
+						object.y = compare[0].point.y;
+					}
+				//}
+			}
+			
+			for (p = stageManager.content.length - 1; p > -1; p--) {
+				for (i = 0; i < maps.length; i++) {
+					if (!maps[i].hasOwnProperty('x') || !maps[i].hasOwnProperty('y') || stageManager.content[p].data.item.bitmapData != maps[i].bmd) continue;
+					
+					stageManager.content[p].data.item.x = stageManager.content[p + 1].data.item.x + maps[i].x;
+					stageManager.content[p].data.item.y = stageManager.content[p + 1].data.item.y + maps[i].y;
+				}
+			}
+			
+			mainView.review();
+			
+			
+			
+			maps = null;
+			
+			appBlock = false;
+			MessageView.message('Сопоставило за:' + String((getTimer() - time) * 0.001) + ' сек.');
+		}
+		
+		
+		
+		
+		// Polygon
+		private function createPolygon():Array {
+			
+			function getPolygon(bmd:BitmapData, indentPoint:Point = null, distance:int = 20):Array {
+				
+				const VISIBLE_PIXEL:uint = 0xff000000;
+				
+				var position:int = 0;
+				var dist:int;
+				var point:Object;
+				var points:Array = [];
+				var pointsLeft:Array = [];
+				var pointsRight:Array = [];
+				
+				if (!indentPoint) indentPoint = new Point();
+				
+				// Выбрать крайние точки слева и справа
+				for (var j:int = 0; j < bmd.height; j += 2) {
+					
+					point = null;
+					
+					for (var k:int = 0; k < bmd.width; k+=2) {
+						if (bmd.getPixel32(k, j) < VISIBLE_PIXEL) continue;
+						point = { x:k, y:j };
+						pointsLeft.push(point);
+						break;
+					}
+					
+					for (k = bmd.width - 1; point && k > -1; k-=2) {
+						if (bmd.getPixel32(k, j) < VISIBLE_PIXEL) continue;
+						if (point.x >= k) break;
+						pointsRight.push( { x:k, y:j } );
+						break;
+					}
+				}
+				
+				// Совместить массивы точек в один
+				pointsRight = pointsRight.reverse();
+				points = points.concat(pointsLeft, pointsRight);
+				
+				for (j = 0; j < points.length; j++) {
+					points[j].x = points[j].x + indentPoint.x;
+					points[j].y = points[j].y + indentPoint.y;
+				}
+				
+				for (j = 0; j < points.length; j++) {
+					while (true) {
+						if (points.length <= position + 1)
+							break;
+						
+						dist = Math.sqrt((points[position].x - points[position + 1].x) * (points[position].x - points[position + 1].x) + (points[position].y - points[position + 1].y) * (points[position].y - points[position + 1].y));
+						if (dist > distance) {
+							position ++;
+							break;
+						}
+						
+						points.splice(position + 1, 1);
+					}
+				}
+				
+				return points;
+				
+			}
+			
+			var polygons:Array = [];
+			
+			for (var i:int = 0; i < stageManager.content.length; i++) {
+				var stageInfo:StageInfo = stageManager.content[i].data.item;
+				polygons.push(getPolygon(stageInfo.bitmapData, new Point(stageInfo.x, stageInfo.y)));
+			}
+			
+			for (i = 0; polygons.length == 0 && i < animListManager.content.length; i++) {
+				var animInfo:AnimInfo = animListManager.content[i].data.item;
+				polygons.push(getPolygon(animInfo.bitmapData, new Point(animInfo.x + animInfo.indents[0].x, animInfo.y + animInfo.indents[0].y)));
+				break;
+			}
+			
+			return polygons;
+			
+		}
+		
+		
+		
+		// Mount disk
+		private var projectsAsset:Object = {"Dreams":["dream"],"Alians":["alians"],"Lumeria":["lumeria"],"Western":["western"],"Empire":["empire"],"Kingdom":["kingdom"],"Fantasy":["fantasy"],"Tribes":["tribes"]};
+		private var process:NativeProcess;
+		private function initDisk():void {
+			var file:File = new File('R:');
+			
+			if (file.exists) {
+				Compiler.remote = file;
+			}else{
+				/*var string:String = 'net use R: \\\\DLINK-BECUP\\Volume_1\\PROJECTS /PERSISTENT:YES';
+				var cmd:File = new File(File.documentsDirectory.nativePath + File.separator + 'mount.cmd');
+				var fs:FileStream = new FileStream();
+				fs.open(cmd, FileMode.WRITE);
+				fs.writeUTFBytes(string);
+				fs.close();
+				
+				process = new NativeProcess();
+				process.addEventListener(NativeProcessExitEvent.EXIT, onExit);
+				
+				var info:NativeProcessStartupInfo = new NativeProcessStartupInfo();
+				info.executable = cmd;
+				process.start(info);*/
+				
+				Compiler.nativeProcess('net use R: \\\\192.168.10.165\\Volume_1\\PROJECTS /PERSISTENT:YES', onProcessComplete, null, onProcessError)
+				
+				function onProcessComplete():void {
+					if (file.exists)
+						Compiler.remote = file;
+				}
+				function onProcessError(data:String):void {
+					setTimeout(function():void {
+						MessageView.message(data);
+					}, 2000);
+				}
+			}
+			
+			/*var loader:URLLoader = new URLLoader();
+			loader.addEventListener(Event.COMPLETE, onComplete);
+			loader.load(new URLRequest('https://dreams.islandsville.com/gfx/og_config.txt'));
+			
+			function onComplete(e:Event):void {
+				try {
+					projectsAsset = JSON.parse(e.target.data as String);
+				}catch (e:Error) { }
+				
+				loader.removeEventListener(Event.COMPLETE, onComplete);
+			}*/
+		}
+		private function copyToDisk(directory:File):void {
+			if (!Compiler.remote) return;
+			
+			var list:Array = directory.nativePath.split(File.separator);
+			var name:String;
+			for (var i:int = 0; i < list.length; i++) {
+				for (var projectName:String in projectsAsset) {
+					for each(var variant:String in projectsAsset[projectName]) {
+						if (list[i].toLowerCase().indexOf(variant) != -1) {
+							name = projectName;
+							break;
+						}
+					}
+					if (name) break;
+				}
+				if (name) break;
+			}
+			if (name) {
+				var date:Date = new Date();
+				while (date.getDay() != 4) {
+					date.setTime(date.getTime() + 86400000);
+				}
+				var file:File = new File(Compiler.remote.nativePath + File.separator + name + File.separator + date.getFullYear().toString() + Size.zero(date.getMonth() + 1, 2) + Size.zero(date.getDate(), 2) + File.separator + directory.name);
+				createDirectory(file);
+				
+				directory.copyToAsync(file, true);
+			}
+		}
+		
+		
+		
+		public var animationTypeChecked:Boolean;
+		private var __animationType:Boolean;
+		public function get animationType():Boolean {
+			if (animationTypeChecked)
+				return __animationType;
+			
+			var stagesCount:int = 0;
+			for (var i:int = 0; i < stagesList.length; i++) {
+				if (stagesList[i].extra.hidden) continue;
+				stagesCount ++;
+			}
+			if (stagesCount == 0 && animationsList.length > 1) {
+				__animationType = true;
+			}else {
+				__animationType = false;
+			}
+			
+			return __animationType;
+		}
+		public function set animationType(value:Boolean):void {
+			if (value == __animationType) return;
+			animationTypeChecked = true;
+			__animationType = value;
+		}
+		
+		
+		public function showPointWindow():void {
+			new PointWindow().show();
+		}
+		
+		
+		public function createDirectory(folder:File):Boolean {
+			try {
+				folder.createDirectory();
+			}catch(e:Error) {
+				Alert.show('Не удалось создать папку с расположением\n' + folder.nativePath + '\n' + e.toString(), appName);
+				return false;
+			}
+			
+			return true;
+		}
+		
+		
+		public static function updateProject(text:String = null, type:String = null):void {
+			var updated:Boolean;
+			
+			//if (text
+		}
+		
+		
+		
+		public static function get autoSave():Boolean {
+			return (Main.storage.actionStep && Main.storage.actionStep[7] == 1);
+		}
+		
+		
+		
+		]]>
+	</fx:Script>
+
+	<mx:UIComponent id="main" width="100%" height="100%" nativeDragEnter="onDragEnter(event)" nativeDragDrop="onDragDrop(event)" />
+	
+</s:Application>

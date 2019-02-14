@@ -46,7 +46,7 @@ package tree
 		{	
 			for (var level:Object in struct)
 			{
-				if (level == 55)
+				if (level == 95)
 					trace();
 				if ( level == 1)
 				{
@@ -65,7 +65,7 @@ package tree
 				var firstWithSon:* = getFirstWithSon(int (level) - 1);
 				if ( !firstWithSon)
 					continue;
-				item = struct [level] [firstWithSon._clildren[0]];
+				item = struct[level][firstWithSon._clildren[0]];
 				//for ( item in struct [level - 1] )
 				
 				for ( var i:int = 0; i < length; i ++ )
@@ -264,40 +264,47 @@ package tree
 			
 			for (var level:Object in struct)
 			{
-				if (level == 55)
+				if (level == 94)
 					trace();
 				var node:Node = getFirst(int (level));
 				var count:int = 0;
-				//var length:int = App.numOfProps(struct[level]);
-				//for ( var i:int = 0; i < length; i ++ )
-				//{
-					
+			
 				while (node)
 				{
-					if (node.quest.order == 259)
-						trace();
-						//break;
-					if (node._clildren[0] == 259)
-					{
-						trace();
-					}
-					if (node.ID == 258)
-					{
-						trace();
-					}
 					node.draw();
 					addChild(node);
 					node.y = (uint(level) - 1) * (node.settings.height+ 50);
 					if ( uint(level) - 1 )
 						node.x += struct[int (level) - 1][node.mparent].x + ( (node.settings.width+10) * struct[node.weight - 1][node.mparent]._clildren.indexOf(node.ID) ) + 0;
 					else
-						//node.x = i * ( 120/*node.width*/);
-						node.x = count * (node.settings.width/*node.width*/);
+						node.x = count * (node.settings.width);
 					align(node);
+					if (node.ID == 981 && !node.rightBrather)
+						node.rightBrather = 1359;
 					node = struct[level][node.rightBrather];
 					count++;
 				}
 			}
+			/*for (var level:Object in struct)
+			{
+				var count:int = 0;
+				
+				for each(var nd:* in struct[level])
+				{
+					var node:Node = nd;
+					node.draw();
+					addChild(node);
+					node.y = (uint(level) - 1) * (node.settings.height+ 50);
+					if ( uint(level) - 1 )
+						node.x += struct[int (level) - 1][node.mparent].x + ( (node.settings.width+10) * struct[node.weight - 1][node.mparent]._clildren.indexOf(node.ID) ) + 0;
+					else
+						node.x = count * (node.settings.width + 8);
+					align(node);
+					node = struct[level][node.rightBrather];
+					count++;
+				}
+			}*/
+			
 			alignParent();
 			drawAllLinks();
 		}
@@ -366,7 +373,8 @@ package tree
 					length = App.numOfProps(struct[level]);
 					for ( i = 0; i < length; i ++ )
 					{
-						
+						if (node.ID == 1393)
+							trace();
 						if (!node)
 							break;
 						if ( node.quest.title.search (find) != -1)
